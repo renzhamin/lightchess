@@ -1,6 +1,7 @@
 import Users from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import sendMail from "../modules/SendEmail.js";
 
 export const getUsers = async (req, res) => {
     try {
@@ -20,6 +21,15 @@ export const Register = async (req, res) => {
     const salt = await bcrypt.genSalt();
     const hashPassword = await bcrypt.hash(password, salt);
     try {
+        const user = await Users.findOne({
+            where : {
+                email : email
+            }
+        })
+        if(user){
+            return res.status(400).json({msg:"Email already exits"})
+        } 
+
         await Users.create({
             name: name,
             email: email,
@@ -37,14 +47,16 @@ export const getPasswordResetLink = async (req, res) => {
             where: {
                 email: req.body.email
             }
-        });
+        }).catch((err)=>{
+            res.json({msg: "Email not found"})
+            console.log(err)
+        })
 
         const userID = user.id;
         const name = user.name;
         const email = user.email;
         const password = user.password;
         const secret = password;
-
 
         const accessToken = jwt.sign({userID, name, email}, secret, {
             expiresIn: '5m'
@@ -53,11 +65,15 @@ export const getPasswordResetLink = async (req, res) => {
 
         const url = req.protocol + "://" + req.get('host') + req.originalUrl
 
-        res.send(`<a href=${url}/${userID}/${accessToken}>Reset Password</a>`)
-        console.log(req.originalUrl)
+        const resetLink = `<a target='_blank' href='${url}/${userID}/${accessToken}'>Password Reset Link</a>`
+        sendMail(email, "Reset Password for Lightchess", resetLink)
+            .catch((err)=>{
+                console.log("EMAIL PROBLEM")
+            })
+        res.json({msg:"Email sent"})
 
     } catch (error) {
-        res.status(400).json({msg: "Email not found"});
+        res.status(400).json({msg: "Failed to send email"});
     }
 }
 

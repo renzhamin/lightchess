@@ -2,8 +2,8 @@ import nodemailer from "nodemailer";
 import * as dotenv from 'dotenv';
 dotenv.config({path: process.cwd() + "/../.env"});
 
-const sendMail = (receiverEmail, subject, body) => {
-    var transporter = nodemailer.createTransport({
+const sendMail = async (receiverEmail, subject, body) => {
+    const transporter = nodemailer.createTransport({
         service: 'gmail',
         auth: {
             user: process.env.lightchessEmail,
@@ -11,11 +11,11 @@ const sendMail = (receiverEmail, subject, body) => {
         }
     });
 
-    var mailOptions = {
+    const mailOptions = {
         from: process.env.lightchessEmail,
         to: receiverEmail,
         subject: subject,
-        text: body
+        html: body
     };
 
     transporter.sendMail(mailOptions, function (error, info) {
