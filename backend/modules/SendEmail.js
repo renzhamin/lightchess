@@ -1,6 +1,6 @@
-const nodemailer = require('nodemailer');
-require('dotenv').config({path: __dirname + "/../.env"});
-console.log(process.env);
+import nodemailer from "nodemailer";
+import * as dotenv from 'dotenv';
+dotenv.config({path: process.cwd() + "/../.env"});
 
 const sendMail = (receiverEmail, subject, body) => {
     var transporter = nodemailer.createTransport({
@@ -27,4 +27,4 @@ const sendMail = (receiverEmail, subject, body) => {
     });
 }
 
-module.exports = {sendMail};
+export default sendMail;
