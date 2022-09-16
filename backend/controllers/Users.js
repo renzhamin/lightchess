@@ -2,6 +2,10 @@ import Users from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sendMail from "../modules/SendEmail.js";
+import {validate as validateEmail} from "deep-email-validator";
+import dotenv from 'dotenv'
+import PasswordValidator from "password-validator";
+dotenv.config();
 
 export const getUsers = async (req, res) => {
     try {
@@ -14,20 +18,49 @@ export const getUsers = async (req, res) => {
     }
 }
 
-export const Register = async (req, res, next) => {
-    const {name, email, password, confPassword} = req.body;
+export const validateRegistrationData = async(req, res, next) => {
+
+    if(process.env.DEBUG_MODE === "1"){
+        next()
+    }
+
+    const {email, password, confPassword} = req.body;
+
     if (!email || !password) return res.status(400).json({msg: "Provide credentials"})
     if (password !== confPassword) return res.status(400).json({msg: "Passwords don't match"});
-    try {
-        const user = await Users.findOne({
-            where : {
-                email : email
-            }
-        })
-        if(user){
-            return res.status(400).json({msg:"Email already exits"})
-        } 
 
+    const schema = new PasswordValidator()
+    schema.is().min(8).max(30).has().uppercase().has().lowercase().has().digits()
+    
+    if(schema.validate(password)==false){
+        return res.json(schema.validate(password, {details:true}))
+    }
+
+    const user = await Users.findOne({
+        where : {
+            email : email
+        }
+    }).catch((err) => {
+        console.log(err)
+        return res.json({msg : "Internal error"})
+    })
+
+    if(user){
+        return res.status(400).json({msg:"Email already exits"})
+    } 
+
+    const validity = await validateEmail(email)
+
+    if(validity.valid==false){
+        return res.json({msg : "Invalid Email"})
+    }
+
+    next()
+}
+
+export const Register = async (req, res, next) => {
+    const {name, email, password } = req.body;
+    try {
         const salt = await bcrypt.genSalt();
         const hashPassword = await bcrypt.hash(password, salt);
 
@@ -36,7 +69,7 @@ export const Register = async (req, res, next) => {
             email: email,
             password: hashPassword
         });
-//         res.json({msg: "Register Successfull"});
+        //         res.json({msg: "Register Successfull"});
         req.user = createdUser
         next()
 
@@ -147,10 +180,10 @@ export const verifyEmail = async (req,res) => {
     try {
         await Users.update({ role : 1 }, { where: { id : req.params.userID } })
         res.json({msg : "Email verification successful"})
-   } catch (error) {
-       res.json({msg: "couldnt verify email"})
-       console.log(error)
-   } 
+    } catch (error) {
+        res.json({msg: "couldnt verify email"})
+        console.log(error)
+    } 
 }
 
 

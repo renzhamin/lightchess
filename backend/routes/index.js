@@ -1,5 +1,5 @@
 import express from "express";
-import { getUsers, Register, Login, Logout, resetPassword, getPasswordResetLink, getPasswordResetPage, getEmailVerificationLink, verifyEmail } from "../controllers/Users.js";
+import { getUsers, Register, Login, Logout, resetPassword, getPasswordResetLink, getPasswordResetPage, getEmailVerificationLink, verifyEmail, validateRegistrationData } from "../controllers/Users.js";
 import { verifySpecialAccessToken, verifyToken } from "../middleware/VerifyToken.js";
 import { refreshToken } from "../controllers/RefreshToken.js";
 import bodyParser from "body-parser";
@@ -7,7 +7,7 @@ import bodyParser from "body-parser";
 const router = express.Router();
 
 router.get('/users', verifyToken, getUsers);
-router.post('/register', Register, getEmailVerificationLink);
+router.post('/register', validateRegistrationData, Register, getEmailVerificationLink);
 router.get('/register/:userID/:token', bodyParser.urlencoded({extended:false}),verifySpecialAccessToken, verifyEmail)
 router.post('/login', Login);
 router.get('/token', refreshToken);
