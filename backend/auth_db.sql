@@ -35,7 +35,8 @@ CREATE TABLE `users` (
   `password` varchar(255) DEFAULT NULL,
   `refresh_token` text DEFAULT NULL,
   `createdAt` datetime NOT NULL,
-  `updatedAt` datetime NOT NULL
+  `updatedAt` datetime NOT NULL,
+`role` int NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=latin1;
 
 --

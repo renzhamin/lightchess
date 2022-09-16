@@ -14,12 +14,10 @@ export const getUsers = async (req, res) => {
     }
 }
 
-export const Register = async (req, res) => {
+export const Register = async (req, res, next) => {
     const {name, email, password, confPassword} = req.body;
     if (!email || !password) return res.status(400).json({msg: "Provide credentials"})
     if (password !== confPassword) return res.status(400).json({msg: "Passwords don't match"});
-    const salt = await bcrypt.genSalt();
-    const hashPassword = await bcrypt.hash(password, salt);
     try {
         const user = await Users.findOne({
             where : {
@@ -30,16 +28,54 @@ export const Register = async (req, res) => {
             return res.status(400).json({msg:"Email already exits"})
         } 
 
-        await Users.create({
+        const salt = await bcrypt.genSalt();
+        const hashPassword = await bcrypt.hash(password, salt);
+
+        const createdUser = await Users.create({
             name: name,
             email: email,
             password: hashPassword
         });
-        res.json({msg: "Register Successfull"});
+//         res.json({msg: "Register Successfull"});
+        req.user = createdUser
+        next()
+
     } catch (error) {
         console.log(error);
     }
 }
+
+
+export const getEmailVerificationLink = async (req, res) => {
+    try {
+        const userID = req.user.id;
+        const name = req.user.name;
+        const email = req.user.email;
+        const password = req.user.password;
+        const secret = password;
+
+        console.log(name, email, password)
+
+        const accessToken = jwt.sign({userID, name, email}, secret, {
+            expiresIn: '30d'
+        });
+
+
+        const url = req.protocol + "://" + req.get('host') + req.originalUrl
+
+        const verificationLink = `<a target='_blank' href='${url}/${userID}/${accessToken}'>Verify your email</a>`
+        await sendMail(email, "Lightchess account verification", verificationLink)
+            .catch((err)=>{
+                res.json({msg : "Invalid Email"})
+                console.log(err)
+            })
+        res.json({msg:"Register successful, please verify your email before login"})
+
+    } catch (error) {
+        res.status(400).json({msg: "Register failed"});
+    }
+}
+
 
 export const getPasswordResetLink = async (req, res) => {
     try {
@@ -79,9 +115,9 @@ export const getPasswordResetLink = async (req, res) => {
 
 export const getPasswordResetPage = (req, res) => {
 
-    const {userID, passwordResetToken} = req.params
+    const {userID, token} = req.params
 
-    res.send(`<form action="/resetpassword/${userID}/${passwordResetToken}" method="POST">
+    res.send(`<form action="/resetpassword/${userID}/${token}" method="POST">
         <input type="password" name="password" value="" placeholder="Enter your new password..." /> 
         <input type="submit" value="Reset Password" />
     </form>`);
@@ -107,6 +143,16 @@ export const resetPassword = async (req, res) => {
     }
 }
 
+export const verifyEmail = async (req,res) => {
+    try {
+        await Users.update({ role : 1 }, { where: { id : req.params.userID } })
+        res.json({msg : "Email verification successful"})
+   } catch (error) {
+       res.json({msg: "couldnt verify email"})
+       console.log(error)
+   } 
+}
+
 
 export const Login = async (req, res) => {
     try {
@@ -120,7 +166,10 @@ export const Login = async (req, res) => {
         }
 
         const match = await bcrypt.compare(req.body.password, user.password);
-        if (!match) return res.status(400).json({msg: "Wrong Password"});
+        if (!match) 
+            return res.status(400).json({msg: "Wrong Password"});
+        if (parseInt(user.role) < 1) 
+            return res.status(400).json({ msg:"Email not verified"})
         const userID = user.id;
         const name = user.name;
         const email = user.email;

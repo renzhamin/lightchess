@@ -12,10 +12,10 @@ export const verifyToken = (req, res, next) => {
     })
 }
 
-export const verifyPasswordResetToken = async (req, res, next) =>{
+export const verifySpecialAccessToken = async (req, res, next) =>{
     try {
 
-        const { userID, passwordResetToken } = req.params
+        const { userID, token } = req.params
 
         const user = await Users.findOne({
             where : {
@@ -25,7 +25,7 @@ export const verifyPasswordResetToken = async (req, res, next) =>{
         
         const secret = user.password;
 
-        jwt.verify(passwordResetToken, secret, (err, decoded) => {
+        jwt.verify(token, secret, (err, decoded) => {
             if(err) return res.status(404).json({ msg : "Invalid token"});
             req.email = decoded.email;
             req.userID = userID;

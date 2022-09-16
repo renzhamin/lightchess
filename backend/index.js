@@ -14,6 +14,7 @@ try {
     console.error(error);
 }
 
+
 app.use(cors({ credentials:true, origin: true }));
 app.use(cookieParser());
 app.use(express.json());
