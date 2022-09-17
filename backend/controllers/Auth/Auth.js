@@ -3,7 +3,11 @@ import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import sendMail from "../../modules/SendEmail.js";
 import dotenv from 'dotenv'
+import Sequelize from "sequelize";
 dotenv.config();
+
+const { Op } = Sequelize
+
 
 export const getUsers = async (req, res) => {
     try {
@@ -64,11 +68,25 @@ export const getPasswordResetPage = (req, res) => {
 
 export const Login = async (req, res) => {
     try {
+        const email = req.body.email || ""
+        const username = req.body.username || ""
+
         const user = await Users.findOne({
             where: {
-                email: req.body.email
+                [Op.or] : [
+                    { email : email },
+                    { username : email },
+                    { username : username }
+                ]
             }
+        }).catch((err)=>{
+            console.log(err)
+            return res.json({msg : "Internal Error"})
         });
+
+        if(!user){
+            return res.status(400).json({ msg:"User doesn't exist" })
+        }
         if (!req.body.password) {
             return res.status(400).json({msg: "Password field empty"});
         }
@@ -80,7 +98,6 @@ export const Login = async (req, res) => {
             return res.status(400).json({ msg:"Email not verified"})
         const userID = user.id;
         const name = user.name;
-        const email = user.email;
         const accessToken = jwt.sign({userID, name, email}, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: '20s'
         });
@@ -98,7 +115,7 @@ export const Login = async (req, res) => {
         });
         res.json({accessToken});
     } catch (error) {
-        res.status(404).json({msg: "Email not found"});
+        res.status(404).json({msg: "Internal Error"});
     }
 }
 

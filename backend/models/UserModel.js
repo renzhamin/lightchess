@@ -7,6 +7,9 @@ const Users = db.define('users',{
     name:{
         type: DataTypes.STRING
     },
+    username :{
+        type : DataTypes.STRING
+    },
     email:{
         type: DataTypes.STRING
     },

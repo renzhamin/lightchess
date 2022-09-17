@@ -10,12 +10,14 @@ export const validateRegistrationData = async (req, res, next) => {
         next();
     }
 
-    const {email, password, confPassword} = req.body;
+    const {email, username, password, confPassword} = req.body;
 
     if (!email || !password)
         return res.status(400).json({msg: "Provide credentials"});
     if (password !== confPassword)
         return res.status(400).json({msg: "Passwords don't match"});
+    if(!username)
+        return res.status(400).json({msg : "Provide username"})
 
     const schema = new PasswordValidator();
     schema.is().min(8).max(30).has().uppercase().has().lowercase().has().digits();
@@ -24,7 +26,7 @@ export const validateRegistrationData = async (req, res, next) => {
         return res.json(schema.validate(password, {details: true}));
     }
 
-    const user = await Users.findOne({
+    let user = await Users.findOne({
         where: {
             email: email
         }
@@ -37,6 +39,16 @@ export const validateRegistrationData = async (req, res, next) => {
         return res.status(400).json({msg: "Email already exits"});
     }
 
+    user = null
+    user = await Users.findOne({
+        where : {
+            username : username
+        }
+    })
+    
+    if(user)
+        return res.status(400).json({msg : "Username already exists"})
+
     const validity = await validateEmail(email);
 
     if (validity.valid == false) {
@@ -47,17 +59,16 @@ export const validateRegistrationData = async (req, res, next) => {
 };
 
 export const createUser = async (req, res, next) => {
-    const {name, email, password} = req.body;
+    const {name, username, email, password} = req.body;
     try {
         const salt = await bcrypt.genSalt();
         const hashPassword = await bcrypt.hash(password, salt);
-
         const createdUser = await Users.create({
             name: name,
+            username : username,
             email: email,
             password: hashPassword
         });
-        //         res.json({msg: "Register Successfull"});
         req.user = createdUser;
         next();
 
