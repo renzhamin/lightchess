@@ -12,7 +12,7 @@ const Login = () => {
         e.preventDefault();
         try {
             await axios.post('http://localhost:5000/login', {
-                email: email,
+                username: email,
                 password: password
             });
             history.push("/dashboard");

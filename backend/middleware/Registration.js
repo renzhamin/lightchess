@@ -2,22 +2,70 @@ import Users from "../models/UserModel.js";
 import bcrypt from "bcrypt";
 import {validate as validateEmail} from "deep-email-validator";
 import PasswordValidator from "password-validator";
+import { Sequelize } from "sequelize";
+import dotenv from 'dotenv'
+const { Op } = Sequelize
 
+dotenv.config()
 
 export const validateRegistrationData = async (req, res, next) => {
 
-    if (process.env.DEBUG_MODE === "1") {
-        next();
-    }
-
     const {email, username, password, confPassword} = req.body;
 
-    if (!email || !password)
-        return res.status(400).json({msg: "Provide credentials"});
-    if (password !== confPassword)
-        return res.status(400).json({msg: "Passwords don't match"});
     if(!username)
         return res.status(400).json({msg : "Provide username"})
+
+    if(!email)
+        return res.status(400).json({msg : "Provide email"})
+
+    if (!password)
+        return res.status(400).json({msg: "Provide password"});
+
+
+
+    let user = await Users.findOne({
+        where: {
+            [Op.or] : [
+                { username : username },
+                { email : username }
+            ]
+        }
+    }).catch((err)=>{
+        console.log(err)
+        console.log("Error quering if username already exists")
+        return res.json({msg : "Internal Error"})
+    });
+
+    if(user)
+        return res.status(400).json({msg : "username already in use"})
+
+    user = null;
+    user = await Users.findOne({
+        where: {
+            [Op.or] : [
+                { username : email },
+                { email : email }
+            ]
+        }
+    }).catch((err)=>{
+        console.log(err)
+        console.log("Error quering if email already exists")
+        return res.json({msg : "Internal Error"})
+    });
+
+    if (user) {
+        return res.status(400).json({msg: "email already in use"});
+    }
+
+
+
+    if (process.env.DEBUG_MODE == "1") {
+        return next();
+    }
+
+
+    if (password !== confPassword)
+        return res.status(400).json({msg: "Passwords don't match"});
 
     const schema = new PasswordValidator();
     schema.is().min(8).max(30).has().uppercase().has().lowercase().has().digits();
@@ -26,28 +74,6 @@ export const validateRegistrationData = async (req, res, next) => {
         return res.json(schema.validate(password, {details: true}));
     }
 
-    let user = await Users.findOne({
-        where: {
-            email: email
-        }
-    }).catch((err) => {
-        console.log(err);
-        return res.json({msg: "Internal error"});
-    });
-
-    if (user) {
-        return res.status(400).json({msg: "Email already exits"});
-    }
-
-    user = null
-    user = await Users.findOne({
-        where : {
-            username : username
-        }
-    })
-    
-    if(user)
-        return res.status(400).json({msg : "Username already exists"})
 
     const validity = await validateEmail(email);
 
@@ -68,6 +94,9 @@ export const createUser = async (req, res, next) => {
             username : username,
             email: email,
             password: hashPassword
+        }).catch((err)=>{
+            console.log(err, "Failed to create user")
+            return res.json({msg : "Error creating user"})
         });
         req.user = createdUser;
         next();
