@@ -94,8 +94,11 @@ export const Login = async (req, res) => {
         const match = await bcrypt.compare(req.body.password, user.password);
         if (!match) 
             return res.status(400).json({msg: "Wrong Password"});
-        if (parseInt(user.role) < 1) 
-            return res.status(400).json({ msg:"Email not verified"})
+
+        if(process.env.DEBUG_MODE != "1"){
+            if (parseInt(user.role) < 1) 
+                return res.status(400).json({ msg:"Email not verified"})
+        }
         const userID = user.id;
         const name = user.name;
         const accessToken = jwt.sign({userID, name, email}, process.env.ACCESS_TOKEN_SECRET, {

@@ -18,7 +18,8 @@ const sendMail = async (receiverEmail, subject, body) => {
         html: body
     };
 
-    transporter.sendMail(mailOptions, function (error, info) {
+
+    transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
             console.log(error);
         } else {
