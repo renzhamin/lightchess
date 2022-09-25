@@ -1,10 +1,9 @@
-import Users from "../models/UserModel.js";
+import Users from "../models/UserModel";
 import bcrypt from "bcrypt";
 import {validate as validateEmail} from "deep-email-validator";
 import PasswordValidator from "password-validator";
-import { Sequelize } from "sequelize";
+import { Sequelize, Op } from "sequelize";
 import dotenv from 'dotenv'
-const { Op } = Sequelize
 
 dotenv.config()
 
@@ -103,4 +102,3 @@ export const createUser = async (req, res, next) => {
         console.log(error);
     }
 };
-

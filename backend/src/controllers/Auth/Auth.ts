@@ -1,7 +1,7 @@
-import Users from "../../models/UserModel.js";
+import Users from "../../models/UserModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import sendMail from "../../modules/SendEmail.js";
+import sendMail from "../../modules/SendEmail";
 import dotenv from 'dotenv'
 import Sequelize from "sequelize";
 dotenv.config();

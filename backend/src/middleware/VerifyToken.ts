@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import Users from "../models/UserModel.js";
+import Users from "../models/UserModel";
 
 export const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
@@ -26,14 +26,14 @@ export const verifySpecialAccessToken = async (req, res, next) =>{
         const secret = user.password;
 
         jwt.verify(token, secret, (err, decoded) => {
-            if(err) return res.status(404).json({ msg : "Invalid token"});
+            if(err) return res.status(404).json({ msg : "Invalid token found"});
             req.email = decoded.email;
             req.userID = userID;
             next();
         })
 
     } catch ( error ){
-        res.status(404).json({msg : "Invalid token"})
+        res.status(404).json({msg : "Invalid token, no id"})
     }
 
 }

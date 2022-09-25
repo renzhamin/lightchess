@@ -1,11 +1,11 @@
 import jwt from "jsonwebtoken";
-import sendMail from "../modules/SendEmail.js";
+import sendMail from "../modules/SendEmail";
 import dotenv from "dotenv"
 
 dotenv.config()
 
 
-export const completeRegistration = async (req, res) => {
+export const sendEmailVerificationLink = async (req, res) => {
     const userID = req.user.id;
     const name = req.user.name;
     const email = req.user.email;
