@@ -1,18 +1,17 @@
 import jwt from "jsonwebtoken";
 import Users from "../models/UserModel";
-import dotenv from 'dotenv'
+import {verifyAccessToken} from "../modules/Tokens";
 
-dotenv.config()
 
 export const verifyToken = (req, res, next) => {
     const authHeader = req.headers['authorization'];
     const token = authHeader && authHeader.split(' ')[1];
     if(token == null) return res.sendStatus(401);
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-        if(err) return res.sendStatus(403);
-        req.email = decoded.email;
-        next();
-    })
+    const user = verifyAccessToken(token)
+    if(!user) return res.status(401).json({msg:"Invalid token"})
+
+    req.user = user
+    return next()
 }
 
 export const verifySpecialAccessToken = async (req, res, next) =>{

@@ -3,9 +3,7 @@ import bcrypt from "bcrypt";
 import {validate as validateEmail} from "deep-email-validator";
 import PasswordValidator from "password-validator";
 import { Sequelize, Op } from "sequelize";
-import dotenv from 'dotenv'
 
-dotenv.config()
 
 export const validateRegistrationData = async (req, res, next) => {
 
@@ -68,7 +66,7 @@ export const validateRegistrationData = async (req, res, next) => {
     schema.is().min(8).max(30).has().uppercase().has().lowercase().has().digits();
 
     if (schema.validate(password) == false) {
-        return res.json(schema.validate(password, {details: true}));
+        return res.status(400).json(schema.validate(password, {details: true}));
     }
 
 

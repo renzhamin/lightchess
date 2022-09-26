@@ -1,8 +1,5 @@
 import jwt from "jsonwebtoken";
 import sendMail from "../modules/SendEmail";
-import dotenv from "dotenv"
-
-dotenv.config()
 
 
 export const sendEmailVerificationLink = async (req, res) => {
