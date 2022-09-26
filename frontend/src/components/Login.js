@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import axios from 'axios';
-import { useHistory } from 'react-router-dom';
+import {  useHistory } from 'react-router-dom';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -22,6 +22,7 @@ const Login = () => {
             }
         }
     }
+
 
     return (
         <section className="hero has-background-grey-light is-fullheight is-fullwidth">
@@ -47,6 +48,7 @@ const Login = () => {
                                     <button className="button is-success is-fullwidth">Login</button>
                                 </div>
                             </form>
+                            <a href="http://localhost:5000/login/federated/google">Sign in With Google</a>
                         </div>
                     </div>
                 </div>
