@@ -86,36 +86,6 @@ async (accessToken, refreshToken, profile, cb) => {
 
 let router_google = express.Router();
 
-/* GET /login
- *
- * This route prompts the user to log in.
- *
- * The 'login' view renders an HTML page, which contain a button prompting the
- * user to sign in with Google.  When the user clicks this button, a request
- * will be sent to the `GET /login/federated/accounts.google.com` route.
- */
-// router_google.get('/login', function(req, res, next) {
-//     res.render('login');
-// });
-
-/* GET /login/federated/accounts.google.com
- *
- * This route redirects the user to Google, where they will authenticate.
- *
- * Signing in with Google is implemented using OAuth 2.0.  This route initiates
- * an OAuth 2.0 flow by redirecting the user to Google's identity server at
- * 'https://accounts.google.com'.  Once there, Google will authenticate the user
- * and obtain their consent to release identity information to this app.
- *
- * Once Google has completed their interaction with the user, the user will be
- * redirected back to the app at `GET /oauth2/redirect/accounts.google.com`.
- */
-router_google.get('/login/federated/google', passport.authenticate('google'), 
-    function (req,res) {
-        res.json({msg:"Hello"})
-    }
-);
-
 /*
    This route completes the authentication sequence when Google redirects the
    user back to the application.  When a new user signs in, a user account is
@@ -139,16 +109,6 @@ router_google.get('/oauth2/redirect/google', passport.authenticate('google', {
         return res.redirect("http://localhost:3000/dashboard")
 });
 
-/* POST /logout
- *
- * This route logs the user out.
- */
-// router_google.post('/logout', function(req, res, next) {
-//     req.logout(function(err) {
-//         if (err) { return next(err); }
-//         res.redirect('/');
-//     });
-// });
 
-// module.exports = router_google;
+
 export default router_google

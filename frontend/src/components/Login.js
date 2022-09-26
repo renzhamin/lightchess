@@ -11,7 +11,7 @@ const Login = () => {
     const Auth = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:5000/login', {
+            await axios.post('http://localhost:5000/api/login', {
                 username: email,
                 password: password
             });
@@ -48,7 +48,7 @@ const Login = () => {
                                     <button className="button is-success is-fullwidth">Login</button>
                                 </div>
                             </form>
-                            <a href="http://localhost:5000/login/federated/google">Sign in With Google</a>
+                            <a href="http://localhost:5000/api/login/federated/google">Sign in With Google</a>
                         </div>
                     </div>
                 </div>

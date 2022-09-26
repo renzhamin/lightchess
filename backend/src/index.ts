@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import cors from "cors";
 import db from "./config/Database";
 import router from "./routes/index";
-import session from "express-session";
 import passport from 'passport';
 
 
