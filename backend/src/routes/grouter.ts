@@ -5,8 +5,11 @@ import GoogleStrategy from 'passport-google-oidc'
 import db from '../config/Database'
 import FUsers from '../models/FederatedUserModel'
 import Users from '../models/UserModel'
-import {type} from "os";
+import jwt from 'jsonwebtoken'
+import dotenv from 'dotenv'
+import {getAccessTokenFromUserDetails, getRefreshToken} from "../modules/Tokens";
 
+dotenv.config()
 // Configure the Google strategy for use by Passport.
 //
 // OAuth 2.0-based strategies require a `verify` function which receives the
@@ -23,7 +26,7 @@ passport.use(new GoogleStrategy({
 
 // verify function 
 async (issuer, profile, cb) => {
-
+    console.log("GOT HERE")
     let fuser = await FUsers.findOne({
         where : {
             provider : issuer,
@@ -107,7 +110,12 @@ let grouter = express.Router();
  * Once Google has completed their interaction with the user, the user will be
  * redirected back to the app at `GET /oauth2/redirect/accounts.google.com`.
  */
-grouter.get('/login/federated/google', passport.authenticate('google'));
+grouter.get('/login/federated/google', passport.authenticate('google'), 
+    function (req,res) {
+        console.log("GOT FROM PASSPORT", req.user);
+        res.json({msg:"Hello"})
+    }
+);
 
 /*
    This route completes the authentication sequence when Google redirects the
@@ -116,9 +124,23 @@ grouter.get('/login/federated/google', passport.authenticate('google'));
    user returns, they are signed in to their linked account.
    */
 grouter.get('/oauth2/redirect/google', passport.authenticate('google', {
-    successReturnToOrRedirect: '/',
-    failureRedirect: '/login'
-}));
+    failureRedirect: 'http://localhost:3000',
+    session : false
+}), async function (req,res) {
+
+        const { id,name,email } = req.user
+
+        console.log(id,name,email)
+
+        const refreshToken = getRefreshToken({id,name,email})
+
+        res.cookie('refreshToken', refreshToken, {
+            httpOnly: true,
+            maxAge: 24 * 60 * 60 * 30 * 1000
+        });
+
+        return res.redirect("http://localhost:3000/dashboard")
+});
 
 /* POST /logout
  *

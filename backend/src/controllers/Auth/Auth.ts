@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import sendMail from "../../modules/SendEmail";
 import dotenv from 'dotenv'
 import Sequelize from "sequelize";
+import {getAccessTokenFromUserDetails, getRefreshToken, verifyAccessToken, verifyRefreshToken} from "../../modules/Tokens";
 dotenv.config();
 
 const { Op } = Sequelize
@@ -14,7 +15,7 @@ export const getUsers = async (req, res) => {
         const users = await Users.findAll({
             attributes: ['id', 'name', 'email']
         });
-        res.json(users);
+        return res.json(users);
     } catch (error) {
         console.log(error);
     }
@@ -97,24 +98,13 @@ export const Login = async (req, res) => {
         const { id,name } = user
         email = user.email
 
-        const accessToken = jwt.sign({id, name, email}, process.env.ACCESS_TOKEN_SECRET, {
-            expiresIn: '20s'
-        });
-        const refreshToken = jwt.sign({id, name, email}, process.env.REFRESH_TOKEN_SECRET, {
-            expiresIn: '1d'
-        });
+
+        const accessToken = getAccessTokenFromUserDetails({id,name,email})
+        const refreshToken = getRefreshToken({id,name,email})
 
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 1000
-        });
-
-        await Users.update({refresh_token: refreshToken}, {
-            where: {
-                id: id
-            }
-        }).catch((err)=>{
-            return res.json({msg:"Error updating token"})
+            maxAge: 24 * 60 * 60 * 30 * 1000
         });
 
         return res.json({accessToken});

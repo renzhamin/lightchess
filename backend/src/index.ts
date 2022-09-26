@@ -23,9 +23,16 @@ const app = express();
 })()
 
 
-app.use(cors({ credentials:true, origin: true }));
+// app.use(cors({ credentials:true, origin: true }));
+// app.use(cors());
+app.use(cors({
+    origin : true,
+    credentials : true
+}))
 app.use(cookieParser());
 app.use(express.json());
+app.use(passport.initialize())
+// app.use(passport.session())
 app.use(session({
   secret: 'keyboard cat',
   resave: false, // don't save session if unmodified

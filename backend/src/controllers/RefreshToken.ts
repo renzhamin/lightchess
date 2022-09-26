@@ -11,5 +11,5 @@ export const refreshToken = async (req, res) => {
     if(accessToken)
         return res.json({accessToken})
 
-    return res.status(404).json({msg:"Invalid token"})
+    return res.status(401).json({msg:"Invalid token"})
 }
