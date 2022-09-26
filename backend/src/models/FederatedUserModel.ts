@@ -2,7 +2,7 @@ import { Sequelize,DataTypes, Model, InferAttributes, InferCreationAttributes, C
 import db from "../config/Database";
 
 
-class FUser extends Model<InferAttributes<FUser>, InferCreationAttributes<FUser>> {
+class FUsers extends Model<InferAttributes<FUsers>, InferCreationAttributes<FUsers>> {
     declare id : CreationOptional<number>
     declare provider : string
     declare subject : string
@@ -11,7 +11,7 @@ class FUser extends Model<InferAttributes<FUser>, InferCreationAttributes<FUser>
 }
 
 
-FUser.init(
+FUsers.init(
     {
         id : {
             type : DataTypes.INTEGER.UNSIGNED,
@@ -32,7 +32,5 @@ FUser.init(
     }
 )
 
-FUser.sync()
 
-
-export default FUser;
+export default FUsers;

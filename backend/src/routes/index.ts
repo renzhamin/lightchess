@@ -1,5 +1,5 @@
 import express from "express";
-import { getUsers, Login, Logout, getPasswordResetLink, getPasswordResetPage } from "../controllers/Auth/Auth";
+import { getUsers, Login, Logout, getPasswordResetLink, getPasswordResetPage, sendToken } from "../controllers/Auth/Auth";
 import {resetPassword, verifyEmail} from "../controllers/Auth/Updates";
 import {sendEmailVerificationLink} from "../controllers/EmailVerification";
 import {createUser, validateRegistrationData} from "../middleware/Registration";

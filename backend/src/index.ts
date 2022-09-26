@@ -6,6 +6,7 @@ import db from "./config/Database";
 import router from "./routes/index";
 import grouter from './routes/grouter'
 import session from "express-session";
+import passport from 'passport';
 
 
 dotenv.config();
@@ -30,7 +31,8 @@ app.use(session({
   resave: false, // don't save session if unmodified
   saveUninitialized: false // don't create session until something stored
 }));
+passport.authenticate('session')
 app.use(router);
 app.use(grouter)
 
-app.listen(3000, ()=> console.log('Server running at port 5000'));
+app.listen(5000, ()=> console.log('Server running at port 5000'));

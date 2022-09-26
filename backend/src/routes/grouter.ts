@@ -1,10 +1,11 @@
 import {Sequelize} from "sequelize-typescript";
 import express from "express";
-import passport from "passport";
+import passport, {use} from "passport";
 import GoogleStrategy from 'passport-google-oidc'
 import db from '../config/Database'
-import FUser from '../models/FederatedUserModel'
-import User from '../models/UserModel'
+import FUsers from '../models/FederatedUserModel'
+import Users from '../models/UserModel'
+import {type} from "os";
 
 // Configure the Google strategy for use by Passport.
 //
@@ -23,46 +24,37 @@ passport.use(new GoogleStrategy({
 // verify function 
 async (issuer, profile, cb) => {
 
-    let fuser = await FUser.findOne({
+    let fuser = await FUsers.findOne({
         where : {
             provider : issuer,
             subject : profile.id
         }
     })
-    
-    let user : User
 
     if(fuser){
-        let existing_user = await User.findOne({
+        let existing_user = await Users.findOne({
             where : {
-                id : user.id
+                id : fuser.id
             }
-        }).catch((err)=>{
-            return cb(null, false)
         })
+
+        if(!existing_user) 
+            return cb(null, false, {msg:"Database config mismatch"})
 
         return cb(null, existing_user)
     }
 
-    user = await User.create({
-        where : {
-            name : profile.displayName,
-            email : profile.emails[0],
-            role  : 1
-        }
-    }).catch((err)=>{
-        return cb(null, false)
-    })
+    let user = await Users.create({
+        name : profile.displayName,
+        email : profile.emails[0].value
+    }).catch(err=>{ return cb(err,false) })
 
-    fuser = await FUser.create({
-        where : {
-            id : user.id,
-            provider : issuer,
-            subject : profile.id
-        }
-    }).catch((err)=>{ 
-        return cb(null, false)
-    })
+
+    await FUsers.create({
+        id : user.id,
+        provider : issuer,
+        subject : profile.id
+    }).catch(err=>{ return cb(err,false) })
 
     return cb(null, user)
 }));
@@ -76,9 +68,9 @@ async (issuer, profile, cb) => {
 // from the database when deserializing.  However, due to the fact that this
 // example does not have a database, the complete Facebook profile is serialized
 // and deserialized.
-passport.serializeUser(function(user : User, cb) {
+passport.serializeUser(function(user : Users, cb) {
     process.nextTick(function() {
-        cb(null, { id: user.id, username: user.username, name: user.name });
+        cb(null, { id: user.id, email: user.email, name: user.name });
     });
 });
 

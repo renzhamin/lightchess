@@ -22,33 +22,27 @@ export const getUsers = async (req, res) => {
 
 export const getPasswordResetLink = async (req, res) => {
     try {
-        const user = await Users.findOne({
+        const user : Users = await Users.findOne({
             where: {
                 email: req.body.email
             }
-        }).catch((err)=>{
-            res.json({msg: "Email not found"})
-            console.log(err)
         })
 
-        const userID = user.id;
-        const name = user.name;
-        const email = user.email;
-        const password = user.password;
-        const secret = password;
+        if(!user)
+            return res.json({msg: "Email not found"})
 
-        const accessToken = jwt.sign({userID, name, email}, secret, {
+        const {id, name, email} = user;
+        const secret = user.password;
+
+        const accessToken = jwt.sign({id, name, email}, secret, {
             expiresIn: '5m'
         });
 
 
         const url = req.protocol + "://" + req.get('host') + req.originalUrl
 
-        const resetLink = `<a target='_blank' href='${url}/${userID}/${accessToken}'>Password Reset Link</a>`
+        const resetLink = `<a target='_blank' href='${url}/${id}/${accessToken}'>Password Reset Link</a>`
         sendMail(email, "Reset Password for Lightchess", resetLink)
-            .catch((err)=>{
-                console.log("EMAIL PROBLEM")
-            })
         res.json({msg:"Email sent"})
 
     } catch (error) {
@@ -61,15 +55,15 @@ export const getPasswordResetPage = (req, res) => {
     const {userID, token} = req.params
 
     res.send(`<form action="/resetpassword/${userID}/${token}" method="POST">
-        <input type="password" name="password" value="" placeholder="Enter your new password..." /> 
-        <input type="submit" value="Reset Password" />
-    </form>`);
+             <input type="password" name="password" value="" placeholder="Enter your new password..." /> 
+             <input type="submit" value="Reset Password" />
+             </form>`);
 }
 
 export const Login = async (req, res) => {
     try {
-        const email = req.body.email || ""
-        const username = req.body.username || ""
+        let email = req.body.email || ""
+        let username = req.body.username || ""
 
         const user = await Users.findOne({
             where: {
@@ -99,26 +93,34 @@ export const Login = async (req, res) => {
             if (parseInt(user.role) < 1) 
                 return res.status(400).json({ msg:"Email not verified"})
         }
-        const userID = user.id;
-        const name = user.name;
-        const accessToken = jwt.sign({userID, name, email}, process.env.ACCESS_TOKEN_SECRET, {
+
+        const { id,name } = user
+        email = user.email
+
+        const accessToken = jwt.sign({id, name, email}, process.env.ACCESS_TOKEN_SECRET, {
             expiresIn: '20s'
         });
-        const refreshToken = jwt.sign({userID, name, email}, process.env.REFRESH_TOKEN_SECRET, {
+        const refreshToken = jwt.sign({id, name, email}, process.env.REFRESH_TOKEN_SECRET, {
             expiresIn: '1d'
         });
-        await Users.update({refresh_token: refreshToken}, {
-            where: {
-                id: userID
-            }
-        });
+
         res.cookie('refreshToken', refreshToken, {
             httpOnly: true,
             maxAge: 24 * 60 * 60 * 1000
         });
-        res.json({accessToken});
+
+        await Users.update({refresh_token: refreshToken}, {
+            where: {
+                id: id
+            }
+        }).catch((err)=>{
+            return res.json({msg:"Error updating token"})
+        });
+
+        return res.json({accessToken});
+
     } catch (error) {
-        res.status(404).json({msg: "Internal Error"});
+        return res.status(404).json({msg: "Internal Error"});
     }
 }
 
@@ -131,12 +133,14 @@ export const Logout = async (req, res) => {
         }
     });
     if (!user) return res.sendStatus(204);
-    const userID = user.id;
+
     await Users.update({refresh_token: null}, {
         where: {
-            id: userID
+            id: user.id
         }
     });
+
     res.clearCookie('refreshToken');
+    
     return res.sendStatus(200);
 }
