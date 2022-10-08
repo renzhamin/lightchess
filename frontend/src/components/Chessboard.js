@@ -12,7 +12,14 @@ function Board() {
 
     const result = game.move(move);
     if (result == null) {
-      console.log("Invalid");
+      const newMove = { from: sourceSquare, to: targetSquare, promotion: "q" };
+      const newResult = game.move(newMove);
+
+      if (newResult == null) {
+        console.log("Invalid");
+      } else {
+        setPosition(game.fen());
+      }
     } else {
       setPosition(game.fen());
     }
