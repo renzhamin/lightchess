@@ -8,7 +8,7 @@ import passport from 'passport';
 
 
 dotenv.config();
-const app = express();
+const app : express.Application = express();
 
 (async ()=>{
     try {
