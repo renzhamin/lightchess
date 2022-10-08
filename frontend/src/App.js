@@ -4,6 +4,7 @@ import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 import Register from "./components/Register";
 import PgnViewer from "./components/PgnViewer";
+import Board from "./components/Chessboard";
 
 function App() {
   return (
@@ -25,6 +26,10 @@ function App() {
         <Route path="/pgnviewer">
           <Navbar />
           <PgnViewer />
+        </Route>
+        <Route path="/play">
+          <Navbar />
+          <Board />
         </Route>
       </Switch>
     </BrowserRouter>
