@@ -1,15 +1,20 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect } from 'react'
-import axios from 'axios';
+import React, { useState, useEffect, useContext } from "react";
+import axios from "axios";
 import jwt_decode from "jwt-decode";
-import { useHistory } from 'react-router-dom';
+import { useHistory } from "react-router-dom";
+import { AppContext } from "../App.js";
+import { Chat } from "./Chat.js";
 
 const Dashboard = () => {
-    const [name, setName] = useState('');
-    const [token, setToken] = useState('');
-    const [expire, setExpire] = useState('');
+    const [name, setName] = useState("");
+
+    const [token, setToken] = useState("");
+    const [expire, setExpire] = useState("");
     const [users, setUsers] = useState([]);
     const history = useHistory();
+
+    const { socket, userMap, setUserMap } = useContext(AppContext);
 
     useEffect(() => {
         refreshToken();
@@ -18,48 +23,59 @@ const Dashboard = () => {
 
     const refreshToken = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/token');
+            const response = await axios.get("http://localhost:5000/api/token");
             setToken(response.data.accessToken);
             const decoded = jwt_decode(response.data.accessToken);
             setName(decoded.name);
+
+            if (socket.disconnected === true) {
+                console.log(name);
+            }
             setExpire(decoded.exp);
         } catch (error) {
             if (error.response) {
                 history.push("/");
             }
         }
-    }
+    };
 
     const axiosJWT = axios.create();
 
-    axiosJWT.interceptors.request.use(async (config) => {
-        const currentDate = new Date();
-        if (expire * 1000 < currentDate.getTime()) {
-            const response = await axios.get('http://localhost:5000/api/token');
-            config.headers.Authorization = `Bearer ${response.data.accessToken}`;
-            setToken(response.data.accessToken);
-            const decoded = jwt_decode(response.data.accessToken);
-            setName(decoded.name);
-            setExpire(decoded.exp);
+    axiosJWT.interceptors.request.use(
+        async (config) => {
+            const currentDate = new Date();
+            if (expire * 1000 < currentDate.getTime()) {
+                const response = await axios.get(
+                    "http://localhost:5000/api/token"
+                );
+                config.headers.Authorization = `Bearer ${response.data.accessToken}`;
+                setToken(response.data.accessToken);
+                const decoded = jwt_decode(response.data.accessToken);
+                setName(decoded.name);
+                setExpire(decoded.exp);
+            }
+            return config;
+        },
+        (error) => {
+            return Promise.reject(error);
         }
-        return config;
-    }, (error) => {
-        return Promise.reject(error);
-    });
+    );
 
     const getUsers = async () => {
-        const response = await axiosJWT.get('http://localhost:5000/api/users', {
+        const response = await axiosJWT.get("http://localhost:5000/api/users", {
             headers: {
-                Authorization: `Bearer ${token}`
-            }
+                Authorization: `Bearer ${token}`,
+            },
         });
         setUsers(response.data);
-    }
+    };
 
     return (
         <div className="container mt-5">
             <h1>Welcome Back: {name}</h1>
-            <button onClick={getUsers} className="button is-info">Get Users</button>
+            <button onClick={getUsers} className="button is-info">
+                Get Users
+            </button>
             <table className="table is-striped is-fullwidth">
                 <thead>
                     <tr>
@@ -76,11 +92,12 @@ const Dashboard = () => {
                             <td>{user.email}</td>
                         </tr>
                     ))}
-
                 </tbody>
             </table>
-        </div>
-    )
-}
 
-export default Dashboard
+            <Chat name={name} />
+        </div>
+    );
+};
+
+export default Dashboard;
