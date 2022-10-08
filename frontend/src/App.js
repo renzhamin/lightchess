@@ -3,6 +3,7 @@ import Dashboard from "./components/Dashboard";
 import Login from "./components/Login";
 import Navbar from "./components/Navbar";
 import Register from "./components/Register";
+import PgnViewer from "./components/PgnViewer";
 
 import { io } from "socket.io-client";
 import React from "react";
@@ -31,6 +32,7 @@ const initSocket = (name) => {
 
 function App() {
     const [userMap, setUserMap] = useState(new Map());
+
     return (
         <AppContext.Provider
             value={{ userMap, setUserMap, socket, initSocket }}
@@ -40,12 +42,19 @@ function App() {
                     <Route exact path="/">
                         <Login />
                     </Route>
+                    <Route exact path="/login">
+                        <Login />
+                    </Route>
                     <Route path="/register">
                         <Register />
                     </Route>
                     <Route path="/dashboard">
                         <Navbar />
                         <Dashboard />
+                    </Route>
+                    <Route path="/pgnviewer">
+                        <Navbar />
+                        <PgnViewer />
                     </Route>
                 </Switch>
             </BrowserRouter>

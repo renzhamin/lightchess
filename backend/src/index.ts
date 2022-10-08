@@ -61,7 +61,6 @@ io.on("connection", (socket) => {
     })
 
     socket.on("getusers", (arg, callback) => {
-        console.log("getusers called")
         const dMap = serialiseMap(userMap)
         callback(dMap)
     })

@@ -3,10 +3,17 @@ import dotenv from 'dotenv'
 
 dotenv.config()
 
-export const verifyRefreshToken = ( refreshToken ) => {
+type User = {
+    id : number,
+    name : string,
+    email : string,
+    expire? : string
+}
+
+export const verifyRefreshToken = ( refreshToken : string ) : User => {
     let user = null
 
-    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded) => {
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET, (err, decoded : User) => {
         if(err) return null;
         user = decoded
     })
@@ -15,16 +22,16 @@ export const verifyRefreshToken = ( refreshToken ) => {
 }
 
 
-export const verifyAccessToken = ( accessToken ) => {
+export const verifyAccessToken = ( accessToken : string ) : User => {
     let user = null
-    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET, (err, decoded : User) => {
         if(err) return null;
         user = decoded
     })
     return user
 }
 
-export const getAccessToken = (refreshToken : string)=> {
+export const getAccessToken = (refreshToken: string) : string => {
     const user = verifyRefreshToken(refreshToken)
 
     if(!user) return null;
@@ -39,7 +46,7 @@ export const getAccessToken = (refreshToken : string)=> {
 }
 
 
-export const getAccessTokenFromUserDetails = (user)=> {
+export const getAccessTokenFromUserDetails = (user : User)=> {
     if(!user) return null;
 
     const {id, name, email} = user
@@ -51,7 +58,7 @@ export const getAccessTokenFromUserDetails = (user)=> {
     return accessToken
 }
 
-export const getRefreshToken = (user)=> {
+export const getRefreshToken = (user : User)=> {
     if(!user) return null;
 
     const {id, name, email} = user
