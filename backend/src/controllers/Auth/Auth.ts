@@ -7,8 +7,6 @@ import Sequelize from "sequelize"
 import {
     getAccessTokenFromUserDetails,
     getRefreshToken,
-    verifyAccessToken,
-    verifyRefreshToken,
 } from "../../modules/Tokens"
 dotenv.config()
 
@@ -27,7 +25,7 @@ export const getUsers = async (req, res) => {
 
 export const getPasswordResetLink = async (req, res) => {
     try {
-        const user: Users = await Users.findOne({
+        const user: Users | null = await Users.findOne({
             where: {
                 email: req.body.email,
             },
@@ -64,7 +62,7 @@ export const getPasswordResetPage = (req, res) => {
 export const Login = async (req, res) => {
     try {
         let email = req.body.email || ""
-        let username = req.body.username || ""
+        const username = req.body.username || ""
 
         const user = await Users.findOne({
             where: {

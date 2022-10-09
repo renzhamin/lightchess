@@ -1,15 +1,12 @@
-import Users from "../models/UserModel";
-import jwt from "jsonwebtoken";
-import {getAccessToken} from "../modules/Tokens";
+import { getAccessToken } from "../modules/Tokens"
 
 export const refreshToken = async (req, res) => {
-    const refreshToken = req.cookies.refreshToken;
-    if (!refreshToken) return res.sendStatus(401);
+    const refreshToken = req.cookies.refreshToken
+    if (!refreshToken) return res.sendStatus(401)
 
     const accessToken = getAccessToken(refreshToken)
 
-    if(accessToken)
-        return res.json({accessToken})
+    if (accessToken) return res.json({ accessToken })
 
-    return res.status(401).json({msg:"Invalid token"})
+    return res.status(401).json({ msg: "Invalid token" })
 }

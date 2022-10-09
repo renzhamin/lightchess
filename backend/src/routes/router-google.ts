@@ -1,13 +1,10 @@
-import {Sequelize} from "sequelize-typescript";
-import express from "express";
-import passport, {use} from "passport";
-import GoogleStrategy from 'passport-google-oauth20'
-import db from '../config/Database'
-import FUsers from '../models/FederatedUserModel'
-import Users from '../models/UserModel'
-import jwt from 'jsonwebtoken'
-import dotenv from 'dotenv'
-import {getAccessTokenFromUserDetails, getRefreshToken} from "../modules/Tokens";
+import express from "express"
+import passport from "passport"
+import GoogleStrategy from "passport-google-oauth20"
+import FUsers from "../models/FederatedUserModel"
+import Users from "../models/UserModel"
+import dotenv from "dotenv"
+import { getRefreshToken } from "../modules/Tokens"
 
 dotenv.config()
 // Configure the Google strategy for use by Passport.
@@ -17,50 +14,58 @@ dotenv.config()
 // behalf, along with the user's profile.  The function must invoke `cb`
 // with a user object, which will be set at `req.user` in route handlers after
 // authentication.
-passport.use(new GoogleStrategy({
-    clientID: process.env['GOOGLE_CLIENT_ID'],
-    clientSecret: process.env['GOOGLE_CLIENT_SECRET'],
-    callbackURL: '/oauth2/redirect/google',
-    scope: [ 'profile', 'email' ]
-}, 
+passport.use(
+    new GoogleStrategy(
+        {
+            clientID: process.env["GOOGLE_CLIENT_ID"],
+            clientSecret: process.env["GOOGLE_CLIENT_SECRET"],
+            callbackURL: "/oauth2/redirect/google",
+            scope: ["profile", "email"],
+        },
 
-// verify function 
-async (accessToken, refreshToken, profile, cb) => {
-    const issuer = 'google'
-    let fuser = await FUsers.findOne({
-        where : {
-            provider : issuer,
-            subject : profile.id
-        }
-    })
+        // verify function
+        async (accessToken, refreshToken, profile, cb) => {
+            const issuer = "google"
+            const fuser = await FUsers.findOne({
+                where: {
+                    provider: issuer,
+                    subject: profile.id,
+                },
+            })
 
-    if(fuser){
-        let existing_user = await Users.findOne({
-            where : {
-                id : fuser.id
+            if (fuser) {
+                const existing_user = await Users.findOne({
+                    where: {
+                        id: fuser.id,
+                    },
+                })
+
+                if (!existing_user)
+                    return cb(null, false, { msg: "Database config mismatch" })
+
+                return cb(null, existing_user)
             }
-        })
 
-        if(!existing_user) 
-            return cb(null, false, {msg:"Database config mismatch"})
+            const user = await Users.create({
+                name: profile.displayName,
+                email: profile.emails[0].value,
+                role: 1,
+            }).catch((err) => {
+                return cb(err, false)
+            })
 
-        return cb(null, existing_user)
-    }
+            await FUsers.create({
+                id: user.id,
+                provider: issuer,
+                subject: profile.id,
+            }).catch((err) => {
+                return cb(err, false)
+            })
 
-    let user = await Users.create({
-        name : profile.displayName,
-        email : profile.emails[0].value
-    }).catch(err=>{ return cb(err,false) })
-
-
-    await FUsers.create({
-        id : user.id,
-        provider : issuer,
-        subject : profile.id
-    }).catch(err=>{ return cb(err,false) })
-
-    return cb(null, user)
-}));
+            return cb(null, user)
+        }
+    )
+)
 
 // Configure Passport authenticated session persistence.
 //
@@ -76,15 +81,14 @@ async (accessToken, refreshToken, profile, cb) => {
 //         cb(null, { id: user.id, email: user.email, name: user.name });
 //     });
 // });
-// 
+//
 // passport.deserializeUser(function(user, cb) {
 //     process.nextTick(function() {
 //         return cb(null, user);
 //     });
 // });
 
-
-let router_google = express.Router();
+const router_google = express.Router()
 
 /*
    This route completes the authentication sequence when Google redirects the
@@ -92,23 +96,24 @@ let router_google = express.Router();
    automatically created and their Google account is linked.  When an existing
    user returns, they are signed in to their linked account.
    */
-router_google.get('/oauth2/redirect/google', passport.authenticate('google', {
-    failureRedirect: 'http://localhost:3000',
-    session : false
-}), async function (req,res) {
+router_google.get(
+    "/oauth2/redirect/google",
+    passport.authenticate("google", {
+        failureRedirect: "http://localhost:3000",
+        session: false,
+    }),
+    async function (req, res) {
+        const { id, name, email } = req.user
 
-        const { id,name,email } = req.user
+        const refreshToken = getRefreshToken({ id, name, email })
 
-        const refreshToken = getRefreshToken({id,name,email})
-
-        res.cookie('refreshToken', refreshToken, {
+        res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
-            maxAge: 24 * 60 * 60 * 30 * 1000
-        });
+            maxAge: 24 * 60 * 60 * 30 * 1000,
+        })
 
         return res.redirect("http://localhost:3000/dashboard")
-});
-
-
+    }
+)
 
 export default router_google

@@ -2,7 +2,7 @@ import Users from "../models/UserModel"
 import bcrypt from "bcrypt"
 import { validate as validateEmail } from "deep-email-validator"
 import PasswordValidator from "password-validator"
-import { Sequelize, Op } from "sequelize"
+import { Op } from "sequelize"
 
 export const validateRegistrationData = async (req, res, next) => {
     const { email, name, password, confPassword } = req.body

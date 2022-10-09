@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import db from "./config/Database"
 import router from "./routes/index"
-import passport from "passport"
 
 import { createServer } from "http"
 import { Server } from "socket.io"
@@ -44,7 +43,7 @@ interface UserData {
     name: string
 }
 
-let userMap: Map<string, UserData> = new Map()
+const userMap: Map<string, UserData> = new Map()
 
 function serialiseMap<K, V>(x: Map<K, V>) {
     const dMap = Object.fromEntries(x.entries())
