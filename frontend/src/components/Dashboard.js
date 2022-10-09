@@ -14,12 +14,17 @@ const Dashboard = () => {
     const [users, setUsers] = useState([]);
     const history = useHistory();
 
-    const { socket, userMap, setUserMap } = useContext(AppContext);
+    const { initSocket, updateUserList } = useContext(AppContext);
 
     useEffect(() => {
         refreshToken();
         getUsers();
     }, []);
+
+    useEffect(() => {
+        initSocket(name);
+        updateUserList();
+    }, [name]);
 
     const refreshToken = async () => {
         try {
@@ -27,10 +32,6 @@ const Dashboard = () => {
             setToken(response.data.accessToken);
             const decoded = jwt_decode(response.data.accessToken);
             setName(decoded.name);
-
-            if (socket.disconnected === true) {
-                console.log(name);
-            }
             setExpire(decoded.exp);
         } catch (error) {
             if (error.response) {
@@ -68,6 +69,7 @@ const Dashboard = () => {
             },
         });
         setUsers(response.data);
+        initSocket(name);
     };
 
     return (

@@ -56,19 +56,26 @@ io.on("connection", (socket) => {
         userMap.delete(socket.id)
     })
 
-    socket.on("message", ({ to, msg }) => {
-        socket.to(to).emit("message", { from: socket.id, msg })
-    })
-
-    socket.on("getusers", (arg, callback) => {
-        const dMap = serialiseMap(userMap)
-        callback(dMap)
-    })
-
-    socket.on("name", (name, fn) => {
-        userMap.set(socket.id, { name })
-        fn(`welcome ${name}`)
-        console.log(userMap)
+    socket.onAny((eventName, ...args: any) => {
+        if (eventName === "message") {
+            const { to, msg } = args[0]
+            socket.to(to).emit("message", { from: socket.id, msg })
+        } else if (eventName === "getusers") {
+            const callback = args[args.length - 1]
+            const dMap = serialiseMap(userMap)
+            callback(dMap)
+        } else if (eventName == "name") {
+            const fn = args[args.length - 1]
+            const name = args[0]
+            userMap.set(socket.id, { name })
+            fn(`welcome ${name}`)
+        } else {
+            if (!args || !args.length) return
+            const { to } = args[0]
+            if (to) {
+                socket.to(to).emit(eventName, { from: socket.id, ...args[0] })
+            }
+        }
     })
 })
 
