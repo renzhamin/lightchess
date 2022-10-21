@@ -9,6 +9,8 @@ import Board from "./components/Chessboard";
 import { io } from "socket.io-client";
 import React from "react";
 import { useState } from "react";
+import SignIn from "./components/SignIn";
+import SignUp from "./components/SignUp";
 
 export const AppContext = React.createContext();
 
@@ -55,13 +57,13 @@ function App() {
             <BrowserRouter>
                 <Switch>
                     <Route exact path="/">
-                        <Login />
+                        <SignIn />
                     </Route>
                     <Route exact path="/login">
-                        <Login />
+                        <SignIn />
                     </Route>
                     <Route path="/register">
-                        <Register />
+                        <SignUp />
                     </Route>
                     <Route path="/dashboard">
                         <Navbar />
