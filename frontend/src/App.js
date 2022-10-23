@@ -5,12 +5,14 @@ import Navbar from "./components/Navbar";
 import Register from "./components/Register";
 import PgnViewer from "./components/PgnViewer";
 import Board from "./components/Chessboard";
-
 import { io } from "socket.io-client";
 import React from "react";
 import { useState } from "react";
 import SignIn from "./components/SignIn";
 import SignUp from "./components/SignUp";
+import CssBaseline from '@mui/material/CssBaseline';
+import theme from './theme'
+import {ThemeProvider} from "@mui/material/styles"
 
 export const AppContext = React.createContext();
 
@@ -54,6 +56,8 @@ function App() {
                 initSocket,
             }}
         >
+            <ThemeProvider theme={theme}>
+            <CssBaseline />
             <BrowserRouter>
                 <Switch>
                     <Route exact path="/">
@@ -79,6 +83,7 @@ function App() {
                     </Route>
                 </Switch>
             </BrowserRouter>
+        </ThemeProvider>
         </AppContext.Provider>
     );
 }

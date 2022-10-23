@@ -13,7 +13,7 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
-import { createTheme, ThemeProvider } from '@mui/material/styles';
+import lightchess_logo_blue from './static/images/lightchess_logo_blue.png'
 
 function Copyright(props) {
     return (
@@ -27,8 +27,6 @@ function Copyright(props) {
       </Typography>
     );
   }
-
-const theme = createTheme();
 
 const SignUp = () => {
     const [name, setName] = useState("");
@@ -56,7 +54,6 @@ const SignUp = () => {
     };
 
   return (
-    <ThemeProvider theme={theme}>
       <Container component="main" maxWidth="xs">
         <CssBaseline />
         <Box
@@ -67,10 +64,9 @@ const SignUp = () => {
             alignItems: 'center',
           }}
         >
-          <Avatar sx={{ m: 1, bgcolor: 'secondary.main' }}>
-            <LockOutlinedIcon />
+          <Avatar alt='lightchess-logo' src={lightchess_logo_blue} sx={{ width: 150, height: 150 }}>
           </Avatar>
-          <Typography component="h1" variant="h5">
+          <Typography component="h1" variant="h5" sx = {{ mt: 1}}>
             Sign up
           </Typography>
           <Box component="form" noValidate onSubmit={SignUp} sx={{ mt: 3 }}>
@@ -133,7 +129,7 @@ const SignUp = () => {
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
+                <Link href="login" variant="body2">
                   Already have an account? Sign in
                 </Link>
               </Grid>
@@ -142,7 +138,6 @@ const SignUp = () => {
         </Box>
         <Copyright sx={{ mt: 5 }} />
       </Container>
-    </ThemeProvider>
   );
 }
 
