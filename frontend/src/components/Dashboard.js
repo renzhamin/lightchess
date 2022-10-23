@@ -7,99 +7,97 @@ import { AppContext } from "../App.js";
 import { Chat } from "./Chat.js";
 
 const Dashboard = () => {
-    const [name, setName] = useState("");
+  const [name, setName] = useState("");
 
-    const [token, setToken] = useState("");
-    const [expire, setExpire] = useState("");
-    const [users, setUsers] = useState([]);
-    const history = useHistory();
+  const [token, setToken] = useState("");
+  const [expire, setExpire] = useState("");
+  const [users, setUsers] = useState([]);
+  const history = useHistory();
 
-    const { initSocket, updateUserList } = useContext(AppContext);
+  const { initSocket, updateUserList } = useContext(AppContext);
 
-    useEffect(() => {
-        refreshToken();
-        getUsers();
-    }, []);
+  useEffect(() => {
+    refreshToken();
+    getUsers();
+  }, []);
 
-    useEffect(() => {
-        initSocket(name);
-        updateUserList();
-    }, [name]);
+  useEffect(() => {
+    initSocket(name);
+    updateUserList();
+  }, [name]);
 
-    const refreshToken = async () => {
-        try {
-            const response = await axios.get("http://localhost:5000/api/token");
-            setToken(response.data.accessToken);
-            const decoded = jwt_decode(response.data.accessToken);
-            setName(decoded.name);
-            setExpire(decoded.exp);
-        } catch (error) {
-            if (error.response) {
-                history.push("/");
-            }
-        }
-    };
+  const refreshToken = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/api/token");
+      setToken(response.data.accessToken);
+      const decoded = jwt_decode(response.data.accessToken);
+      setName(decoded.name);
+      setExpire(decoded.exp);
+    } catch (error) {
+      if (error.response) {
+        history.push("/");
+      }
+    }
+  };
 
-    const axiosJWT = axios.create();
+  const axiosJWT = axios.create();
 
-    axiosJWT.interceptors.request.use(
-        async (config) => {
-            const currentDate = new Date();
-            if (expire * 1000 < currentDate.getTime()) {
-                const response = await axios.get(
-                    "http://localhost:5000/api/token"
-                );
-                config.headers.Authorization = `Bearer ${response.data.accessToken}`;
-                setToken(response.data.accessToken);
-                const decoded = jwt_decode(response.data.accessToken);
-                setName(decoded.name);
-                setExpire(decoded.exp);
-            }
-            return config;
-        },
-        (error) => {
-            return Promise.reject(error);
-        }
-    );
+  axiosJWT.interceptors.request.use(
+    async (config) => {
+      const currentDate = new Date();
+      if (expire * 1000 < currentDate.getTime()) {
+        const response = await axios.get("http://localhost:5000/api/token");
+        config.headers.Authorization = `Bearer ${response.data.accessToken}`;
+        setToken(response.data.accessToken);
+        const decoded = jwt_decode(response.data.accessToken);
+        setName(decoded.name);
+        setExpire(decoded.exp);
+      }
+      return config;
+    },
+    (error) => {
+      return Promise.reject(error);
+    }
+  );
 
-    const getUsers = async () => {
-        const response = await axiosJWT.get("http://localhost:5000/api/users", {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        setUsers(response.data);
-        initSocket(name);
-    };
+  const getUsers = async () => {
+    const response = await axiosJWT.get("http://localhost:5000/api/users", {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    setUsers(response.data);
+    initSocket(name);
+  };
 
-    return (
-        <div className="container mt-5">
-            <h1>Welcome Back: {name}</h1>
-            <button onClick={getUsers} className="button is-info">
-                Get Users
-            </button>
-            <table className="table is-striped is-fullwidth">
-                <thead>
-                    <tr>
-                        <th>No</th>
-                        <th>Name</th>
-                        <th>Email</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {users.map((user, index) => (
-                        <tr key={user.id}>
-                            <td>{index + 1}</td>
-                            <td>{user.name}</td>
-                            <td>{user.email}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+  return (
+    <div className="container mt-5">
+      <h1>Welcome Back: {name}</h1>
+      <button onClick={getUsers} className="button is-info">
+        Get Users
+      </button>
+      <table className="table is-striped is-fullwidth">
+        <thead>
+          <tr>
+            <th>No</th>
+            <th>Name</th>
+            <th>Email</th>
+          </tr>
+        </thead>
+        <tbody>
+          {users.map((user, index) => (
+            <tr key={user.id}>
+              <td>{index + 1}</td>
+              <td>{user.name}</td>
+              <td>{user.email}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-            <Chat name={name} />
-        </div>
-    );
+      <Chat name={name} />
+    </div>
+  );
 };
 
 export default Dashboard;
