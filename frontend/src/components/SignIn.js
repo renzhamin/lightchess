@@ -59,8 +59,7 @@ const SignIn = () =>  {
             alignItems: 'center',
           }}
         >
-          <Avatar alt='lightchess-logo' src={lightchess_logo_blue} sx={{ width: 170 , height: 150 }}>
-          </Avatar>
+          <img style={{ width: 150, height: 150}} src={lightchess_logo_blue} alt='lightchess-logo'/>
           <Typography component="h1" variant="h5" sx = {{ mt: 1 }}>
             Sign in
           </Typography>
@@ -87,10 +86,10 @@ const SignIn = () =>  {
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
             />
-            <FormControlLabel
+            {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
-            />
+            /> */}
             <Button
               type="submit"
               fullWidth
@@ -112,6 +111,9 @@ const SignIn = () =>  {
               </Grid>
             </Grid>
           </Box>
+          <Link href="http://localhost:5000/api/login/federated/google" variant="body2" sx = {{mt: 2}}>
+                  {"Login with Google"}
+                </Link>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
       </Container>
