@@ -18,14 +18,10 @@ export const AppContext = React.createContext();
 
 const socket = io("ws://localhost:5000", { autoConnect: false });
 
-socket.on("message", (data) => {
-  console.log("Got Data : ", data);
-});
-
 const initSocket = (name) => {
   if (socket.connected === true || name === "") return;
   socket.connect();
-  console.log("Inited socket with", name);
+  console.log("Inited socket with", name, socket.id);
   socket.emit("name", name, (response) => {
     console.log(response);
   });
@@ -77,7 +73,7 @@ function App() {
               <Navbar />
               <PgnViewer />
             </Route>
-            <Route path="/play">
+            <Route path="/play/:id">
               <Navbar />
               <Board />
             </Route>

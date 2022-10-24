@@ -1,18 +1,33 @@
-import { Chessboard } from "react-chessboard";
 import * as ChessJS from "chess.js";
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
+import { useParams } from "react-router";
+import { Chessboard } from "react-chessboard";
+import { AppContext } from "../App";
 
 function Board() {
+  const { socket } = useContext(AppContext);
   const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess; // For VS code intellisence to work
   const [game, setGame] = useState(new Chess());
   const [position, setPosition] = useState(game.fen());
   const [boardOrientation, setBoardOrientation] = useState("white");
 
+  const { id } = useParams();
+  useEffect(() => {
+    socket.on("send_fen", (data) => {
+      console.log("GOOOOOT FEN FOR REAL");
+      setPosition(data.fen);
+    });
+
+    return () => {
+      socket.off("send_fen");
+    };
+  }, []);
+
   function sendFen(fen) {
     // TODO: send fen to opponent, get opponent fen
     // return opponent fen
-    console.log(fen);
-
+    console.log("Sending Fen", fen);
+    socket.emit("send_fen", { to: id, fen });
     return null;
   }
 
@@ -37,14 +52,7 @@ function Board() {
 
     // if valid move
     setPosition(game.fen());
-
-    const response = sendFen(game.fen());
-
-    if (response !== null) {
-      setPosition(game.fen());
-    }
-
-    setPosition(game.fen());
+    sendFen(game.fen());
   }
 
   return (
