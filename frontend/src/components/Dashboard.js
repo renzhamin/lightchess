@@ -5,99 +5,114 @@ import jwt_decode from "jwt-decode";
 import { useHistory } from "react-router-dom";
 import { AppContext } from "../App.js";
 import { Chat } from "./Chat.js";
+import TextField from '@mui/material/TextField';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Checkbox from '@mui/material/Checkbox';
+import Link from '@mui/material/Link';
+import Grid from '@mui/material/Grid';
+import Box from '@mui/material/Box';
+import { Table, Button, Typography, Container, CssBaseline, TableContainer, Paper, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
+
+import lightchess_logo_blue from './static/images/lightchess_logo_blue.png'
 
 const Dashboard = () => {
-  const [name, setName] = useState("");
+    const [name, setName] = useState("");
 
-  const [token, setToken] = useState("");
-  const [expire, setExpire] = useState("");
-  const [users, setUsers] = useState([]);
-  const history = useHistory();
+    const [token, setToken] = useState("");
+    const [expire, setExpire] = useState("");
+    const [users, setUsers] = useState([]);
+    const history = useHistory();
 
-  const { initSocket, updateUserList } = useContext(AppContext);
+    const { initSocket, updateUserList } = useContext(AppContext);
 
-  useEffect(() => {
-    refreshToken();
-    getUsers();
-  }, []);
+    useEffect(() => {
+        refreshToken();
+        getUsers();
+    }, []);
 
-  useEffect(() => {
-    initSocket(name);
-    updateUserList();
-  }, [name]);
+    useEffect(() => {
+        initSocket(name);
+        updateUserList();
+    }, [name]);
 
-  const refreshToken = async () => {
-    try {
-      const response = await axios.get("http://localhost:5000/api/token");
-      setToken(response.data.accessToken);
-      const decoded = jwt_decode(response.data.accessToken);
-      setName(decoded.name);
-      setExpire(decoded.exp);
-    } catch (error) {
-      if (error.response) {
-        history.push("/");
-      }
-    }
-  };
+    const refreshToken = async () => {
+        try {
+            const response = await axios.get("http://localhost:5000/api/token");
+            setToken(response.data.accessToken);
+            const decoded = jwt_decode(response.data.accessToken);
+            setName(decoded.name);
+            setExpire(decoded.exp);
+        } catch (error) {
+            if (error.response) {
+                history.push("/");
+            }
+        }
+    };
 
-  const axiosJWT = axios.create();
+    const axiosJWT = axios.create();
 
-  axiosJWT.interceptors.request.use(
-    async (config) => {
-      const currentDate = new Date();
-      if (expire * 1000 < currentDate.getTime()) {
-        const response = await axios.get("http://localhost:5000/api/token");
-        config.headers.Authorization = `Bearer ${response.data.accessToken}`;
-        setToken(response.data.accessToken);
-        const decoded = jwt_decode(response.data.accessToken);
-        setName(decoded.name);
-        setExpire(decoded.exp);
-      }
-      return config;
-    },
-    (error) => {
-      return Promise.reject(error);
-    }
-  );
+    axiosJWT.interceptors.request.use(
+        async (config) => {
+            const currentDate = new Date();
+            if (expire * 1000 < currentDate.getTime()) {
+                const response = await axios.get(
+                    "http://localhost:5000/api/token"
+                );
+                config.headers.Authorization = `Bearer ${response.data.accessToken}`;
+                setToken(response.data.accessToken);
+                const decoded = jwt_decode(response.data.accessToken);
+                setName(decoded.name);
+                setExpire(decoded.exp);
+            }
+            return config;
+        },
+        (error) => {
+            return Promise.reject(error);
+        }
+    );
 
-  const getUsers = async () => {
-    const response = await axiosJWT.get("http://localhost:5000/api/users", {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-    });
-    setUsers(response.data);
-    initSocket(name);
-  };
+    const getUsers = async () => {
+        const response = await axiosJWT.get("http://localhost:5000/api/users", {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        setUsers(response.data);
+        initSocket(name);
+    };
 
-  return (
-    <div className="container mt-5">
-      <h1>Welcome Back: {name}</h1>
-      <button onClick={getUsers} className="button is-info">
-        Get Users
-      </button>
-      <table className="table is-striped is-fullwidth">
-        <thead>
-          <tr>
-            <th>No</th>
-            <th>Name</th>
-            <th>Email</th>
-          </tr>
-        </thead>
-        <tbody>
-          {users.map((user, index) => (
-            <tr key={user.id}>
-              <td>{index + 1}</td>
-              <td>{user.name}</td>
-              <td>{user.email}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
-
-      <Chat name={name} />
-    </div>
-  );
+    return (
+        <Container component="main" alignItems='center'>
+        <CssBaseline />
+            <Typography component="h1" variant="h5" sx = {{ mt: 1 }}>
+            Welcome Back: {name}
+          </Typography>
+            <Button size="large" sx={{ mt: 3, mb: 2 }} onClick={getUsers} variant="contained" alignItems="center">
+                Refresh
+            </Button>
+            <TableContainer component={Paper}>
+            <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <TableHead>
+                    <TableRow>
+                        <TableCell>No</TableCell>
+                        <TableCell>Name</TableCell>
+                        <TableCell>Email</TableCell>
+                    </TableRow>
+                </TableHead>
+                <TableBody>
+                    {users.map((user, index) => (
+                        <TableRow key={user.id} sx={{ '&:last-child td, &:last-child th': { border: 0 } }}>
+                            <TableCell>{index + 1}</TableCell>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                        </TableRow>
+                    ))}
+                </TableBody>
+            </Table>
+            </TableContainer>
+            <Chat name={name}/>
+        </Container>
+    );
 };
 
 export default Dashboard;
