@@ -11,10 +11,12 @@ export const Chat = (props) => {
 
   const [text, setText] = useState("");
   const [receiver, setReceiver] = useState({});
+  const [myColor, setMyColor] = useState(0);
+  // 1 is black
 
   useEffect(() => {
     socket.on("Challenge", (data) => {
-      history.push("/play/" + data.to);
+      history.push("/play/" + data.to + "/" + data.yourcolor);
       console.log("Got Challange");
     });
 
@@ -33,8 +35,12 @@ export const Chat = (props) => {
   const Challenge = (e) => {
     console.log("Sending challenge");
     e.preventDefault();
-    socket.emit("Challenge", { to: receiver.id, msg: "challenge" });
-    history.push("/play/" + receiver.id);
+    socket.emit("Challenge", {
+      to: receiver.id,
+      msg: "challenge",
+      yourcolor: myColor == 1 ? 0 : 1,
+    });
+    history.push("/play/" + receiver.id + "/" + myColor);
   };
 
   const handleTextChange = (e) => {

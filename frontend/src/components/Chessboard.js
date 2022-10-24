@@ -10,24 +10,30 @@ function Board() {
   const [game, setGame] = useState(new Chess());
   const [position, setPosition] = useState(game.fen());
   const [boardOrientation, setBoardOrientation] = useState("white");
+  const [isGameStarted, setIsGameStarted] = useState(0);
 
-  const { id } = useParams();
+  const { id, mycolor } = useParams();
+
   useEffect(() => {
-    socket.on("send_fen", (data) => {
-      console.log("GOOOOOT FEN FOR REAL");
-      setPosition(data.fen);
+    if (mycolor == 1) setBoardOrientation("black");
+
+    socket.on("send_move", (data) => {
+      console.log("GOOOOOT MOVE FOR REAL");
+      console.log(data.move);
+      game.move(data.move);
+      setPosition(game.fen());
     });
 
     return () => {
-      socket.off("send_fen");
+      socket.off("send_move");
     };
   }, []);
 
-  function sendFen(fen) {
+  function sendMove(move) {
     // TODO: send fen to opponent, get opponent fen
     // return opponent fen
-    console.log("Sending Fen", fen);
-    socket.emit("send_fen", { to: id, fen });
+    console.log("Sending Move", move);
+    socket.emit("send_move", { to: id, move });
     return null;
   }
 
@@ -49,10 +55,9 @@ function Board() {
         return;
       }
     }
-
     // if valid move
     setPosition(game.fen());
-    sendFen(game.fen());
+    sendMove(move);
   }
 
   return (

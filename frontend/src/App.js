@@ -73,7 +73,7 @@ function App() {
               <Navbar />
               <PgnViewer />
             </Route>
-            <Route path="/play/:id">
+            <Route path="/play/:id/:mycolor">
               <Navbar />
               <Board />
             </Route>
