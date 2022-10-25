@@ -79,6 +79,10 @@ function App() {
                             <Navbar />
                             <Board />
                         </Route>
+                        <Route path="/play">
+                            <Navbar />
+                            <Board />
+                        </Route>
                     </Switch>
                 </BrowserRouter>
             </ThemeProvider>

@@ -19,8 +19,6 @@ import {
     TableBody,
 } from "@mui/material"
 
-import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
-
 const Dashboard = () => {
     const [name, setName] = useState("")
 
