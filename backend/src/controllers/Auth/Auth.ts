@@ -53,7 +53,7 @@ export const getPasswordResetLink = async (req, res) => {
 export const getPasswordResetPage = (req, res) => {
     const { userID, token } = req.params
 
-    res.send(`<form action="/resetpassword/${userID}/${token}" method="POST">
+    res.send(`<form action="/api/resetpassword/${userID}/${token}" method="POST">
              <input type="password" name="password" value="" placeholder="Enter your new password..." /> 
              <input type="submit" value="Reset Password" />
              </form>`)
