@@ -6,6 +6,9 @@ import { AppContext } from "../App"
 import { Grid } from "@mui/material"
 import GameInfo from "./GameInfo"
 import Timer from "./Timer"
+import useSound from "use-sound"
+import moveSfx from "./../components/static/sounds/Move.mp3"
+import parsePgn from "./PgnParser"
 
 function Board() {
     const { socket } = useContext(AppContext)
@@ -17,13 +20,15 @@ function Board() {
 
     const [opponentTimeInfo, setOpponentTimeInfo] = useState("05:00")
     const [myTimeInfo, setMyTimeInfo] = useState("05:00")
-    const [pgn, setPgn] = useState("")
     const [myUsername, setMyUsername] = useState("sshanto")
     const [opponentUsername, setOpponentUsername] = useState("sslabib")
+    const [pgnMoves, setPgnMoves] = useState([])
 
     const { id, mycolor } = useParams()
     const myTimer = useRef()
     const opponentTimer = useRef()
+
+    const [playMoveSfx] = useSound(moveSfx)
 
     useEffect(() => {
         if (mycolor == 1) setBoardOrientation("black")
@@ -37,7 +42,8 @@ function Board() {
             myTimer.current.stopTimer()
             opponentTimer.current.startTimer()
 
-            setPgn(game.pgn())
+            setPgnMoves(parsePgn(game.pgn()))
+            playMoveSfx()
 
             // TODO: sync time
         })
@@ -115,10 +121,13 @@ function Board() {
         }
         // if valid move
 
+        playMoveSfx()
+
         myTimer.current.startTimer()
         opponentTimer.current.stopTimer()
 
-        setPgn(game.pgn())
+        setPgnMoves(parsePgn(game.pgn()))
+        console.log(parsePgn(game.pgn()))
 
         setPosition(game.fen())
         sendMove(move)
@@ -156,7 +165,7 @@ function Board() {
                     myUsername={myUsername}
                     opponentTimeInfo={opponentTimeInfo}
                     myTimeInfo={myTimeInfo}
-                    pgn={pgn}
+                    pgnMoves={pgnMoves}
                     mySide={boardOrientation[0]}
                     turn={game.turn()}
                 />

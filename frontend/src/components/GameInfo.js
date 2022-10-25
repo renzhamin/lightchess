@@ -13,6 +13,7 @@ import {
 import { blue, yellow, red } from "@mui/material/colors"
 
 const GameInfo = (props) => {
+    console.log(props.pgnMoves, "PGN here")
     return (
         <Container component="main" alignItems="center">
             <CssBaseline />
@@ -43,7 +44,45 @@ const GameInfo = (props) => {
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell>{props.pgn}</TableCell>
+                            <TableCell>
+                                <div style={{ overflow: "auto" }}>
+                                    <div
+                                        style={{
+                                            height: "150px",
+                                            width: "300",
+                                        }}
+                                    >
+                                        <Table
+                                            sx={{
+                                                tableLayout: "fixed",
+                                                maxWidth: 300,
+                                            }}
+                                        >
+                                            <TableBody>
+                                                {props.pgnMoves.map(
+                                                    (move, index) => (
+                                                        <TableRow
+                                                            sx={{
+                                                                height: 5,
+                                                            }}
+                                                        >
+                                                            <TableCell>
+                                                                {index + 1}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {move.whiteMove}
+                                                            </TableCell>
+                                                            <TableCell>
+                                                                {move.blackMove}
+                                                            </TableCell>
+                                                        </TableRow>
+                                                    )
+                                                )}
+                                            </TableBody>
+                                        </Table>
+                                    </div>
+                                </div>
+                            </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>

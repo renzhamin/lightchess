@@ -33,7 +33,6 @@ function Timer(props, ref) {
     useEffect(() => {
         let myInterval = 500
         if (isTicking) {
-            console.log(minutes, seconds)
             myInterval = setInterval(() => {
                 if (seconds > 0) {
                     setSeconds(seconds - 1)
