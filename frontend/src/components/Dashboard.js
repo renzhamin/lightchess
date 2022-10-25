@@ -1,16 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { useState, useEffect, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import axios from "axios";
 import jwt_decode from "jwt-decode";
 import { useHistory } from "react-router-dom";
 import { AppContext } from "../App.js";
 import { Chat } from "./Chat.js";
-import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
-import Link from '@mui/material/Link';
-import Grid from '@mui/material/Grid';
-import Box from '@mui/material/Box';
 import { Table, Button, Typography, Container, CssBaseline, TableContainer, Paper, TableHead, TableRow, TableCell, TableBody } from '@mui/material';
 
 import lightchess_logo_blue from './static/images/lightchess_logo_blue.png'

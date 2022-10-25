@@ -18,7 +18,6 @@ function Board() {
     if (mycolor == 1) setBoardOrientation("black");
 
     socket.on("send_move", (data) => {
-      console.log("GOOOOOT MOVE FOR REAL");
       console.log(data.move);
       game.move(data.move);
       setPosition(game.fen());

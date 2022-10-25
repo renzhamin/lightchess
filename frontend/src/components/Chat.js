@@ -16,7 +16,7 @@ export const Chat = (props) => {
 
   useEffect(() => {
     socket.on("Challenge", (data) => {
-      history.push("/play/" + data.to + "/" + data.yourcolor);
+      history.push("/play/" + data.from + "/" + data.yourcolor);
       console.log("Got Challange");
     });
 
