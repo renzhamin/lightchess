@@ -1,16 +1,15 @@
+import CssBaseline from "@mui/material/CssBaseline"
+import { ThemeProvider } from "@mui/material/styles"
+import React, { useState } from "react"
 import { BrowserRouter, Route, Switch } from "react-router-dom"
+import { io } from "socket.io-client"
+import Board from "./components/Chessboard"
 import Dashboard from "./components/Dashboard"
 import Navbar from "./components/Navbar"
 import PgnViewer from "./components/PgnViewer"
-import Board from "./components/Chessboard"
-import { io } from "socket.io-client"
-import React from "react"
-import { useState } from "react"
 import SignIn from "./components/SignIn"
 import SignUp from "./components/SignUp"
-import CssBaseline from "@mui/material/CssBaseline"
 import theme from "./theme"
-import { ThemeProvider } from "@mui/material/styles"
 
 export const AppContext = React.createContext()
 
@@ -48,6 +47,7 @@ function App() {
     return (
         <AppContext.Provider
             value={{
+                userMap,
                 userList,
                 updateUserList,
                 socket,
