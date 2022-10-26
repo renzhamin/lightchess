@@ -45,10 +45,8 @@ interface UserData {
 
 const userMap: Map<string, UserData> = new Map()
 
-function serialiseMap<K, V>(x: Map<K, V>, ownId: K) {
-    const newMap = new Map(JSON.parse(JSON.stringify(Array.from(x))))
-    newMap.delete(ownId)
-    const dMap = Object.fromEntries(newMap.entries())
+function serialiseMap<K, V>(x: Map<K, V>) {
+    const dMap = Object.fromEntries(x.entries())
     return dMap
 }
 
@@ -63,7 +61,7 @@ io.on("connection", (socket) => {
             socket.to(to).emit("message", { from: socket.id, msg })
         } else if (eventName === "getusers") {
             const callback = args[args.length - 1]
-            const dMap = serialiseMap(userMap, socket.id)
+            const dMap = serialiseMap(userMap)
             callback(dMap)
         } else if (eventName == "name") {
             const fn = args[args.length - 1]

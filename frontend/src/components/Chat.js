@@ -55,6 +55,9 @@ export const Chat = (props) => {
                 <option value="Select Receiver">Select Receiver</option>
                 {userList &&
                     userList.map((user) => {
+                        if (user.name === name) {
+                            return ""
+                        }
                         return (
                             <option
                                 key={user.id}
