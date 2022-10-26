@@ -11,20 +11,21 @@ import moveSfx from "./../components/static/sounds/Move.mp3"
 import parsePgn from "./PgnParser"
 
 function Board() {
-    const { socket } = useContext(AppContext)
+    const { socket, userMap } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
     const [game, setGame] = useState(new Chess())
     const [position, setPosition] = useState(game.fen())
     const [boardOrientation, setBoardOrientation] = useState("white")
-    const [isGameStarted, setIsGameStarted] = useState(0)
 
     const [opponentTimeInfo, setOpponentTimeInfo] = useState("05:00")
     const [myTimeInfo, setMyTimeInfo] = useState("05:00")
-    const [myUsername, setMyUsername] = useState("sshanto")
-    const [opponentUsername, setOpponentUsername] = useState("sslabib")
+
+    const [myUsername] = useState(userMap.get(socket.id).name)
     const [pgnMoves, setPgnMoves] = useState([])
 
     const { id, mycolor } = useParams()
+    const [opponentUsername] = useState(userMap.get(id).name)
+
     const myTimer = useRef()
     const opponentTimer = useRef()
 

@@ -66,7 +66,7 @@ io.on("connection", (socket) => {
         } else if (eventName == "name") {
             const fn = args[args.length - 1]
             const name = args[0]
-            userMap.set(socket.id, { name })
+            userMap.set(String(socket.id), { name })
             fn(`welcome ${name}`)
         } else {
             if (!args || !args.length) return

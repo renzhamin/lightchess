@@ -1,7 +1,7 @@
+import { Box, Button, NativeSelect } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
-import { AppContext } from "../App.js"
-import { Button, Box, Select, MenuItem, NativeSelect } from "@mui/material"
 import { useHistory } from "react-router-dom"
+import { AppContext } from "../App.js"
 
 export const Chat = (props) => {
     const { initSocket, socket, updateUserList, userList } =
@@ -9,7 +9,6 @@ export const Chat = (props) => {
     const { name } = props
     const history = useHistory()
 
-    const [text, setText] = useState("")
     const [receiver, setReceiver] = useState({})
     const [myColor, setMyColor] = useState(0)
     // 1 is black
@@ -43,11 +42,6 @@ export const Chat = (props) => {
         history.push("/play/" + receiver.id + "/" + myColor)
     }
 
-    const handleTextChange = (e) => {
-        e.preventDefault()
-        setText(e.target.value)
-    }
-
     return (
         <Box component="form" noValidate onSubmit={Challenge} sx={{ mt: 3 }}>
             <NativeSelect
@@ -61,6 +55,9 @@ export const Chat = (props) => {
                 <option value="Select Receiver">Select Receiver</option>
                 {userList &&
                     userList.map((user) => {
+                        if (user.name === name) {
+                            return ""
+                        }
                         return (
                             <option
                                 key={user.id}
