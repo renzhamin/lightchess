@@ -45,10 +45,36 @@ function Board() {
             setPgnMoves(parsePgn(game.pgn()))
             playMoveSfx()
 
+            if (game.isGameOver()) {
+                // TODO: create a gameResult to send to opponent
+                var gameResult = ""
+                if (game.isCheckmate()) {
+                    if (game.inCheck() && game.turn() === boardOrientation) {
+                        // player lost, opponent won
+                        gameResult += game.turn() + " lost"
+                    } else {
+                        const opponent = game.turn() === "w" ? "b" : "w"
+                        gameResult += opponent + " lost"
+                    }
+                } else if (game.isDraw()) {
+                    gameResult += "game drawn"
+                    if (game.isInsufficientMaterial()) {
+                    } else if (game.isStalemate()) {
+                    } else if (game.isThreefoldRepetition()) {
+                    }
+                    socket.emit("game_over", { to: id, gameResult })
+                }
+                console.log("game over")
+
+                // send gameResult through "game_over"
+            }
+
             // TODO: sync time
         })
 
-        // TODO: create handler for socket.on("game_over")
+        socket.on("game_over", (data) => {
+            console.log("Game over!", data)
+        })
 
         function convertTimeToString(time) {
             var time_ = time.toString()
@@ -88,24 +114,6 @@ function Board() {
             console.log("Not your turn!")
             return
         }
-        console.log(game)
-
-        if (game.isGameOver()) {
-            // TODO: create a gameResult to send to opponent
-            const gameResult = ""
-            if (game.isCheckmate()) {
-                if (game.inCheck() && game.turn() === boardOrientation) {
-                    // player lost, opponent won
-                }
-            } else if (game.isDraw()) {
-                if (game.isInsufficientMaterial()) {
-                } else if (game.isStalemate()) {
-                } else if (game.isThreefoldRepetition()) {
-                }
-            }
-
-            // send gameResult through "game_over"
-        }
 
         var move = { from: sourceSquare, to: targetSquare }
         var result = game.move(move)
@@ -122,6 +130,30 @@ function Board() {
         // if valid move
 
         playMoveSfx()
+
+        if (game.isGameOver()) {
+            // TODO: create a gameResult to send to opponent
+            var gameResult = ""
+            if (game.isCheckmate()) {
+                if (game.inCheck() && game.turn() === boardOrientation) {
+                    // player lost, opponent won
+                    gameResult += game.turn() + " lost"
+                } else {
+                    const opponent = game.turn() === "w" ? "b" : "w"
+                    gameResult += opponent + " lost"
+                }
+            } else if (game.isDraw()) {
+                gameResult += "game drawn"
+                if (game.isInsufficientMaterial()) {
+                } else if (game.isStalemate()) {
+                } else if (game.isThreefoldRepetition()) {
+                }
+            }
+            socket.emit("game_over", { to: id, gameResult })
+            console.log("game over")
+
+            // send gameResult through "game_over"
+        }
 
         myTimer.current.startTimer()
         opponentTimer.current.stopTimer()

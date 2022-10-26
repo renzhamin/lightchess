@@ -13,7 +13,6 @@ import {
 import { blue, yellow, red } from "@mui/material/colors"
 
 const GameInfo = (props) => {
-    console.log(props.pgnMoves, "PGN here")
     return (
         <Container component="main" alignItems="center">
             <CssBaseline />

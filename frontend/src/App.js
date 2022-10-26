@@ -28,8 +28,8 @@ const initSocket = (name) => {
 }
 
 function App() {
-    console.log("BACKEND URL", process.env.REACT_APP_BACKEND_URL)
-    console.log(process.env)
+    // console.log("BACKEND URL", process.env.REACT_APP_BACKEND_URL)
+    // console.log(process.env)
     const [userMap, setUserMap] = useState(new Map())
     const [userList, setUserList] = useState([])
 
