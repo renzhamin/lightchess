@@ -1,3 +1,4 @@
+import axios from "axios"
 import * as ChessJS from "chess.js"
 import { useContext, useEffect, useState, useRef } from "react"
 import { useParams } from "react-router"
@@ -8,6 +9,8 @@ import GameInfo from "./GameInfo"
 import Timer from "./Timer"
 import useSound from "use-sound"
 import moveSfx from "./../components/static/sounds/Move.mp3"
+import captureSfx from "./../components/static/sounds/Capture.mp3"
+import CheckmateSfx from "./../components/static/sounds/Checkmate.mp3"
 import parsePgn from "./PgnParser"
 
 function Board() {
@@ -30,6 +33,22 @@ function Board() {
     const opponentTimer = useRef()
 
     const [playMoveSfx] = useSound(moveSfx)
+    const [playCheckmateSfx] = useSound(CheckmateSfx)
+
+    const addGame = async () => {
+        try {
+            // TODO: set game values properly
+            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/games`, {
+                whiteUsername: "dummywhite",
+                blackUsername: "dummyblack",
+                winnerUsername: "dummywinner",
+                loserUsername: "dummyloser",
+                pgn: game.pgn(),
+            })
+        } catch (error) {
+            console.log(error)
+        }
+    }
 
     useEffect(() => {
         if (mycolor == 1) setBoardOrientation("black")
@@ -44,7 +63,14 @@ function Board() {
             opponentTimer.current.startTimer()
 
             setPgnMoves(parsePgn(game.pgn()))
+
+            // TODO: checkmate sound does not seem to play
+            // if (game.isGameOver()) {
+            //     playCheckmateSfx()
+            //     console.log("checkmate sound played")
+            // } else {
             playMoveSfx()
+            // }
 
             if (game.isGameOver()) {
                 // TODO: create a gameResult to send to opponent
@@ -68,6 +94,9 @@ function Board() {
                 console.log("game over")
 
                 // send gameResult through "game_over"
+
+                // update game table
+                addGame()
             }
 
             // TODO: sync time
