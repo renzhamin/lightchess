@@ -46,6 +46,7 @@ app.use(router)
 
 interface UserData {
     name: string
+    userId: string
 }
 
 const userMap: Map<string, UserData> = new Map()
@@ -68,11 +69,12 @@ io.on("connection", (socket) => {
             const callback = args[args.length - 1]
             const dMap = serialiseMap(userMap)
             callback(dMap)
-        } else if (eventName == "name") {
+        } else if (eventName == "initSocket") {
             const fn = args[args.length - 1]
-            const name = args[0]
-            userMap.set(String(socket.id), { name })
-            fn(`welcome ${name}`)
+            const { name, userId } = args[0]
+            /* console.log("args", name, userId) */
+            userMap.set(String(socket.id), { name, userId })
+            fn(`welcome ${name} with ${userId}`)
         } else {
             if (!args || !args.length) return
             const { to } = args[0]

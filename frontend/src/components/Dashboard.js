@@ -20,6 +20,7 @@ import {
 } from "@mui/material"
 
 const Dashboard = () => {
+    const { userId, setUserId } = useContext(AppContext)
     const [name, setName] = useState("")
 
     const [token, setToken] = useState("")
@@ -35,9 +36,9 @@ const Dashboard = () => {
     }, [])
 
     useEffect(() => {
-        initSocket(name)
+        initSocket({ name, userId })
         updateUserList()
-    }, [name])
+    }, [userId, name])
 
     const refreshToken = async () => {
         try {
@@ -47,6 +48,7 @@ const Dashboard = () => {
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setName(decoded.name)
+            setUserId(decoded.id)
             setExpire(decoded.exp)
         } catch (error) {
             if (error.response) {
@@ -87,7 +89,7 @@ const Dashboard = () => {
             }
         )
         setUsers(response.data)
-        initSocket(name)
+        initSocket({ name, userId })
     }
 
     return (
