@@ -17,27 +17,27 @@ const socket = io(process.env.REACT_APP_WEB_SOCKET_URL, {
     autoConnect: false,
 })
 
-const initSocket = (name) => {
+const initSocket = (args) => {
+    const { name, userId } = args
     if (socket.connected === true || name === "") return
     socket.connect()
-    console.log("Inited socket with", name, socket.id)
-    socket.emit("name", name, (response) => {
+    /* console.log("Inited socket with", name, socket.id) */
+    socket.emit("initSocket", { name, userId }, (response) => {
         console.log(response)
     })
 }
 
 function App() {
-    // console.log("BACKEND URL", process.env.REACT_APP_BACKEND_URL)
-    // console.log(process.env)
     const [userMap, setUserMap] = useState(new Map())
     const [userList, setUserList] = useState([])
+    const [userId, setUserId] = useState(-1)
 
     const updateUserList = () => {
         socket.emit("getusers", "args", (usermap) => {
             let newUserMap = new Map(Object.entries(usermap))
             let users = []
             newUserMap.forEach((value, key) => {
-                users.push({ id: key, name: value.name })
+                users.push({ id: key, name: value.name, userId: value.userId })
             })
             setUserMap(newUserMap)
             setUserList([...users])
@@ -52,6 +52,8 @@ function App() {
                 updateUserList,
                 socket,
                 initSocket,
+                userId,
+                setUserId,
             }}
         >
             <ThemeProvider theme={theme}>

@@ -4,7 +4,7 @@ import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
 
 export const Chat = (props) => {
-    const { initSocket, socket, updateUserList, userList } =
+    const { initSocket, socket, updateUserList, userList, userId } =
         useContext(AppContext)
     const { name } = props
     const history = useHistory()
@@ -48,7 +48,7 @@ export const Chat = (props) => {
                 name="Receiver"
                 onChange={handleReceiverChange}
                 onMouseOver={() => {
-                    initSocket(name)
+                    initSocket({ name, userId })
                     updateUserList()
                 }}
             >
@@ -64,7 +64,7 @@ export const Chat = (props) => {
                                 id={user.id}
                                 value={user.name}
                             >
-                                {user.name}
+                                {user.name + "--" + user.userId}
                             </option>
                         )
                     })}
