@@ -10,6 +10,6 @@ export const refreshToken = async (req, res) => {
 
     if (accessToken) return res.json({ accessToken })
 
-    console.log("Got Invalid token")
-    return res.status(401).json({ msg: "Invalid token" })
+    res.clearCookie("refreshToken")
+    return res.status(401).json({ msg: "refreshToken is invalid" })
 }
