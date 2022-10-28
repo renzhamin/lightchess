@@ -5,6 +5,7 @@ import {sendEmailVerificationLink} from "../controllers/EmailVerification";
 import {createUser, validateRegistrationData} from "../middleware/Registration";
 import { verifySpecialAccessToken, verifyToken } from "../middleware/VerifyToken";
 import { refreshToken } from "../controllers/RefreshToken";
+import { getGames, addGames } from "../modules/Games";
 import passport from "passport";
 import router_google from "./router-google";
 const router = express.Router();
@@ -16,6 +17,8 @@ router.get('/token', refreshToken);
 router.get('/resetpassword', getPasswordResetLink)
 router.get('/resetpassword/:userID/:token', getPasswordResetPage)
 router.post('/resetpassword/:userID/:token', verifySpecialAccessToken, resetPassword)
+router.get('/games', getGames);
+router.post('/games', addGames);
 
 router.post('/login', Login);
 router.delete('/logout', Logout);
