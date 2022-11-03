@@ -12,6 +12,7 @@ import moveSfx from "./../components/static/sounds/Move.mp3"
 import captureSfx from "./../components/static/sounds/Capture.mp3"
 import CheckmateSfx from "./../components/static/sounds/Checkmate.mp3"
 import parsePgn from "./PgnParser"
+import GameEndDialog from "./GameEndDialog"
 
 function Board() {
     const { socket, userMap, userId } = useContext(AppContext)
@@ -23,11 +24,11 @@ function Board() {
     const [opponentTimeInfo, setOpponentTimeInfo] = useState("05:00")
     const [myTimeInfo, setMyTimeInfo] = useState("05:00")
 
-    const [myUsername] = useState(userMap.get(socket.id).name)
+    const [myUsername] = useState(userMap.get(socket.id).username)
     const [pgnMoves, setPgnMoves] = useState([])
 
     const { id, mycolor } = useParams()
-    const [opponentUsername] = useState(userMap.get(id).name)
+    const [opponentUsername] = useState(userMap.get(id).username)
     const [opponentUserId] = useState(userMap.get(id).userId)
 
     const myTimer = useRef()
@@ -35,6 +36,16 @@ function Board() {
 
     const [playMoveSfx] = useSound(moveSfx)
     const [playCheckmateSfx] = useSound(CheckmateSfx)
+
+    const [dialogOpen, dialogSetOpen] = useState(false)
+
+    const handleClickOpen = () => {
+        dialogSetOpen(true)
+    }
+
+    const handleClose = (value) => {
+        dialogSetOpen(false)
+    }
 
     const areYouWinningSon = () => {
         if (boardOrientation[0] != game.turn()) {
@@ -189,7 +200,7 @@ function Board() {
             }
             socket.emit("game_over", { to: id, gameResult })
             console.log("game over")
-
+            handleClickOpen()
             // send gameResult through "game_over"
         }
 
@@ -228,6 +239,9 @@ function Board() {
                     onSquareClick={onSquareClick}
                     boardWidth="720"
                 />
+            </Grid>
+            <Grid item>
+                <GameEndDialog dialogOpen={dialogOpen} onClose={handleClose} />
             </Grid>
             <Grid item>
                 <GameInfo
