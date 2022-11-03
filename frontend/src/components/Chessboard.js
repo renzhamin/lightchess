@@ -14,7 +14,7 @@ import CheckmateSfx from "./../components/static/sounds/Checkmate.mp3"
 import parsePgn from "./PgnParser"
 
 function Board() {
-    const { socket, userMap } = useContext(AppContext)
+    const { socket, userMap, userId } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
     const [game, setGame] = useState(new Chess())
     const [position, setPosition] = useState(game.fen())
@@ -28,6 +28,7 @@ function Board() {
 
     const { id, mycolor } = useParams()
     const [opponentUsername] = useState(userMap.get(id).name)
+    const [opponentUserId] = useState(userMap.get(id).userId)
 
     const myTimer = useRef()
     const opponentTimer = useRef()

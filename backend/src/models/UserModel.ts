@@ -18,8 +18,18 @@ class Users extends Model<
     declare password: CreationOptional<string>
     declare refresh_token: CreationOptional<string>
     declare role: number
-    //     declare createdAt : CreationOptional<Date>
-    //     declare updatedAt : CreationOptional<Date>
+    declare elo: number
+
+    declare totalPlayed: number
+    declare wins: number
+    declare losses: number
+    declare draws: number
+    declare winAsWhite: number
+    declare winAsBlack: number
+    declare loseAsWhite: number
+    declare loseAsBlack: number
+    declare drawAsWhite: number
+    declare drawAsBlack: number
 }
 
 Users.init(
@@ -48,8 +58,51 @@ Users.init(
             type: DataTypes.INTEGER,
             defaultValue: 0,
         },
-        //         createdAt: DataTypes.DATE,
-        //         updatedAt: DataTypes.DATE,
+        elo: {
+            type: DataTypes.INTEGER,
+            defaultValue: 1200,
+        },
+
+        winAsWhite: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        winAsBlack: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        loseAsWhite: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        loseAsBlack: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        drawAsWhite: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        drawAsBlack: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        wins: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        losses: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        draws: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
+        totalPlayed: {
+            type: DataTypes.INTEGER,
+            defaultValue: 0,
+        },
     },
     {
         sequelize: db,
