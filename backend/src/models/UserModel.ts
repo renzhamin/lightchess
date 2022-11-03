@@ -12,24 +12,24 @@ class Users extends Model<
     InferCreationAttributes<Users>
 > {
     declare id: CreationOptional<number>
-    declare name: string
     declare username: CreationOptional<string>
+    declare displayname: CreationOptional<string>
     declare email: string
     declare password: CreationOptional<string>
     declare refresh_token: CreationOptional<string>
-    declare role: number
-    declare elo: number
 
-    declare totalPlayed: number
-    declare wins: number
-    declare losses: number
-    declare draws: number
-    declare winAsWhite: number
-    declare winAsBlack: number
-    declare loseAsWhite: number
-    declare loseAsBlack: number
-    declare drawAsWhite: number
-    declare drawAsBlack: number
+    declare role: CreationOptional<number>
+    declare elo: CreationOptional<number>
+    declare totalPlayed: CreationOptional<number>
+    declare wins: CreationOptional<number>
+    declare losses: CreationOptional<number>
+    declare draws: CreationOptional<number>
+    declare winAsWhite: CreationOptional<number>
+    declare winAsBlack: CreationOptional<number>
+    declare loseAsWhite: CreationOptional<number>
+    declare loseAsBlack: CreationOptional<number>
+    declare drawAsWhite: CreationOptional<number>
+    declare drawAsBlack: CreationOptional<number>
 }
 
 Users.init(
@@ -39,10 +39,10 @@ Users.init(
             autoIncrement: true,
             primaryKey: true,
         },
-        name: {
+        username: {
             type: DataTypes.STRING,
         },
-        username: {
+        displayname: {
             type: DataTypes.STRING,
         },
         email: {

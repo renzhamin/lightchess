@@ -47,7 +47,7 @@ passport.use(
             }
 
             const user = await Users.create({
-                name: profile.displayName,
+                displayname: profile.displayName,
                 email: profile.emails[0].value,
                 role: 1,
             }).catch((err) => {
@@ -103,9 +103,9 @@ router_google.get(
         session: false,
     }),
     async function (req, res) {
-        const { id, name, email } = req.user
+        const { id, username, email } = req.user
 
-        const refreshToken = getRefreshToken({ id, name, email })
+        const refreshToken = getRefreshToken({ id, username, email })
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,

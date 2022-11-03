@@ -117,7 +117,7 @@ const SignIn = () => {
                         </Grid>
                     </Grid>
                 </Box>
-                <Link
+                {/* <Link
                     href={
                         process.env.REACT_APP_BACKEND_URL +
                         "/api/login/federated/google"
@@ -126,7 +126,7 @@ const SignIn = () => {
                     sx={{ mt: 2 }}
                 >
                     {"Login with Google"}
-                </Link>
+                </Link> */}
             </Box>
             <Copyright sx={{ mt: 8, mb: 4 }} />
         </Container>

@@ -13,10 +13,10 @@ export const getGames = async (req, res) => {
 export const addGames = async (req, res) => {
     console.log(req.body.pgn)
     const addedGame = await Games.create({
-        whiteUserId: req.body.whiteUserId,
-        blackUserId: req.body.blackUserId,
-        winnerUserId: req.body.winnerUserId,
-        loserUserId: req.body.loserUserId,
+        whiteUserName: req.body.whiteUserName,
+        blackUserName: req.body.blackUserName,
+        winnerUserName: req.body.winnerUserName,
+        loserUserName: req.body.loserUserName,
         pgn: req.body.pgn,
     }).catch((err) => {
         console.log(err)

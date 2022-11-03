@@ -12,10 +12,10 @@ class Games extends Model<
     InferCreationAttributes<Games>
 > {
     declare id: CreationOptional<number>
-    declare whiteUserId: string
-    declare blackUserId: CreationOptional<string>
-    declare winnerUserId: string
-    declare loserUserId: CreationOptional<string>
+    declare whiteUserName: string
+    declare blackUserName: CreationOptional<string>
+    declare winnerUserName: string
+    declare loserUserName: CreationOptional<string>
     declare pgn: CreationOptional<string>
 }
 
@@ -26,19 +26,19 @@ Games.init(
             autoIncrement: true,
             primaryKey: true,
         },
-        whiteUserId: {
+        whiteUserName: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        blackUserId: {
+        blackUserName: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        winnerUserId: {
+        winnerUserName: {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        loserUserId: {
+        loserUserName: {
             type: DataTypes.STRING,
             allowNull: false,
         },

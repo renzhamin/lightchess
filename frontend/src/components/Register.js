@@ -3,7 +3,7 @@ import axios from "axios"
 import { useHistory } from "react-router-dom"
 
 const Register = () => {
-    const [name, setName] = useState("")
+    const [username, setUserName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confPassword, setConfPassword] = useState("")
@@ -16,7 +16,7 @@ const Register = () => {
             await axios.post(
                 `${process.env.REACT_APP_BACKEND_URL}/api/register`,
                 {
-                    name,
+                    username,
                     email,
                     password,
                     confPassword,
@@ -45,9 +45,9 @@ const Register = () => {
                                             type="text"
                                             className="input"
                                             placeholder="Username"
-                                            value={name}
+                                            value={username}
                                             onChange={(e) =>
-                                                setName(e.target.value)
+                                                setUserName(e.target.value)
                                             }
                                         />
                                     </div>

@@ -30,7 +30,7 @@ function Copyright(props) {
 }
 
 const SignUp = () => {
-    const [name, setName] = useState("")
+    const [username, setUserName] = useState("")
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confPassword, setConfPassword] = useState("")
@@ -43,7 +43,7 @@ const SignUp = () => {
             await axios.post(
                 `${process.env.REACT_APP_BACKEND_URL}/api/register`,
                 {
-                    name,
+                    username,
                     email,
                     password,
                     confPassword,
@@ -92,7 +92,7 @@ const SignUp = () => {
                                 id="Name"
                                 label="Name"
                                 autoFocus
-                                onChange={(e) => setName(e.target.value)}
+                                onChange={(e) => setUserName(e.target.value)}
                             />
                         </Grid>
                         <Grid item xs={12}>

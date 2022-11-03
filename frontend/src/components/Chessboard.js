@@ -15,7 +15,7 @@ import parsePgn from "./PgnParser"
 import GameEndDialog from "./GameEndDialog"
 
 function Board() {
-    const { socket, userMap, userId } = useContext(AppContext)
+    const { socket, userMap } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
     const [game, setGame] = useState(new Chess())
     const [position, setPosition] = useState(game.fen())
@@ -27,9 +27,10 @@ function Board() {
     const [myUsername] = useState(userMap.get(socket.id).username)
     const [pgnMoves, setPgnMoves] = useState([])
 
-    const { id, mycolor } = useParams()
-    const [opponentUsername] = useState(userMap.get(id).username)
-    const [opponentUserId] = useState(userMap.get(id).userId)
+    const { opponent_socket_id, mycolor } = useParams()
+    const [opponentUserName] = useState(
+        userMap.get(opponent_socket_id).username
+    )
 
     const myTimer = useRef()
     const opponentTimer = useRef()
@@ -58,10 +59,12 @@ function Board() {
         try {
             // TODO: set game values properly
             await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/games`, {
-                whiteUserId: mycolor == 1 ? opponentUserId : userId,
-                blackUserId: mycolor == 1 ? userId : opponentUserId,
-                winnerUserId: areYouWinningSon ? userId : opponentUserId,
-                loserUserId: areYouWinningSon ? opponentUserId : userId,
+                whiteUserName: mycolor == 1 ? opponentUserName : myUsername,
+                blackUserName: mycolor == 1 ? myUsername : opponentUserName,
+                winnerUserName: areYouWinningSon
+                    ? myUsername
+                    : opponentUserName,
+                loserUserName: areYouWinningSon ? opponentUserName : myUsername,
                 pgn: game.pgn(),
             })
         } catch (error) {
@@ -70,6 +73,7 @@ function Board() {
     }
 
     useEffect(() => {
+        console.log("Opponent is ", opponentUserName)
         if (mycolor == 1) setBoardOrientation("black")
 
         socket.on("send_move", (data) => {
@@ -108,7 +112,10 @@ function Board() {
                     } else if (game.isStalemate()) {
                     } else if (game.isThreefoldRepetition()) {
                     }
-                    socket.emit("game_over", { to: id, gameResult })
+                    socket.emit("game_over", {
+                        to: opponent_socket_id,
+                        gameResult,
+                    })
                 }
                 console.log("game over")
 
@@ -155,7 +162,7 @@ function Board() {
 
     function sendMove(move) {
         console.log("Sending Move", move)
-        socket.emit("send_move", { to: id, move })
+        socket.emit("send_move", { to: opponent_socket_id, move })
     }
 
     function onDrop(sourceSquare, targetSquare) {
@@ -198,9 +205,9 @@ function Board() {
                 } else if (game.isThreefoldRepetition()) {
                 }
             }
-            socket.emit("game_over", { to: id, gameResult })
+            socket.emit("game_over", { to: opponent_socket_id, gameResult })
             console.log("game over")
-            handleClickOpen()
+            /* handleClickOpen() */
             // send gameResult through "game_over"
         }
 
@@ -240,12 +247,12 @@ function Board() {
                     boardWidth="720"
                 />
             </Grid>
-            <Grid item>
+            {/* <Grid item>
                 <GameEndDialog dialogOpen={dialogOpen} onClose={handleClose} />
-            </Grid>
+            </Grid> */}
             <Grid item>
                 <GameInfo
-                    opponentUsername={opponentUsername}
+                    opponentUserName={opponentUserName}
                     myUsername={myUsername}
                     opponentTimeInfo={opponentTimeInfo}
                     myTimeInfo={myTimeInfo}

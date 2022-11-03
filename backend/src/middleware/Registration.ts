@@ -5,40 +5,25 @@ import PasswordValidator from "password-validator"
 import { Op } from "sequelize"
 
 export const validateRegistrationData = async (req, res, next) => {
-    const { email, name, password, confPassword } = req.body
+    const { email, username, password, confPassword } = req.body
 
     if (!password) return res.status(400).json({ msg: "Provide password" })
 
-    if (!name) return res.status(400).json({ msg: "Provide username" })
+    if (!username) return res.status(400).json({ msg: "Provide username" })
 
     if (!email) return res.status(400).json({ msg: "Provide email" })
 
-    let user = await Users.findOne({
+    const user = await Users.findOne({
         where: {
-            [Op.or]: [{ email: email }, { username: email }],
+            [Op.or]: [{ email: email }, { username: username }],
         },
     }).catch((err) => {
-        console.log(err)
         console.log("Error quering if email already exists")
         return res.json({ msg: "Internal Error" })
     })
 
-    if (user) return res.status(400).json({ msg: "Email already in use" })
-
-    user = null
-    user = await Users.findOne({
-        where: {
-            [Op.or]: [{ email: email }],
-        },
-    }).catch((err) => {
-        console.log(err)
-        console.log("Error quering if username already exists")
-        return res.json({ msg: "Internal Error" })
-    })
-
-    if (user) {
-        return res.status(400).json({ msg: "username already in use" })
-    }
+    if (user)
+        return res.status(400).json({ msg: "email or username already in use" })
 
     if (process.env.DEBUG_MODE == "1") {
         return next()
@@ -75,12 +60,12 @@ export const validateRegistrationData = async (req, res, next) => {
 }
 
 export const createUser = async (req, res, next) => {
-    const { name, email, password } = req.body
+    const { username, email, password } = req.body
     try {
         const salt = await bcrypt.genSalt()
         const hashPassword = await bcrypt.hash(password, salt)
         const createdUser = await Users.create({
-            name: name,
+            username: username,
             email: email,
             password: hashPassword,
         }).catch((err) => {

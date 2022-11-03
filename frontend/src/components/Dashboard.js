@@ -21,7 +21,7 @@ import {
 
 const Dashboard = () => {
     const { userId, setUserId } = useContext(AppContext)
-    const [name, setName] = useState("")
+    const [username, setUserName] = useState("")
 
     const [token, setToken] = useState("")
     const [expire, setExpire] = useState("")
@@ -43,9 +43,9 @@ const Dashboard = () => {
     }, [])
 
     useEffect(() => {
-        initSocket({ name, userId })
+        initSocket({ username, userId })
         updateUserList()
-    }, [userId, name])
+    }, [userId, username])
 
     const refreshToken = async () => {
         try {
@@ -54,7 +54,7 @@ const Dashboard = () => {
             )
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
-            setName(decoded.name)
+            setUserName(decoded.username)
             setUserId(decoded.id)
             setExpire(decoded.exp)
         } catch (error) {
@@ -76,7 +76,7 @@ const Dashboard = () => {
                 config.headers.Authorization = `Bearer ${response.data.accessToken}`
                 setToken(response.data.accessToken)
                 const decoded = jwt_decode(response.data.accessToken)
-                setName(decoded.name)
+                setUserName(decoded.username)
                 setExpire(decoded.exp)
             }
             return config
@@ -96,14 +96,14 @@ const Dashboard = () => {
             }
         )
         setUsers(response.data)
-        initSocket({ name, userId })
+        initSocket({ username, userId })
     }
 
     return (
         <Container component="main" alignItems="center">
             <CssBaseline />
             <Typography component="h1" variant="h5" sx={{ mt: 1 }}>
-                Welcome Back: {name}
+                Welcome Back: {username}
             </Typography>
             <Button
                 size="large"
@@ -134,14 +134,14 @@ const Dashboard = () => {
                                 }}
                             >
                                 <TableCell>{index + 1}</TableCell>
-                                <TableCell>{user.name}</TableCell>
+                                <TableCell>{user.username}</TableCell>
                                 <TableCell>{user.email}</TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Chat name={name} />
+            <Chat name={username} />
         </Container>
     )
 }
