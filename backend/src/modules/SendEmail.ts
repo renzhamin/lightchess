@@ -1,31 +1,30 @@
-import nodemailer from "nodemailer";
-import dotenv from 'dotenv';
-dotenv.config();
+import nodemailer from "nodemailer"
+import dotenv from "dotenv"
+dotenv.config()
 
 const sendMail = async (receiverEmail, subject, body) => {
     const transporter = nodemailer.createTransport({
-        service: 'gmail',
+        service: "gmail",
         auth: {
             user: process.env.lightchessEmail,
-            pass: process.env.lightchessEmailPass
-        }
-    });
+            pass: process.env.lightchessEmailPass,
+        },
+    })
 
     const mailOptions = {
         from: process.env.lightchessEmail,
         to: receiverEmail,
         subject: subject,
-        html: body
-    };
-
+        html: body,
+    }
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.log(error);
+            console.log("Failed to send email to", receiverEmail)
         } else {
-            console.log('Email sent: ' + info.response);
+            console.log("Email sent: " + info.response)
         }
-    });
+    })
 }
 
-export default sendMail;
+export default sendMail

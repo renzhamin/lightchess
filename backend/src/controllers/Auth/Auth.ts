@@ -15,7 +15,7 @@ const { Op } = Sequelize
 export const getUsers = async (req, res) => {
     try {
         const users = await Users.findAll({
-            attributes: ["id", "name", "email"],
+            attributes: ["id", "username", "email"],
         })
         return res.json(users)
     } catch (error) {
@@ -33,10 +33,10 @@ export const getPasswordResetLink = async (req, res) => {
 
         if (!user) return res.json({ msg: "Email not found" })
 
-        const { id, name, email } = user
+        const { id, username, email } = user
         const secret = user.password
 
-        const accessToken = jwt.sign({ id, name, email }, secret, {
+        const accessToken = jwt.sign({ id, username, email }, secret, {
             expiresIn: "5m",
         })
 
@@ -61,16 +61,13 @@ export const getPasswordResetPage = (req, res) => {
 
 export const Login = async (req, res) => {
     try {
-        let email = req.body.email || ""
-        const username = req.body.username || ""
+        const email = req.body.email
+
+        if (!email) res.status(401).json({ msg: "Provide Email" })
 
         const user = await Users.findOne({
             where: {
-                [Op.or]: [
-                    { email: email },
-                    { username: email },
-                    { username: username },
-                ],
+                [Op.or]: [{ email: email }, { username: email }],
             },
         }).catch((err) => {
             console.log(err)
@@ -92,11 +89,14 @@ export const Login = async (req, res) => {
                 return res.status(400).json({ msg: "Email not verified" })
         }
 
-        const { id, name } = user
-        email = user.email
+        const { id, username } = user
 
-        const accessToken = getAccessTokenFromUserDetails({ id, name, email })
-        const refreshToken = getRefreshToken({ id, name, email })
+        const accessToken = getAccessTokenFromUserDetails({
+            id,
+            username,
+            email,
+        })
+        const refreshToken = getRefreshToken({ id, username, email })
 
         res.cookie("refreshToken", refreshToken, {
             maxAge: 24 * 60 * 60 * 30 * 1000,

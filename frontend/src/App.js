@@ -18,11 +18,10 @@ const socket = io(process.env.REACT_APP_WEB_SOCKET_URL, {
 })
 
 const initSocket = (args) => {
-    const { name, userId } = args
-    if (socket.connected === true || name === "") return
+    const { username, userId } = args
+    if (socket.connected === true || username === "") return
     socket.connect()
-    /* console.log("Inited socket with", name, socket.id) */
-    socket.emit("initSocket", { name, userId }, (response) => {
+    socket.emit("initSocket", { username, userId }, (response) => {
         console.log(response)
     })
 }
@@ -31,13 +30,18 @@ function App() {
     const [userMap, setUserMap] = useState(new Map())
     const [userList, setUserList] = useState([])
     const [userId, setUserId] = useState(-1)
+    const [username, setUserName] = useState("")
 
     const updateUserList = () => {
         socket.emit("getusers", "args", (usermap) => {
             let newUserMap = new Map(Object.entries(usermap))
             let users = []
             newUserMap.forEach((value, key) => {
-                users.push({ id: key, name: value.name, userId: value.userId })
+                users.push({
+                    id: key,
+                    username: value.username,
+                    userId: value.userId,
+                })
             })
             setUserMap(newUserMap)
             setUserList([...users])
@@ -53,6 +57,8 @@ function App() {
                 socket,
                 initSocket,
                 userId,
+                username,
+                setUserName,
                 setUserId,
             }}
         >
@@ -77,7 +83,7 @@ function App() {
                             <Navbar />
                             <PgnViewer />
                         </Route>
-                        <Route path="/play/:id/:mycolor">
+                        <Route path="/play/:opponent_socket_id/:mycolor">
                             <Navbar />
                             <Board />
                         </Route>

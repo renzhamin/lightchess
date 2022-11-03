@@ -38,7 +38,7 @@ const GameInfo = (props) => {
                         <TableRow>
                             <TableCell>
                                 <Typography variant="h5">
-                                    {props.opponentUsername}
+                                    {props.opponentUserName}
                                 </Typography>
                             </TableCell>
                         </TableRow>

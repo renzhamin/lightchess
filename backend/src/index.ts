@@ -43,7 +43,7 @@ app.use(express.urlencoded({ extended: false }))
 app.use(router)
 
 interface UserData {
-    name: string
+    username: string
     userId: string
 }
 
@@ -69,10 +69,10 @@ io.on("connection", (socket) => {
             callback(dMap)
         } else if (eventName == "initSocket") {
             const fn = args[args.length - 1]
-            const { name, userId } = args[0]
-            /* console.log("args", name, userId) */
-            userMap.set(String(socket.id), { name, userId })
-            fn(`welcome ${name} with ${userId}`)
+            const { username, userId } = args[0]
+            /* console.log("args", username, userId) */
+            userMap.set(String(socket.id), { username, userId })
+            fn(`welcome ${username} with ${userId}`)
         } else {
             if (!args || !args.length) return
             const { to } = args[0]

@@ -5,7 +5,7 @@ dotenv.config()
 
 type User = {
     id: number
-    name: string
+    username: string
     email: string
     expire?: string
 }
@@ -43,10 +43,10 @@ export const getAccessToken = (refreshToken: string): string | null => {
 
     if (!user) return null
 
-    const { id, name, email } = user
+    const { id, username, email } = user
 
     const accessToken = jwt.sign(
-        { id, name, email },
+        { id, username, email },
         process.env.ACCESS_TOKEN_SECRET,
         {
             expiresIn: "5m",
@@ -59,10 +59,10 @@ export const getAccessToken = (refreshToken: string): string | null => {
 export const getAccessTokenFromUserDetails = (user: User) => {
     if (!user) return null
 
-    const { id, name, email } = user
+    const { id, username, email } = user
 
     const accessToken = jwt.sign(
-        { id, name, email },
+        { id, username, email },
         process.env.ACCESS_TOKEN_SECRET,
         {
             expiresIn: "5m",
@@ -75,11 +75,11 @@ export const getAccessTokenFromUserDetails = (user: User) => {
 export const getRefreshToken = (user: User) => {
     if (!user) return null
 
-    const { id, name, email } = user
+    const { id, username, email } = user
     const expiresIn = user.expire || "30d"
 
     const refreshToken = jwt.sign(
-        { id, name, email },
+        { id, username, email },
         process.env.REFRESH_TOKEN_SECRET,
         {
             expiresIn: expiresIn,

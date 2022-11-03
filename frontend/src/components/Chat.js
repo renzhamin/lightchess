@@ -6,7 +6,7 @@ import { AppContext } from "../App.js"
 export const Chat = (props) => {
     const { initSocket, socket, updateUserList, userList, userId } =
         useContext(AppContext)
-    const { name } = props
+    const { username } = props
     const history = useHistory()
 
     const [receiver, setReceiver] = useState({})
@@ -28,7 +28,7 @@ export const Chat = (props) => {
         e.preventDefault()
         const selectedIndex = e.target.options.selectedIndex
         const id = e.target.options[selectedIndex].getAttribute("id")
-        setReceiver({ id, name: e.target.value })
+        setReceiver({ id, username: e.target.value })
     }
 
     const Challenge = (e) => {
@@ -48,23 +48,23 @@ export const Chat = (props) => {
                 name="Receiver"
                 onChange={handleReceiverChange}
                 onMouseOver={() => {
-                    initSocket({ name, userId })
+                    initSocket({ username, userId })
                     updateUserList()
                 }}
             >
                 <option value="Select Receiver">Select Receiver</option>
                 {userList &&
                     userList.map((user) => {
-                        if (user.name === name) {
+                        if (user.username === username) {
                             return ""
                         }
                         return (
                             <option
                                 key={user.id}
                                 id={user.id}
-                                value={user.name}
+                                value={user.username}
                             >
-                                {user.name + "--" + user.userId}
+                                {user.username + "--" + user.userId}
                             </option>
                         )
                     })}
