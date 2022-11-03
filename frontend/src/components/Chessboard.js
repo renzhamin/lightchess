@@ -12,6 +12,7 @@ import moveSfx from "./../components/static/sounds/Move.mp3"
 import captureSfx from "./../components/static/sounds/Capture.mp3"
 import CheckmateSfx from "./../components/static/sounds/Checkmate.mp3"
 import parsePgn from "./PgnParser"
+import GameEndDialog from "./GameEndDialog"
 
 function Board() {
     const { socket, userMap } = useContext(AppContext)
@@ -36,6 +37,16 @@ function Board() {
 
     const [playMoveSfx] = useSound(moveSfx)
     const [playCheckmateSfx] = useSound(CheckmateSfx)
+
+    const [dialogOpen, dialogSetOpen] = useState(false)
+
+    const handleClickOpen = () => {
+        dialogSetOpen(true)
+    }
+
+    const handleClose = (value) => {
+        dialogSetOpen(false)
+    }
 
     const areYouWinningSon = () => {
         if (boardOrientation[0] != game.turn()) {
@@ -196,7 +207,7 @@ function Board() {
             }
             socket.emit("game_over", { to: opponent_socket_id, gameResult })
             console.log("game over")
-
+            /* handleClickOpen() */
             // send gameResult through "game_over"
         }
 
@@ -236,6 +247,9 @@ function Board() {
                     boardWidth="720"
                 />
             </Grid>
+            {/* <Grid item>
+                <GameEndDialog dialogOpen={dialogOpen} onClose={handleClose} />
+            </Grid> */}
             <Grid item>
                 <GameInfo
                     opponentUserName={opponentUserName}
