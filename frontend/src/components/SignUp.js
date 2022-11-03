@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, forwardRef } from "react"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
 import Button from "@mui/material/Button"
@@ -9,7 +9,13 @@ import Grid from "@mui/material/Grid"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import Container from "@mui/material/Container"
+import Snackbar from "@mui/material/Snackbar"
+import MuiAlert from "@mui/material/Alert"
 import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
+
+const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+})
 
 function Copyright(props) {
     return (
@@ -34,6 +40,7 @@ const SignUp = () => {
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confPassword, setConfPassword] = useState("")
+    const [open, setOpen] = useState(false)
     const [msg, setMsg] = useState("")
     const history = useHistory()
 
@@ -49,17 +56,45 @@ const SignUp = () => {
                     confPassword,
                 }
             )
-            history.push("/")
+            // history.push("/")
+            history.push({
+                pathname: "/login",
+                openSnackbar: true,
+            })
         } catch (error) {
+            setOpen(true)
             if (error.response) {
                 setMsg(error.response.data.msg)
             }
         }
     }
 
+    const handleClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return
+        }
+
+        setOpen(false)
+    }
+
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
+            <Snackbar
+                open={open}
+                autoHideDuration={3000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                key={"bottomright"}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity="warning"
+                    sx={{ width: "100%" }}
+                >
+                    {msg}
+                </Alert>
+            </Snackbar>
             <Box
                 sx={{
                     marginTop: 8,

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect, useContext } from "react"
+import { useState, useEffect, useContext, forwardRef } from "react"
 import axios from "axios"
 import jwt_decode from "jwt-decode"
 import { useHistory } from "react-router-dom"
@@ -17,16 +17,27 @@ import {
     TableRow,
     TableCell,
     TableBody,
+    Snackbar,
 } from "@mui/material"
+import MuiAlert from "@mui/material/Alert"
+import { useLocation } from "react-router-dom"
+
+const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+})
 
 const Dashboard = () => {
+    const location = useLocation()
+    const history = useHistory()
+
     const { userId, setUserId } = useContext(AppContext)
     const [username, setUserName] = useState("")
 
     const [token, setToken] = useState("")
     const [expire, setExpire] = useState("")
     const [users, setUsers] = useState([])
-    const history = useHistory()
+
+    const [open, setOpen] = useState(location.openSnackbar)
 
     const { initSocket, updateUserList } = useContext(AppContext)
 
@@ -99,9 +110,32 @@ const Dashboard = () => {
         initSocket({ username, userId })
     }
 
+    const handleClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return
+        }
+
+        setOpen(false)
+    }
+
     return (
         <Container component="main" alignItems="center">
             <CssBaseline />
+            <Snackbar
+                open={open}
+                autoHideDuration={3000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                key={"bottomright"}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity="success"
+                    sx={{ width: "100%" }}
+                >
+                    Logged in!
+                </Alert>
+            </Snackbar>
             <Typography component="h1" variant="h5" sx={{ mt: 1 }}>
                 Welcome Back: {username}
             </Typography>
