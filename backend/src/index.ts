@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import db from "./config/Database"
 import router from "./routes/index"
-import Games from "./models/GamesModel"
 
 import { createServer } from "http"
 import { Server } from "socket.io"
@@ -21,10 +20,9 @@ export const io = new Server(server, {
 ;(async () => {
     try {
         // TODO: db.sync() does not sync everything on ./models
-        // db are only being synced when they are imported 
+        // db are only being synced when they are imported
         // in other files
         await db.sync()
-        await Games.sync()
         await db.authenticate()
         console.log("Database Connected...")
     } catch (error) {

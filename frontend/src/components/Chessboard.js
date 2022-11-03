@@ -36,14 +36,21 @@ function Board() {
     const [playMoveSfx] = useSound(moveSfx)
     const [playCheckmateSfx] = useSound(CheckmateSfx)
 
+    const areYouWinningSon = () => {
+        if (boardOrientation[0] != game.turn()) {
+            return true
+        }
+        return false
+    }
+
     const addGame = async () => {
         try {
             // TODO: set game values properly
             await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/games`, {
-                whiteUsername: "dummywhite",
-                blackUsername: "dummyblack",
-                winnerUsername: "dummywinner",
-                loserUsername: "dummyloser",
+                whiteUserId: mycolor == 1 ? opponentUserId : userId,
+                blackUserId: mycolor == 1 ? userId : opponentUserId,
+                winnerUserId: areYouWinningSon ? userId : opponentUserId,
+                loserUserId: areYouWinningSon ? opponentUserId : userId,
                 pgn: game.pgn(),
             })
         } catch (error) {
