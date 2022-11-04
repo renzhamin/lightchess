@@ -13,6 +13,14 @@ import {
 import { blue, yellow, red } from "@mui/material/colors"
 
 const GameInfo = (props) => {
+    function myClockTick() {
+        return props.mySide === props.turn && !props.gameOver
+    }
+
+    function opponentClockTick() {
+        return props.mySide !== props.turn && !props.gameOver
+    }
+
     return (
         <Container component="main" alignItems="center">
             <CssBaseline />
@@ -23,9 +31,9 @@ const GameInfo = (props) => {
                             <TableCell>
                                 <Button
                                     variant="contained"
-                                    disabled={props.mySide === props.turn}
+                                    disabled={!opponentClockTick()}
                                     color={
-                                        props.mySide === props.turn
+                                        !opponentClockTick()
                                             ? "primary"
                                             : "success"
                                     }
@@ -94,11 +102,9 @@ const GameInfo = (props) => {
                             <TableCell>
                                 <Button
                                     sx={{ fontSize: 35 }}
-                                    disabled={props.mySide !== props.turn}
+                                    disabled={!myClockTick()}
                                     color={
-                                        props.mySide === props.turn
-                                            ? "success"
-                                            : "primary"
+                                        !myClockTick() ? "primary" : "success"
                                     }
                                     variant="contained"
                                 >

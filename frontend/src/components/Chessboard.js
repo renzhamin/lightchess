@@ -27,6 +27,8 @@ function Board() {
     const [myUsername] = useState(userMap.get(socket.id).username)
     const [pgnMoves, setPgnMoves] = useState([])
 
+    const [isGameOver, setIsGameOver] = useState(false)
+
     const { opponent_socket_id, mycolor } = useParams()
     const [opponentUserName] = useState(
         userMap.get(opponent_socket_id).username
@@ -84,7 +86,6 @@ function Board() {
             // timer
             myTimer.current.stopTimer()
             opponentTimer.current.startTimer()
-
             setPgnMoves(parsePgn(game.pgn()))
 
             // TODO: checkmate sound does not seem to play
@@ -98,6 +99,7 @@ function Board() {
             if (game.isGameOver()) {
                 // TODO: create a gameResult to send to opponent
                 var gameResult = ""
+                setIsGameOver(true)
                 if (game.isCheckmate()) {
                     if (game.inCheck() && game.turn() === boardOrientation) {
                         // player lost, opponent won
@@ -122,6 +124,8 @@ function Board() {
                 // send gameResult through "game_over"
 
                 // update game table
+                myTimer.current.stopTimer()
+                opponentTimer.current.stopTimer()
                 addGame()
             }
 
@@ -129,6 +133,7 @@ function Board() {
         })
 
         socket.on("game_over", (data) => {
+            setIsGameOver(true)
             console.log("Game over!", data)
         })
 
@@ -137,6 +142,11 @@ function Board() {
             if (time < 10) time_ = "0" + time_
 
             return time_
+        }
+
+        if (isGameOver) {
+            myTimer.current.stopTimer()
+            opponentTimer.current.stopTimer()
         }
 
         const interval = setInterval(() => {
@@ -187,8 +197,19 @@ function Board() {
 
         playMoveSfx()
 
+        myTimer.current.startTimer()
+        opponentTimer.current.stopTimer()
+
+        setPgnMoves(parsePgn(game.pgn()))
+        console.log(parsePgn(game.pgn()))
+
+        setPosition(game.fen())
+        sendMove(move)
+        console.log(isGameOver)
+
         if (game.isGameOver()) {
             // TODO: create a gameResult to send to opponent
+            setIsGameOver(true)
             var gameResult = ""
             if (game.isCheckmate()) {
                 if (game.inCheck() && game.turn() === boardOrientation) {
@@ -207,18 +228,16 @@ function Board() {
             }
             socket.emit("game_over", { to: opponent_socket_id, gameResult })
             console.log("game over")
+            myTimer.current.stopTimer()
+            opponentTimer.current.stopTimer()
             /* handleClickOpen() */
             // send gameResult through "game_over"
         }
 
-        myTimer.current.startTimer()
-        opponentTimer.current.stopTimer()
-
-        setPgnMoves(parsePgn(game.pgn()))
-        console.log(parsePgn(game.pgn()))
-
-        setPosition(game.fen())
-        sendMove(move)
+        if (isGameOver) {
+            myTimer.current.stopTimer()
+            opponentTimer.current.stopTimer()
+        }
     }
 
     function onSquareClick(square) {
@@ -259,6 +278,7 @@ function Board() {
                     pgnMoves={pgnMoves}
                     mySide={boardOrientation[0]}
                     turn={game.turn()}
+                    gameOver={isGameOver}
                 />
             </Grid>
             <Timer
