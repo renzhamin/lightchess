@@ -1,4 +1,4 @@
-import { useState, forwardRef } from "react"
+import { useState, forwardRef, useContext } from "react"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
 import Button from "@mui/material/Button"
@@ -12,6 +12,7 @@ import Container from "@mui/material/Container"
 import Snackbar from "@mui/material/Snackbar"
 import MuiAlert from "@mui/material/Alert"
 import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
+import { AppContext } from "../App"
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -36,7 +37,7 @@ function Copyright(props) {
 }
 
 const SignUp = () => {
-    const [username, setUserName] = useState("")
+    const { username, setUserName } = useContext(AppContext)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confPassword, setConfPassword] = useState("")

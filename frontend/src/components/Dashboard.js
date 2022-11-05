@@ -30,8 +30,7 @@ const Dashboard = () => {
     const location = useLocation()
     const history = useHistory()
 
-    const { userId, setUserId } = useContext(AppContext)
-    const [username, setUserName] = useState("")
+    const { userId, setUserId, username, setUserName } = useContext(AppContext)
 
     const [token, setToken] = useState("")
     const [expire, setExpire] = useState("")

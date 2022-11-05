@@ -1,9 +1,10 @@
-import React, { useState } from "react"
+import React, { useContext, useState } from "react"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
+import { AppContext } from "../App"
 
 const Register = () => {
-    const [username, setUserName] = useState("")
+    const { username, setUserName } = useContext(AppContext)
     const [email, setEmail] = useState("")
     const [password, setPassword] = useState("")
     const [confPassword, setConfPassword] = useState("")

@@ -4,9 +4,8 @@ import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
 
 export const Chat = (props) => {
-    const { initSocket, socket, updateUserList, userList, userId } =
+    const { initSocket, socket, updateUserList, userList, userId, username } =
         useContext(AppContext)
-    const { username } = props
     const history = useHistory()
 
     const [receiver, setReceiver] = useState({})
@@ -55,7 +54,7 @@ export const Chat = (props) => {
                 <option value="Select Receiver">Select Receiver</option>
                 {userList &&
                     userList.map((user) => {
-                        if (user.username === username) {
+                        if (user.username == username) {
                             return ""
                         }
                         return (
