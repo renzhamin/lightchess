@@ -1,6 +1,6 @@
 import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { BrowserRouter, Route, Switch } from "react-router-dom"
 import { io } from "socket.io-client"
 import Board from "./components/Chessboard"
@@ -47,6 +47,15 @@ function App() {
             setUserList([...users])
         })
     }
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            updateUserList()
+        }, 2000)
+        return () => {
+            clearInterval(interval)
+        }
+    })
 
     return (
         <AppContext.Provider

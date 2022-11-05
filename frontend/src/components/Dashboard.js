@@ -44,13 +44,6 @@ const Dashboard = () => {
     useEffect(() => {
         refreshToken()
         getUsers()
-        const interval = setInterval(() => {
-            updateUserList()
-        }, 2000)
-
-        return () => {
-            clearInterval(interval)
-        }
     }, [])
 
     useEffect(() => {
