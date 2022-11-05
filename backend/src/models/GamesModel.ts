@@ -6,6 +6,7 @@ import {
     CreationOptional,
 } from "sequelize"
 import db from "../config/Database"
+import { updateStatsAfterMatchEnd } from "../controllers/updateUserInfo"
 
 class Games extends Model<
     InferAttributes<Games>,
@@ -48,9 +49,32 @@ Games.init(
         },
     },
     {
+        hooks: {
+            afterCreate: (games, options) => {
+                if (games.winnerUserName) {
+                    const black =
+                        games.winnerUserName == games.blackUserName
+                            ? true
+                            : false
+
+                    updateStatsAfterMatchEnd(
+                        games.winnerUserName,
+                        true,
+                        false,
+                        black
+                    )
+
+                    updateStatsAfterMatchEnd(
+                        games.loserUserName,
+                        false,
+                        false,
+                        !black
+                    )
+                }
+            },
+        },
         sequelize: db,
         tableName: "games",
-        // timestamps: false,
     }
 )
 

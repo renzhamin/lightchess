@@ -15,7 +15,7 @@ import parsePgn from "./PgnParser"
 import GameEndDialog from "./GameEndDialog"
 
 function Board() {
-    const { socket, userMap } = useContext(AppContext)
+    const { socket, userMap, username: myUsername } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
     const [game, setGame] = useState(new Chess())
     const [position, setPosition] = useState(game.fen())
@@ -24,14 +24,13 @@ function Board() {
     const [opponentTimeInfo, setOpponentTimeInfo] = useState("05:00")
     const [myTimeInfo, setMyTimeInfo] = useState("05:00")
 
-    const [myUsername] = useState(userMap.get(socket.id).username)
     const [pgnMoves, setPgnMoves] = useState([])
 
     const [isGameOver, setIsGameOver] = useState(false)
 
     const { opponent_socket_id, mycolor } = useParams()
     const [opponentUserName] = useState(
-        userMap.get(opponent_socket_id).username
+        userMap.get(opponent_socket_id)?.username
     )
 
     const myTimer = useRef()
