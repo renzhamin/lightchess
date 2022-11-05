@@ -12,7 +12,20 @@ import moveSfx from "./../components/static/sounds/Move.mp3"
 import captureSfx from "./../components/static/sounds/Capture.mp3"
 import CheckmateSfx from "./../components/static/sounds/Checkmate.mp3"
 import parsePgn from "./PgnParser"
-import GameEndDialog from "./GameEndDialog"
+import GameEndDialog from "./GameEndDialog.js"
+import { Typography, Button } from "@mui/material"
+import * as React from "react"
+import PropTypes from "prop-types"
+import Avatar from "@mui/material/Avatar"
+import List from "@mui/material/List"
+import ListItem from "@mui/material/ListItem"
+import ListItemAvatar from "@mui/material/ListItemAvatar"
+import ListItemText from "@mui/material/ListItemText"
+import DialogTitle from "@mui/material/DialogTitle"
+import Dialog from "@mui/material/Dialog"
+import PersonIcon from "@mui/icons-material/Person"
+import AddIcon from "@mui/icons-material/Add"
+import { blue } from "@mui/material/colors"
 
 function Board() {
     const { socket, userMap, username: myUsername } = useContext(AppContext)
@@ -39,14 +52,14 @@ function Board() {
     const [playMoveSfx] = useSound(moveSfx)
     const [playCheckmateSfx] = useSound(CheckmateSfx)
 
-    const [dialogOpen, dialogSetOpen] = useState(false)
+    const [open, setOpen] = React.useState(false)
 
     const handleClickOpen = () => {
-        dialogSetOpen(true)
+        setOpen(true)
     }
 
     const handleClose = (value) => {
-        dialogSetOpen(false)
+        setOpen(false)
     }
 
     const areYouWinningSon = () => {
@@ -123,6 +136,7 @@ function Board() {
                 // send gameResult through "game_over"
 
                 // update game table
+                handleClickOpen()
                 myTimer.current.stopTimer()
                 opponentTimer.current.stopTimer()
                 addGame()
@@ -133,6 +147,7 @@ function Board() {
 
         socket.on("game_over", (data) => {
             setIsGameOver(true)
+            handleClickOpen()
             console.log("Game over!", data)
         })
 
@@ -227,6 +242,7 @@ function Board() {
             }
             socket.emit("game_over", { to: opponent_socket_id, gameResult })
             console.log("game over")
+            handleClickOpen()
             myTimer.current.stopTimer()
             opponentTimer.current.stopTimer()
             /* handleClickOpen() */
@@ -253,6 +269,9 @@ function Board() {
             spacing={3}
         >
             <Grid item>
+                <GameEndDialog open={open} onClose={handleClose} />
+            </Grid>
+            <Grid item>
                 <Chessboard
                     id="BasicBoard"
                     showBoardNotation="true"
@@ -265,9 +284,6 @@ function Board() {
                     boardWidth="720"
                 />
             </Grid>
-            {/* <Grid item>
-                <GameEndDialog dialogOpen={dialogOpen} onClose={handleClose} />
-            </Grid> */}
             <Grid item>
                 <GameInfo
                     opponentUserName={opponentUserName}
