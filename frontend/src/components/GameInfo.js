@@ -9,12 +9,18 @@ import {
     TableRow,
     TableCell,
     TableBody,
+    IconButton,
 } from "@mui/material"
-import { blue, yellow, red } from "@mui/material/colors"
+import CloseIcon from "@mui/icons-material/Close"
+import { Close } from "@material-ui/icons"
 
 const GameInfo = (props) => {
     function myClockTick() {
         return props.mySide === props.turn && !props.gameOver
+    }
+
+    function resign() {
+        props.gameEndHandler(true)
     }
 
     function opponentClockTick() {
@@ -89,6 +95,20 @@ const GameInfo = (props) => {
                                         </Table>
                                     </div>
                                 </div>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell align="center">
+                                <IconButton
+                                    onClick={() => {
+                                        resign()
+                                    }}
+                                    color="primary"
+                                    aria-label="resign-button"
+                                    component="label"
+                                >
+                                    <Close />
+                                </IconButton>
                             </TableCell>
                         </TableRow>
                         <TableRow>

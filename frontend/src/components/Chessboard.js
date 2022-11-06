@@ -62,6 +62,43 @@ function Board() {
         setOpen(false)
     }
 
+    function gameEndHandler(resigned) {
+        setIsGameOver(true)
+        var gameResult = ""
+
+        if (resigned) {
+            gameResult += myUsername + " lost"
+        } else if (game.isCheckmate()) {
+            if (game.inCheck() && game.turn() === boardOrientation) {
+                // player lost, opponent won
+                gameResult += game.turn() + " lost"
+            } else {
+                const opponent = game.turn() === "w" ? "b" : "w"
+                gameResult += opponent + " lost"
+            }
+        } else if (game.isDraw()) {
+            gameResult += "game drawn"
+            if (game.isInsufficientMaterial()) {
+            } else if (game.isStalemate()) {
+            } else if (game.isThreefoldRepetition()) {
+            }
+        }
+        socket.emit("game_over", {
+            to: opponent_socket_id,
+            gameResult,
+        })
+        console.log("game over")
+
+        // send gameResult through "game_over"
+
+        // update game table
+        handleClickOpen()
+        myTimer.current.stopTimer()
+        opponentTimer.current.stopTimer()
+        console.log(gameResult)
+        addGame()
+    }
+
     const areYouWinningSon = () => {
         if (boardOrientation[0] != game.turn()) {
             return true
@@ -109,39 +146,9 @@ function Board() {
             // }
 
             if (game.isGameOver()) {
+                gameEndHandler()
                 // TODO: create a gameResult to send to opponent
-                var gameResult = ""
-                setIsGameOver(true)
-                if (game.isCheckmate()) {
-                    if (game.inCheck() && game.turn() === boardOrientation) {
-                        // player lost, opponent won
-                        gameResult += game.turn() + " lost"
-                    } else {
-                        const opponent = game.turn() === "w" ? "b" : "w"
-                        gameResult += opponent + " lost"
-                    }
-                } else if (game.isDraw()) {
-                    gameResult += "game drawn"
-                    if (game.isInsufficientMaterial()) {
-                    } else if (game.isStalemate()) {
-                    } else if (game.isThreefoldRepetition()) {
-                    }
-                    socket.emit("game_over", {
-                        to: opponent_socket_id,
-                        gameResult,
-                    })
-                }
-                console.log("game over")
-
-                // send gameResult through "game_over"
-
-                // update game table
-                handleClickOpen()
-                myTimer.current.stopTimer()
-                opponentTimer.current.stopTimer()
-                addGame()
             }
-
             // TODO: sync time
         })
 
@@ -156,11 +163,6 @@ function Board() {
             if (time < 10) time_ = "0" + time_
 
             return time_
-        }
-
-        if (isGameOver) {
-            myTimer.current.stopTimer()
-            opponentTimer.current.stopTimer()
         }
 
         const interval = setInterval(() => {
@@ -190,7 +192,10 @@ function Board() {
     }
 
     function onDrop(sourceSquare, targetSquare) {
-        if (game.turn() !== boardOrientation[0]) {
+        if (isGameOver) {
+            console.log("Game is already over")
+            return
+        } else if (game.turn() !== boardOrientation[0]) {
             console.log("Not your turn!")
             return
         }
@@ -222,36 +227,7 @@ function Board() {
         console.log(isGameOver)
 
         if (game.isGameOver()) {
-            // TODO: create a gameResult to send to opponent
-            setIsGameOver(true)
-            var gameResult = ""
-            if (game.isCheckmate()) {
-                if (game.inCheck() && game.turn() === boardOrientation) {
-                    // player lost, opponent won
-                    gameResult += game.turn() + " lost"
-                } else {
-                    const opponent = game.turn() === "w" ? "b" : "w"
-                    gameResult += opponent + " lost"
-                }
-            } else if (game.isDraw()) {
-                gameResult += "game drawn"
-                if (game.isInsufficientMaterial()) {
-                } else if (game.isStalemate()) {
-                } else if (game.isThreefoldRepetition()) {
-                }
-            }
-            socket.emit("game_over", { to: opponent_socket_id, gameResult })
-            console.log("game over")
-            handleClickOpen()
-            myTimer.current.stopTimer()
-            opponentTimer.current.stopTimer()
-            /* handleClickOpen() */
-            // send gameResult through "game_over"
-        }
-
-        if (isGameOver) {
-            myTimer.current.stopTimer()
-            opponentTimer.current.stopTimer()
+            gameEndHandler()
         }
     }
 
@@ -286,6 +262,7 @@ function Board() {
             </Grid>
             <Grid item>
                 <GameInfo
+                    gameEndHandler={gameEndHandler}
                     opponentUserName={opponentUserName}
                     myUsername={myUsername}
                     opponentTimeInfo={opponentTimeInfo}
