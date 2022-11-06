@@ -38,7 +38,7 @@ function Board() {
     const [myTimeInfo, setMyTimeInfo] = useState("05:00")
 
     const [pgnMoves, setPgnMoves] = useState([])
-
+    const [gameEndMessage, setGameEndMessage] = useState("")
     const [isGameOver, setIsGameOver] = useState(false)
 
     const { opponent_socket_id, mycolor } = useParams()
@@ -66,23 +66,30 @@ function Board() {
         setIsGameOver(true)
         var gameResult = ""
 
+        //TODO: Make sure this shows correct result, for all 4 cases:
+        // - Checkmate
+        // - Resign
+        // - Timeover
+        // - Draw
+
         if (resigned) {
-            gameResult += myUsername + " lost"
+            gameResult += myUsername + " Lost"
         } else if (game.isCheckmate()) {
             if (game.inCheck() && game.turn() === boardOrientation) {
                 // player lost, opponent won
-                gameResult += game.turn() + " lost"
+                gameResult += game.turn() + " Lost"
             } else {
                 const opponent = game.turn() === "w" ? "b" : "w"
-                gameResult += opponent + " lost"
+                gameResult += opponent + " Lost"
             }
         } else if (game.isDraw()) {
-            gameResult += "game drawn"
+            gameResult += "Game Drawn"
             if (game.isInsufficientMaterial()) {
             } else if (game.isStalemate()) {
             } else if (game.isThreefoldRepetition()) {
             }
         }
+
         socket.emit("game_over", {
             to: opponent_socket_id,
             gameResult,
@@ -92,6 +99,7 @@ function Board() {
         // send gameResult through "game_over"
 
         // update game table
+        setGameEndMessage(gameResult)
         handleClickOpen()
         myTimer.current.stopTimer()
         opponentTimer.current.stopTimer()
@@ -154,6 +162,8 @@ function Board() {
 
         socket.on("game_over", (data) => {
             setIsGameOver(true)
+            setGameEndMessage("Placeholder") // Doesn't call gameEndHandler(), doesn't set message
+            // TODO: Make this player call game_over as well.
             handleClickOpen()
             console.log("Game over!", data)
         })
@@ -178,13 +188,22 @@ function Board() {
                 ":" +
                 convertTimeToString(opponentTimer.current.getSeconds())
             setMyTimeInfo(opponentTime)
+
+            if (
+                !isGameOver &&
+                myTimer.current.getMinutes() === 0 &&
+                myTimer.current.getSeconds() === 0
+            ) {
+                console.log(isGameOver)
+                gameEndHandler(true)
+            }
         }, 500)
 
         return () => {
             socket.off("send_move")
             clearInterval(interval)
         }
-    }, [])
+    }, [isGameOver])
 
     function sendMove(move) {
         console.log("Sending Move", move)
@@ -245,7 +264,11 @@ function Board() {
             spacing={3}
         >
             <Grid item>
-                <GameEndDialog open={open} onClose={handleClose} />
+                <GameEndDialog
+                    open={open}
+                    onClose={handleClose}
+                    gameEndMessage={gameEndMessage}
+                />
             </Grid>
             <Grid item>
                 <Chessboard
@@ -274,14 +297,14 @@ function Board() {
                 />
             </Grid>
             <Timer
-                initialMinute={5}
-                initialSeconds={0}
+                initialMinute={0}
+                initialSeconds={10}
                 isTicking={0}
                 ref={opponentTimer}
             />
             <Timer
-                initialMinute={5}
-                initialSeconds={0}
+                initialMinute={0}
+                initialSeconds={10}
                 isTicking={0}
                 ref={myTimer}
             />
