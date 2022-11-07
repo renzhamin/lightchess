@@ -39,6 +39,7 @@ function Board() {
 
     const [pgnMoves, setPgnMoves] = useState([])
     const [gameEndMessage, setGameEndMessage] = useState("")
+    const [gameEndTitle, setGameEndTitle] = useState("")
     const [isGameOver, setIsGameOver] = useState(false)
 
     const { opponent_socket_id, mycolor } = useParams()
@@ -58,11 +59,23 @@ function Board() {
         setOpen(true)
     }
 
+    var resigned = false
+
     const handleClose = (value) => {
         setOpen(false)
     }
 
-    function gameEndHandler(resigned) {
+    function setEndDialogMessages() {
+        if (areYouWinningSon()) {
+            setGameEndTitle("Victory!")
+            setGameEndMessage("ELO ++")
+        } else {
+            setGameEndTitle("Defeat!")
+            setGameEndMessage("ELO --")
+        }
+    }
+
+    function gameEndHandler(iResigned) {
         setIsGameOver(true)
         var gameResult = ""
 
@@ -72,7 +85,13 @@ function Board() {
         // - Timeover
         // - Draw
 
-        if (resigned) {
+        console.log("Have I resigned?")
+        console.log(iResigned)
+        if (iResigned) {
+            addGame()
+            resigned = true
+            console.log("Resigned Value Here")
+            console.log(resigned)
             gameResult += myUsername + " Lost"
         } else if (game.isCheckmate()) {
             if (game.inCheck() && game.turn() === boardOrientation) {
@@ -99,31 +118,43 @@ function Board() {
         // send gameResult through "game_over"
 
         // update game table
-        setGameEndMessage(gameResult)
+
+        console.log("Game over, what is dialog message")
+        console.log(areYouWinningSon())
+
+        setEndDialogMessages()
         handleClickOpen()
         myTimer.current.stopTimer()
         opponentTimer.current.stopTimer()
         console.log(gameResult)
-        addGame()
     }
 
     const areYouWinningSon = () => {
-        if (boardOrientation[0] != game.turn()) {
-            return true
+        console.log("Resign variable")
+        console.log(resigned)
+        if (
+            resigned ||
+            (game.isGameOver() && boardOrientation[0] == game.turn())
+        ) {
+            return false
         }
-        return false
+        return true
     }
 
     const addGame = async () => {
+        console.log("Adding Game")
         try {
             // TODO: set game values properly
+            console.log(game.pgn())
             await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/games`, {
                 whiteUserName: mycolor == 1 ? opponentUserName : myUsername,
                 blackUserName: mycolor == 1 ? myUsername : opponentUserName,
-                winnerUserName: areYouWinningSon
+                winnerUserName: areYouWinningSon()
                     ? myUsername
                     : opponentUserName,
-                loserUserName: areYouWinningSon ? opponentUserName : myUsername,
+                loserUserName: areYouWinningSon()
+                    ? opponentUserName
+                    : myUsername,
                 pgn: game.pgn(),
             })
         } catch (error) {
@@ -141,8 +172,8 @@ function Board() {
             setPosition(game.fen())
 
             // timer
-            myTimer.current.stopTimer()
-            opponentTimer.current.startTimer()
+            opponentTimer.current.stopTimer()
+            myTimer.current.startTimer()
             setPgnMoves(parsePgn(game.pgn()))
 
             // TODO: checkmate sound does not seem to play
@@ -162,8 +193,14 @@ function Board() {
 
         socket.on("game_over", (data) => {
             setIsGameOver(true)
-            setGameEndMessage("Placeholder") // Doesn't call gameEndHandler(), doesn't set message
-            // TODO: Make this player call game_over as well.
+            // NOT CONFIDENT THIS WORKS
+            if (areYouWinningSon()) {
+                setGameEndTitle("Victory!")
+                setGameEndMessage("ELO ++")
+            } else {
+                setGameEndTitle("Defeat!")
+                setGameEndMessage("ELO --")
+            }
             handleClickOpen()
             console.log("Game over!", data)
         })
@@ -194,7 +231,13 @@ function Board() {
                 myTimer.current.getMinutes() === 0 &&
                 myTimer.current.getSeconds() === 0
             ) {
-                console.log(isGameOver)
+                console.log("My time")
+                console.log(myTimer.current.getSeconds())
+                console.log(myTimer.current.getSeconds())
+                console.log("Opponent time")
+                console.log(opponentTimer.current.getSeconds())
+                console.log(opponentTimer.current.getSeconds())
+                console.log("My time is over")
                 gameEndHandler(true)
             }
         }, 500)
@@ -235,8 +278,8 @@ function Board() {
 
         playMoveSfx()
 
-        myTimer.current.startTimer()
-        opponentTimer.current.stopTimer()
+        opponentTimer.current.startTimer()
+        myTimer.current.stopTimer()
 
         setPgnMoves(parsePgn(game.pgn()))
         console.log(parsePgn(game.pgn()))
@@ -246,6 +289,7 @@ function Board() {
         console.log(isGameOver)
 
         if (game.isGameOver()) {
+            addGame()
             gameEndHandler()
         }
     }
@@ -268,6 +312,7 @@ function Board() {
                     open={open}
                     onClose={handleClose}
                     gameEndMessage={gameEndMessage}
+                    gameEndTitle={gameEndTitle}
                 />
             </Grid>
             <Grid item>

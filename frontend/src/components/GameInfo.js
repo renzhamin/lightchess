@@ -45,7 +45,7 @@ const GameInfo = (props) => {
                                     }
                                     sx={{ fontSize: 35 }}
                                 >
-                                    {props.opponentTimeInfo}
+                                    {props.myTimeInfo}
                                 </Button>
                             </TableCell>
                         </TableRow>
@@ -128,7 +128,7 @@ const GameInfo = (props) => {
                                     }
                                     variant="contained"
                                 >
-                                    {props.myTimeInfo}
+                                    {props.opponentTimeInfo}
                                 </Button>
                             </TableCell>
                         </TableRow>

@@ -20,7 +20,9 @@ function GameEndDialog(props) {
 
     return (
         <Dialog onClose={handleClose} open={open}>
-            <DialogTitle align="center">Game Over!</DialogTitle>
+            <DialogTitle align="center">
+                {props.gameEndTitle}
+            </DialogTitle>
             <DialogContent>
                 <DialogContentText id="game-description" align="center">
                     {props.gameEndMessage}
