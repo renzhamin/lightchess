@@ -20,11 +20,15 @@ import { refreshToken } from "../controllers/RefreshToken"
 import { getGames, addGames } from "../modules/Games"
 import passport from "passport"
 import router_google from "./router-google"
-import { getPublicUserInfo } from "../controllers/getUserInfo"
+import {
+    getLastNMatchResults,
+    getPublicUserInfo,
+} from "../controllers/getUserInfo"
 const router = express.Router()
 
 router.get("/users", verifyToken, getUsers)
 router.get("/user/:username", getPublicUserInfo)
+router.get("/user/:username/recents/:n", getLastNMatchResults)
 router.post(
     "/register",
     validateRegistrationData,
