@@ -4,6 +4,7 @@ import cookieParser from "cookie-parser"
 import cors from "cors"
 import db from "./config/Database"
 import router from "./routes/index"
+import path from "path"
 
 import { createServer } from "http"
 import { Server } from "socket.io"
@@ -41,6 +42,8 @@ app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 
 app.use(router)
+
+app.use(express.static(path.join(__dirname, "build")))
 
 interface UserData {
     username: string
@@ -83,4 +86,9 @@ io.on("connection", (socket) => {
     })
 })
 
-server.listen(5000, () => console.log("Server running at port 5000"))
+let PORT = process.env.PORT || "5000"
+const HOST = "0.0.0.0"
+
+server.listen(parseInt(PORT), HOST, () =>
+    console.log("Server running at port", PORT)
+)
