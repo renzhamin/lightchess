@@ -96,24 +96,24 @@ const router_google = express.Router()
    automatically created and their Google account is linked.  When an existing
    user returns, they are signed in to their linked account.
    */
-router_google.get(
-    "/oauth2/redirect/google",
-    passport.authenticate("google", {
-        failureRedirect: "http://localhost:3000",
-        session: false,
-    }),
-    async function (req, res) {
-        const { id, username, email } = req.user
-
-        const refreshToken = getRefreshToken({ id, username, email })
-
-        res.cookie("refreshToken", refreshToken, {
-            httpOnly: true,
-            maxAge: 24 * 60 * 60 * 30 * 1000,
-        })
-
-        return res.redirect("http://localhost:3000/dashboard")
-    }
-)
+/* router_google.get( */
+/*     "/oauth2/redirect/google", */
+/*     passport.authenticate("google", { */
+/*         failureRedirect: "http://localhost:3000", */
+/*         session: false, */
+/*     }), */
+/*     async function (req, res) { */
+/*         const { id, username, email } = req.user */
+/**/
+/*         const refreshToken = getRefreshToken({ id, username, email }) */
+/**/
+/*         res.cookie("refreshToken", refreshToken, { */
+/*             httpOnly: true, */
+/*             maxAge: 24 * 60 * 60 * 30 * 1000, */
+/*         }) */
+/**/
+/*         return res.redirect("http://localhost:3000/dashboard") */
+/*     } */
+/* ) */
 
 export default router_google
