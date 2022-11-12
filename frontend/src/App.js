@@ -1,7 +1,7 @@
 import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
 import React, { useEffect, useState } from "react"
-import { BrowserRouter, Route, Switch } from "react-router-dom"
+import { HashRouter, Route, Switch } from "react-router-dom"
 import { io } from "socket.io-client"
 import Board from "./components/Chessboard"
 import Dashboard from "./components/Dashboard"
@@ -73,7 +73,7 @@ function App() {
         >
             <ThemeProvider theme={theme}>
                 <CssBaseline />
-                <BrowserRouter>
+                <HashRouter>
                     <Switch>
                         <Route exact path="/">
                             <SignIn />
@@ -101,7 +101,7 @@ function App() {
                             <Board />
                         </Route>
                     </Switch>
-                </BrowserRouter>
+                </HashRouter>
             </ThemeProvider>
         </AppContext.Provider>
     )
