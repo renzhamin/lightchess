@@ -2,6 +2,7 @@ import React, { useContext, useState } from "react"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
 import { AppContext } from "../App"
+import { config } from "../config"
 
 const Register = () => {
     const { username, setUserName } = useContext(AppContext)
@@ -14,15 +15,12 @@ const Register = () => {
     const Register = async (e) => {
         e.preventDefault()
         try {
-            await axios.post(
-                `${process.env.REACT_APP_BACKEND_URL}/api/register`,
-                {
-                    username,
-                    email,
-                    password,
-                    confPassword,
-                }
-            )
+            await axios.post(`${config.backend}/api/register`, {
+                username,
+                email,
+                password,
+                confPassword,
+            })
             history.push("/")
         } catch (error) {
             if (error.response) {

@@ -26,6 +26,7 @@ import Dialog from "@mui/material/Dialog"
 import PersonIcon from "@mui/icons-material/Person"
 import AddIcon from "@mui/icons-material/Add"
 import { blue } from "@mui/material/colors"
+import { config } from "../config"
 
 function Board() {
     const { socket, userMap, username: myUsername } = useContext(AppContext)
@@ -146,7 +147,7 @@ function Board() {
         try {
             // TODO: set game values properly
             console.log(game.pgn())
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/games`, {
+            await axios.post(`${config.backend}/api/games`, {
                 whiteUserName: mycolor == 1 ? opponentUserName : myUsername,
                 blackUserName: mycolor == 1 ? myUsername : opponentUserName,
                 winnerUserName: areYouWinningSon()

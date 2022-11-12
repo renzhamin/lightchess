@@ -13,6 +13,7 @@ import Snackbar from "@mui/material/Snackbar"
 import MuiAlert from "@mui/material/Alert"
 import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
 import { AppContext } from "../App"
+import { config } from "../config"
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -49,7 +50,7 @@ const SignUp = () => {
         e.preventDefault()
         try {
             await axios.post(
-                `${process.env.REACT_APP_BACKEND_URL}/api/register`,
+                `${config.backend}/api/register`,
                 {
                     username,
                     email,

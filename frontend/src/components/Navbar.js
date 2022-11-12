@@ -3,6 +3,7 @@ import axios from "axios"
 import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
 import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material"
+import { config } from "../config"
 
 const Navbar = () => {
     const { socket } = useContext(AppContext)
@@ -11,7 +12,7 @@ const Navbar = () => {
     const Logout = async () => {
         try {
             await axios.delete(
-                `${process.env.REACT_APP_BACKEND_URL}/api/logout`
+                `${config.backend}/api/logout`
             )
             history.push("/")
             socket.disconnect()

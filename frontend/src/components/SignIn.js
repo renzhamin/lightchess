@@ -12,6 +12,7 @@ import Container from "@mui/material/Container"
 import Snackbar from "@mui/material/Snackbar"
 import MuiAlert from "@mui/material/Alert"
 import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
+import { config } from "../config"
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -50,7 +51,7 @@ const SignIn = () => {
     const Auth = async (e) => {
         e.preventDefault()
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
+            await axios.post(`${config.backend}/api/login`, {
                 email: email,
                 password: password,
             })
@@ -182,7 +183,7 @@ const SignIn = () => {
                 </Box>
                 {/* <Link
                     href={
-                        process.env.REACT_APP_BACKEND_URL +
+                        config.backend +
                         "/api/login/federated/google"
                     }
                     variant="body2"

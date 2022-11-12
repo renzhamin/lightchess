@@ -10,10 +10,11 @@ import PgnViewer from "./components/PgnViewer"
 import SignIn from "./components/SignIn"
 import SignUp from "./components/SignUp"
 import theme from "./theme"
+import { config } from "./config"
 
 export const AppContext = React.createContext()
 
-const socket = io(process.env.REACT_APP_WEB_SOCKET_URL, {
+const socket = io(config.backend_ws, {
     autoConnect: false,
 })
 
@@ -25,7 +26,6 @@ const initSocket = (args) => {
         console.log(response)
     })
 }
-
 function App() {
     const [userMap, setUserMap] = useState(new Map())
     const [userList, setUserList] = useState([])

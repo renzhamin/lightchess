@@ -21,6 +21,7 @@ import {
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
+import { config } from "../config"
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -52,9 +53,7 @@ const Dashboard = () => {
 
     const refreshToken = async () => {
         try {
-            const response = await axios.get(
-                `${process.env.REACT_APP_BACKEND_URL}/api/token`
-            )
+            const response = await axios.get(`${config.backend}/api/token`)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setUserName(decoded.username)
@@ -73,9 +72,7 @@ const Dashboard = () => {
         async (config) => {
             const currentDate = new Date()
             if (expire * 1000 < currentDate.getTime()) {
-                const response = await axios.get(
-                    `${process.env.REACT_APP_BACKEND_URL}/api/token`
-                )
+                const response = await axios.get(`${config.backend}/api/token`)
                 config.headers.Authorization = `Bearer ${response.data.accessToken}`
                 setToken(response.data.accessToken)
                 const decoded = jwt_decode(response.data.accessToken)
@@ -90,14 +87,11 @@ const Dashboard = () => {
     )
 
     const getUsers = async () => {
-        const response = await axiosJWT.get(
-            `${process.env.REACT_APP_BACKEND_URL}/api/users`,
-            {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            }
-        )
+        const response = await axiosJWT.get(`${config.backend}/api/users`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        })
         setUsers(response.data)
         initSocket({ username, userId })
     }

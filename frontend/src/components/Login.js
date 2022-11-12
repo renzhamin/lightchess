@@ -1,6 +1,7 @@
 import React, { useState } from "react"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
+import { config } from "./config"
 
 const Login = () => {
     const [email, setEmail] = useState("")
@@ -11,7 +12,7 @@ const Login = () => {
     const Auth = async (e) => {
         e.preventDefault()
         try {
-            await axios.post(`${process.env.REACT_APP_BACKEND_URL}/api/login`, {
+            await axios.post(`${config.backend}/api/login`, {
                 email: email,
                 password: password,
             })
@@ -73,7 +74,7 @@ const Login = () => {
                             </form>
                             <a
                                 href={
-                                    process.env.REACT_APP_BACKEND_URL +
+                                    config.backend +
                                     "/api/login/federated/google"
                                 }
                             >
