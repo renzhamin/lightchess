@@ -6,7 +6,10 @@ import {
     CreationOptional,
 } from "sequelize"
 import db from "../config/Database"
-import { updateStatsAfterMatchEnd } from "../controllers/updateUserInfo"
+import {
+    updateElo,
+    updateStatsAfterMatchEnd,
+} from "../controllers/updateUserInfo"
 
 class Games extends Model<
     InferAttributes<Games>,
@@ -69,6 +72,20 @@ Games.init(
                         false,
                         false,
                         !black
+                    )
+                } else {
+                    // draw
+                    updateStatsAfterMatchEnd(
+                        games.whiteUserName,
+                        false,
+                        true,
+                        false
+                    )
+                    updateStatsAfterMatchEnd(
+                        games.blackUserName,
+                        false,
+                        true,
+                        true
                     )
                 }
             },

@@ -1,5 +1,18 @@
-import { InferAttributes } from "sequelize"
 import Users from "../models/UserModel"
+
+export const updateElo = async (username: string, elo: number) => {
+    const user = await Users.findOne({
+        where: { username: username },
+    })
+
+    if (!user) {
+        console.log(username, " not found for elo update")
+        return
+    }
+
+    user.elo = elo
+    await user.save()
+}
 
 export const updateStatsAfterMatchEnd = async (
     username: string,
@@ -24,7 +37,12 @@ export const updateStatsAfterMatchEnd = async (
         where: { username: username },
     })
 
-    await user?.increment([col1, col2], { by: 1 })
+    if (!user) {
+        console.log(username, "not found for updateStatsAfterMatchEnd")
+        return
+    }
 
-    await user?.save()
+    await user.increment([col1, col2], { by: 1 })
+
+    await user.save()
 }
