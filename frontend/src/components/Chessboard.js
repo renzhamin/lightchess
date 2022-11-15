@@ -31,6 +31,8 @@ import { config } from "../config"
 var myInfo = {}
 var opponentInfo = {}
 
+var whiteElo, blackElo
+
 function Board() {
     const { socket, userMap, username: myUsername } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
@@ -95,8 +97,18 @@ function Board() {
             setGameEndTitle("Defeat!")
             setGameEndMessage("ELO " + delta)
         }
-        var myNewElo = myInfo.data.elo + delta
-        var opponentNewElo = opponentInfo.data.elo - delta
+        let myNewElo = myInfo.data.elo + delta
+        let opponentNewElo = opponentInfo.data.elo - delta
+
+        // I am white
+        whiteElo = myNewElo
+        blackElo = opponentNewElo
+
+        // I am black
+        if (mycolor == 1) {
+            ;[whiteElo, blackElo] = [blackElo, whiteElo]
+        }
+
         console.log(myNewElo, opponentNewElo)
         // UPDATE DATABASE HERE WITH THESE NEW VALUES
     }
@@ -110,6 +122,15 @@ function Board() {
     }
 
     function gameEndHandler(iResigned) {
+        if (iResigned) {
+            resigned = true
+        }
+        myTimer.current.stopTimer()
+        opponentTimer.current.stopTimer()
+        setEndDialogMessages()
+        handleClickOpen()
+        console.log(gameResult)
+
         setIsGameOver(true)
         var gameResult = ""
 
@@ -120,11 +141,8 @@ function Board() {
         // - Draw
 
         if (iResigned) {
-            addGame()
-            resigned = true
-            console.log("Resigned Value Here")
-            console.log(resigned)
             gameResult += myUsername + " Lost"
+            addGame()
         } else if (game.isCheckmate()) {
             if (game.inCheck() && game.turn() === boardOrientation) {
                 // player lost, opponent won
@@ -150,12 +168,6 @@ function Board() {
         // send gameResult through "game_over"
 
         // update game table
-
-        myTimer.current.stopTimer()
-        opponentTimer.current.stopTimer()
-        setEndDialogMessages()
-        handleClickOpen()
-        console.log(gameResult)
     }
 
     const areYouWinningSon = () => {
@@ -170,6 +182,7 @@ function Board() {
 
     const addGame = async () => {
         console.log("Adding Game")
+        console.log("add game", whiteElo, blackElo)
         try {
             // TODO: set game values properly
             console.log(game.pgn())
@@ -183,6 +196,8 @@ function Board() {
                     ? opponentUserName
                     : myUsername,
                 pgn: game.pgn(),
+                whiteUserElo: whiteElo,
+                blackUserElo: blackElo,
             })
         } catch (error) {
             console.log(error)
@@ -319,8 +334,8 @@ function Board() {
         console.log(isGameOver)
 
         if (game.isGameOver()) {
-            addGame()
             gameEndHandler()
+            addGame()
         }
     }
 
