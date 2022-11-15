@@ -28,10 +28,8 @@ import AddIcon from "@mui/icons-material/Add"
 import { blue } from "@mui/material/colors"
 import { config } from "../config"
 
-
 var myInfo = {}
 var opponentInfo = {}
-
 
 function Board() {
     const { socket, userMap, username: myUsername } = useContext(AppContext)
@@ -61,8 +59,6 @@ function Board() {
 
     const [open, setOpen] = React.useState(false)
 
-
-
     const handleClickOpen = () => {
         setOpen(true)
     }
@@ -85,7 +81,7 @@ function Board() {
         // console.log(opponentInfo.data)
         console.log("at setEndDialogMessages", myInfo.data)
 
-
+        console.log("Stopped timer, now updating deltas")
 
         var delta = ratingDelta(
             myInfo.data.elo,
@@ -99,7 +95,10 @@ function Board() {
             setGameEndTitle("Defeat!")
             setGameEndMessage("ELO " + delta)
         }
-        console.log(delta)
+        var myNewElo = myInfo.data.elo + delta
+        var opponentNewElo = opponentInfo.data.elo - delta
+        console.log(myNewElo, opponentNewElo)
+        // UPDATE DATABASE HERE WITH THESE NEW VALUES
     }
 
     const fetchData = async () => {
@@ -152,10 +151,10 @@ function Board() {
 
         // update game table
 
-        setEndDialogMessages()
-        handleClickOpen()
         myTimer.current.stopTimer()
         opponentTimer.current.stopTimer()
+        setEndDialogMessages()
+        handleClickOpen()
         console.log(gameResult)
     }
 
@@ -196,10 +195,12 @@ function Board() {
             myInfo = data
         })
 
-        axios.get(`${config.backend}/api/user/` + opponentUserName).then((data) => {
-            opponentInfo = data
-        })
-        
+        axios
+            .get(`${config.backend}/api/user/` + opponentUserName)
+            .then((data) => {
+                opponentInfo = data
+            })
+
         console.log("Opponent is ", opponentUserName)
         if (mycolor == 1) setBoardOrientation("black")
 
@@ -230,22 +231,12 @@ function Board() {
 
         socket.on("game_over", (data) => {
             setIsGameOver(true)
-            console.log(myInfo.data)
-            console.log(opponentInfo.data)
+            // console.log(myInfo.data)
+            // console.log(opponentInfo.data)
             // NOT CONFIDENT THIS WORKS
-            var delta = ratingDelta(
-                myInfo.data.elo,
-                opponentInfo.data.elo,
-                areYouWinningSon()
-            )
-            if (areYouWinningSon()) {
-                setGameEndTitle("Victory!")
-                setGameEndMessage("ELO +" + delta)
-            } else {
-                setGameEndTitle("Defeat!")
-                setGameEndMessage("ELO " + delta)
-            }
-            console.log("ELO Change: " + delta)
+            myTimer.current.stopTimer()
+            opponentTimer.current.stopTimer()
+            setEndDialogMessages()
             handleClickOpen()
             console.log("Game over!", data)
         })
