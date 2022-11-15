@@ -1,3 +1,4 @@
+import { updateElo } from "../controllers/updateUserInfo"
 import Games from "../models/GamesModel"
 
 export const getGames = async (req, res) => {
@@ -22,5 +23,20 @@ export const addGames = async (req, res) => {
         console.log(err)
         return res.json({ msg: err })
     })
+
+    const { whiteUserElo, blackUserElo } = req.body
+
+    if (isNaN(parseInt(whiteUserElo))) {
+        console.log(req.body.whiteUserName, "'s elo is Nan")
+        return
+    }
+    if (isNaN(parseInt(blackUserElo))) {
+        console.log(req.body.blackUserElo, "'s elo is Nan")
+        return
+    }
+
+    updateElo(req.body.blackUserName, parseInt(req.body.blackUserElo))
+    updateElo(req.body.whiteUserName, parseInt(req.body.whiteUserElo))
+
     res.json({ game: addedGame })
 }
