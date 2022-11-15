@@ -21,10 +21,21 @@ const Navbar = () => {
         }
     }
 
+    const Home = () => {
+        history.push("/dashboard")
+    }
+
     return (
         <React.Fragment>
             <AppBar position="static">
                 <Toolbar variant="dense">
+                    <Button
+                        variant="text"
+                        sx={{ marginLeft: "left" }}
+                        onClick={Home}
+                    >
+                        Home
+                    </Button>
                     <Button
                         variant="outlined"
                         sx={{ marginLeft: "auto" }}
@@ -32,6 +43,7 @@ const Navbar = () => {
                     >
                         Log Out
                     </Button>
+                    
                 </Toolbar>
             </AppBar>
         </React.Fragment>

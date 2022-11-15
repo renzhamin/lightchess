@@ -1,15 +1,16 @@
 import React, { useLayoutEffect } from "react"
+import { useHistory, useLocation } from "react-router-dom"
 // import Children from "react-children-utilities";
 import * as uuid from "uuid"
 import { pgnView } from "@mliebelt/pgn-viewer"
 
 function PgnViewer(props) {
     // const gameDecription = Children.onlyText(props.children);
+    const location = useLocation()
     const id = "board-" + uuid.v4()
 
-    const pgn = `
-  1. d4 d5 2. Nc3 Nc6 3. Nxd5 Nxd4
-  `
+    const pgn = location.pgn === undefined ? `1. d4 d5 2. Nc3 Nc6 3. Nxd5 Nxd4` : location.pgn
+    console.log(location.pgn, pgn)
 
     useLayoutEffect(() => {
         pgnView(id, {
@@ -20,7 +21,8 @@ function PgnViewer(props) {
             showResult: true,
             boardSize: "650",
             showFen: true,
-            pieceStyle: "merida",
+            pieceStyle: "wikipedia",
+            theme: "brown",
             resizable: true,
         })
     })

@@ -10,6 +10,7 @@ import PgnViewer from "./components/PgnViewer"
 import SignIn from "./components/SignIn"
 import SignUp from "./components/SignUp"
 import theme from "./theme"
+import Profile from "./components/Profile"
 import { config } from "./config"
 
 export const AppContext = React.createContext()
@@ -99,6 +100,10 @@ function App() {
                         <Route path="/play">
                             <Navbar />
                             <Board />
+                        </Route>
+                        <Route path="/user/:username">
+                            <Navbar />
+                            <Profile/>
                         </Route>
                     </Switch>
                 </HashRouter>
