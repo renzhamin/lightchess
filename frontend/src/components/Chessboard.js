@@ -28,6 +28,11 @@ import AddIcon from "@mui/icons-material/Add"
 import { blue } from "@mui/material/colors"
 import { config } from "../config"
 
+var myInfo = {}
+var opponentInfo = {}
+
+var whiteElo, blackElo
+
 function Board() {
     const { socket, userMap, username: myUsername } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
@@ -60,6 +65,13 @@ function Board() {
         setOpen(true)
     }
 
+    function ratingDelta(myRating, opponentRating, myGameResult) {
+        var myChanceToWin =
+            1 / (1 + Math.pow(10, (opponentRating - myRating) / 400))
+
+        return Math.round(32 * (myGameResult - myChanceToWin))
+    }
+
     var resigned = false
 
     const handleClose = (value) => {
@@ -67,16 +79,58 @@ function Board() {
     }
 
     function setEndDialogMessages() {
+        // console.log(myInfo.data)
+        // console.log(opponentInfo.data)
+        console.log("at setEndDialogMessages", myInfo.data)
+
+        console.log("Stopped timer, now updating deltas")
+
+        var delta = ratingDelta(
+            myInfo.data.elo,
+            opponentInfo.data.elo,
+            areYouWinningSon()
+        )
         if (areYouWinningSon()) {
             setGameEndTitle("Victory!")
-            setGameEndMessage("ELO ++")
+            setGameEndMessage("ELO +" + delta)
         } else {
             setGameEndTitle("Defeat!")
-            setGameEndMessage("ELO --")
+            setGameEndMessage("ELO " + delta)
         }
+        let myNewElo = myInfo.data.elo + delta
+        let opponentNewElo = opponentInfo.data.elo - delta
+
+        // I am white
+        whiteElo = myNewElo
+        blackElo = opponentNewElo
+
+        // I am black
+        if (mycolor == 1) {
+            ;[whiteElo, blackElo] = [blackElo, whiteElo]
+        }
+
+        console.log(myNewElo, opponentNewElo)
+        // UPDATE DATABASE HERE WITH THESE NEW VALUES
+    }
+
+    const fetchData = async () => {
+        myInfo = await axios.get(`${config.backend}/api/user/` + myUsername)
+        opponentInfo = await axios.get(
+            `${config.backend}/api/user/` + opponentUserName
+        )
+        console.log(myInfo, opponentInfo)
     }
 
     function gameEndHandler(iResigned) {
+        if (iResigned) {
+            resigned = true
+        }
+        myTimer.current.stopTimer()
+        opponentTimer.current.stopTimer()
+        setEndDialogMessages()
+        handleClickOpen()
+        console.log(gameResult)
+
         setIsGameOver(true)
         var gameResult = ""
 
@@ -86,14 +140,9 @@ function Board() {
         // - Timeover
         // - Draw
 
-        console.log("Have I resigned?")
-        console.log(iResigned)
         if (iResigned) {
-            addGame()
-            resigned = true
-            console.log("Resigned Value Here")
-            console.log(resigned)
             gameResult += myUsername + " Lost"
+            addGame()
         } else if (game.isCheckmate()) {
             if (game.inCheck() && game.turn() === boardOrientation) {
                 // player lost, opponent won
@@ -119,20 +168,9 @@ function Board() {
         // send gameResult through "game_over"
 
         // update game table
-
-        console.log("Game over, what is dialog message")
-        console.log(areYouWinningSon())
-
-        setEndDialogMessages()
-        handleClickOpen()
-        myTimer.current.stopTimer()
-        opponentTimer.current.stopTimer()
-        console.log(gameResult)
     }
 
     const areYouWinningSon = () => {
-        console.log("Resign variable")
-        console.log(resigned)
         if (
             resigned ||
             (game.isGameOver() && boardOrientation[0] == game.turn())
@@ -144,6 +182,7 @@ function Board() {
 
     const addGame = async () => {
         console.log("Adding Game")
+        console.log("add game", whiteElo, blackElo)
         try {
             // TODO: set game values properly
             console.log(game.pgn())
@@ -157,6 +196,8 @@ function Board() {
                     ? opponentUserName
                     : myUsername,
                 pgn: game.pgn(),
+                whiteUserElo: whiteElo,
+                blackUserElo: blackElo,
             })
         } catch (error) {
             console.log(error)
@@ -164,6 +205,17 @@ function Board() {
     }
 
     useEffect(() => {
+        // fetchData()
+        axios.get(`${config.backend}/api/user/` + myUsername).then((data) => {
+            myInfo = data
+        })
+
+        axios
+            .get(`${config.backend}/api/user/` + opponentUserName)
+            .then((data) => {
+                opponentInfo = data
+            })
+
         console.log("Opponent is ", opponentUserName)
         if (mycolor == 1) setBoardOrientation("black")
 
@@ -194,14 +246,12 @@ function Board() {
 
         socket.on("game_over", (data) => {
             setIsGameOver(true)
+            // console.log(myInfo.data)
+            // console.log(opponentInfo.data)
             // NOT CONFIDENT THIS WORKS
-            if (areYouWinningSon()) {
-                setGameEndTitle("Victory!")
-                setGameEndMessage("ELO ++")
-            } else {
-                setGameEndTitle("Defeat!")
-                setGameEndMessage("ELO --")
-            }
+            myTimer.current.stopTimer()
+            opponentTimer.current.stopTimer()
+            setEndDialogMessages()
             handleClickOpen()
             console.log("Game over!", data)
         })
@@ -232,12 +282,6 @@ function Board() {
                 myTimer.current.getMinutes() === 0 &&
                 myTimer.current.getSeconds() === 0
             ) {
-                console.log("My time")
-                console.log(myTimer.current.getSeconds())
-                console.log(myTimer.current.getSeconds())
-                console.log("Opponent time")
-                console.log(opponentTimer.current.getSeconds())
-                console.log(opponentTimer.current.getSeconds())
                 console.log("My time is over")
                 gameEndHandler(true)
             }
@@ -290,8 +334,8 @@ function Board() {
         console.log(isGameOver)
 
         if (game.isGameOver()) {
-            addGame()
             gameEndHandler()
+            addGame()
         }
     }
 
@@ -343,13 +387,13 @@ function Board() {
                 />
             </Grid>
             <Timer
-                initialMinute={0}
+                initialMinute={5}
                 initialSeconds={10}
                 isTicking={0}
                 ref={opponentTimer}
             />
             <Timer
-                initialMinute={0}
+                initialMinute={5}
                 initialSeconds={10}
                 isTicking={0}
                 ref={myTimer}

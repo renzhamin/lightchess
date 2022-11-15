@@ -42,6 +42,9 @@ const Dashboard = () => {
     const { initSocket, updateUserList } = useContext(AppContext)
 
     useEffect(() => {
+        axios.get(`${config.backend}/api/user/a`).then((data) => {
+            console.log("Got data", data)
+        })
         refreshToken()
         getUsers()
     }, [])
