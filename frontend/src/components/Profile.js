@@ -1,7 +1,7 @@
 import { useLocation } from "react-router-dom"
 import axios from "axios"
 import { config } from "../config"
-import { Button, Container } from "@mui/material"
+import { Button, Container, Grid } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
 import { Pie } from "react-chartjs-2"
@@ -94,7 +94,17 @@ function Profile(props) {
             >
                 Refresh
             </Button> */}
-            <Pie data={data} redraw="true" />
+            <Grid>
+                <Grid item>
+                    <Pie
+                        data={data}
+                        redraw="true"
+                        width={500}
+                        height={500}
+                        options={{ maintainAspectRatio: false }}
+                    />
+                </Grid>
+            </Grid>
         </Container>
     )
 }
