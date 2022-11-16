@@ -1,6 +1,6 @@
 import { useLocation } from "react-router-dom"
 import axios from "axios"
-import { config } from "../config"
+import { config } from "../config/config_env"
 import { Button, Container, Grid } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"

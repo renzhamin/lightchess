@@ -21,7 +21,7 @@ import {
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
-import { config } from "../config"
+import { config } from "../config/config_env"
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -31,7 +31,7 @@ const Dashboard = () => {
     const location = useLocation()
     const history = useHistory()
 
-    const { userId, setUserId, username, setUserName } = useContext(AppContext)
+    const { username, setUserName } = useContext(AppContext)
 
     const [token, setToken] = useState("")
     const [expire, setExpire] = useState("")
@@ -42,17 +42,14 @@ const Dashboard = () => {
     const { initSocket, updateUserList } = useContext(AppContext)
 
     useEffect(() => {
-        axios.get(`${config.backend}/api/user/a`).then((data) => {
-            console.log("Got data", data)
-        })
         refreshToken()
         getUsers()
     }, [])
 
     useEffect(() => {
-        initSocket({ username, userId })
+        initSocket({ username })
         updateUserList()
-    }, [userId, username])
+    }, [username])
 
     const refreshToken = async () => {
         try {
@@ -60,7 +57,6 @@ const Dashboard = () => {
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setUserName(decoded.username)
-            setUserId(decoded.id)
             setExpire(decoded.exp)
         } catch (error) {
             if (error.response) {
@@ -96,7 +92,7 @@ const Dashboard = () => {
             },
         })
         setUsers(response.data)
-        initSocket({ username, userId })
+        initSocket({ username })
     }
 
     const handleClose = (event, reason) => {

@@ -11,7 +11,7 @@ import SignIn from "./components/SignIn"
 import SignUp from "./components/SignUp"
 import theme from "./theme"
 import Profile from "./components/Profile"
-import { config } from "./config"
+import { config } from "./config/config_env"
 
 export const AppContext = React.createContext()
 
@@ -20,17 +20,29 @@ const socket = io(config.backend_ws, {
 })
 
 const initSocket = (args) => {
-    const { username, userId } = args
+    const { username } = args
     if (socket.connected === true || username === "") return
     socket.connect()
-    socket.emit("initSocket", { username, userId }, (response) => {
+    socket.emit("initSocket", { username }, (response) => {
         console.log(response)
     })
 }
+const initReady = (args) => {
+    const { username } = args
+    if (username === "") return
+    if (socket.disconnected) {
+        initSocket({ username })
+    }
+    socket.emit("initReady", { username }, (response) => {
+        console.log(response)
+    })
+}
+
 function App() {
     const [userMap, setUserMap] = useState(new Map())
     const [userList, setUserList] = useState([])
-    const [userId, setUserId] = useState(-1)
+    const [readyUserMap, setReadyUserMap] = useState(new Map())
+    const [readyUserList, setReadyUserList] = useState([])
     const [username, setUserName] = useState("")
 
     const updateUserList = () => {
@@ -41,17 +53,31 @@ function App() {
                 users.push({
                     id: key,
                     username: value.username,
-                    userId: value.userId,
                 })
             })
             setUserMap(newUserMap)
             setUserList([...users])
         })
     }
+    const updateReadyUserList = () => {
+        socket.emit("get_readyusers", "args", (usermap) => {
+            let newReadyMap = new Map(Object.entries(usermap))
+            let users = []
+            newReadyMap.forEach((value, key) => {
+                users.push({
+                    id: key,
+                    ...value,
+                })
+            })
+            setReadyUserMap(newReadyMap)
+            setReadyUserList([...users])
+        })
+    }
 
     useEffect(() => {
         const interval = setInterval(() => {
             updateUserList()
+            updateReadyUserList()
         }, 2000)
         return () => {
             clearInterval(interval)
@@ -64,12 +90,14 @@ function App() {
                 userMap,
                 userList,
                 updateUserList,
+                readyUserMap,
+                readyUserList,
+                updateReadyUserList,
                 socket,
                 initSocket,
-                userId,
+                initReady,
                 username,
                 setUserName,
-                setUserId,
             }}
         >
             <ThemeProvider theme={theme}>
@@ -103,7 +131,7 @@ function App() {
                         </Route>
                         <Route path="/user/:username">
                             <Navbar />
-                            <Profile/>
+                            <Profile />
                         </Route>
                     </Switch>
                 </HashRouter>

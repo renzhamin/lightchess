@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react"
 import axios from "axios"
 import { useHistory } from "react-router-dom"
 import { AppContext } from "../App"
-import { config } from "../config"
+import { config } from "../config/config_env"
 
 const Register = () => {
     const { username, setUserName } = useContext(AppContext)

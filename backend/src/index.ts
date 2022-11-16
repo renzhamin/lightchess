@@ -48,7 +48,6 @@ app.use(express.static(path.join(__dirname, "build")))
 
 interface UserData {
     username: string
-    userId: string
 }
 
 const userMap: Map<string, UserData> = new Map()
@@ -79,10 +78,10 @@ io.on("connection", (socket) => {
             callback(dMap)
         } else if (eventName == "initSocket") {
             const fn = args[args.length - 1]
-            const { username, userId } = args[0]
+            const { username } = args[0]
             /* console.log("args", username, userId) */
-            userMap.set(String(socket.id), { username, userId })
-            fn(`welcome ${username} from SERVER`)
+            userMap.set(String(socket.id), { username })
+            fn(`welcome ${username} from SERVER [initSocket successfull]`)
         } else if (eventName == "initReady") {
             const fn = args[args.length - 1]
             const data = args[0]
@@ -103,7 +102,7 @@ io.on("connection", (socket) => {
                     data.elo = user.elo
                     readyMap.set(String(socket.id), data)
                     fn(
-                        `welcome ${data.username} with elo ${data.elo} from SERVER`
+                        `welcome ${data.username} with elo ${data.elo} from SERVER [initReady successfull]`
                     )
                 })
             }

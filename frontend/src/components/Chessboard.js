@@ -26,7 +26,7 @@ import Dialog from "@mui/material/Dialog"
 import PersonIcon from "@mui/icons-material/Person"
 import AddIcon from "@mui/icons-material/Add"
 import { blue } from "@mui/material/colors"
-import { config } from "../config"
+import { config } from "../config/config_env"
 
 var myInfo = {}
 var opponentInfo = {}

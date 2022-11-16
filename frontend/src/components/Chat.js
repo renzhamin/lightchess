@@ -6,7 +6,7 @@ import { AppContext } from "../App.js"
 var playingAgainst
 
 export const Chat = (props) => {
-    const { initSocket, socket, updateUserList, userList, userId, username } =
+    const { initSocket, socket, updateUserList, userList, username } =
         useContext(AppContext)
     const history = useHistory()
     const [open, setOpen] = useState(false)
@@ -28,7 +28,7 @@ export const Chat = (props) => {
     }
 
     useEffect(() => {
-        initSocket({ username, userId })
+        initSocket({ username })
         updateUserList()
 
         socket.on("Challenge_accepted", (data) => {
@@ -86,7 +86,7 @@ export const Chat = (props) => {
                 name="Receiver"
                 onChange={handleReceiverChange}
                 onMouseOver={() => {
-                    initSocket({ username, userId })
+                    initSocket({ username })
                     updateUserList()
                 }}
             >

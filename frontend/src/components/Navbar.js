@@ -3,7 +3,7 @@ import axios from "axios"
 import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
 import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material"
-import { config } from "../config"
+import { config } from "../config/config_env"
 
 const Navbar = () => {
     const { socket } = useContext(AppContext)
