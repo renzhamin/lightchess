@@ -11,6 +11,7 @@ export const updateElo = async (username: string, elo: number) => {
     }
 
     user.elo = elo
+    user.elo_history += "," + String(elo)
     await user.save()
 }
 

@@ -20,6 +20,7 @@ class Users extends Model<
 
     declare role: CreationOptional<number>
     declare elo: CreationOptional<number>
+    declare elo_history: CreationOptional<string>
     declare totalPlayed: CreationOptional<number>
     declare wins: CreationOptional<number>
     declare losses: CreationOptional<number>
@@ -61,6 +62,11 @@ Users.init(
         elo: {
             type: DataTypes.INTEGER,
             defaultValue: 1200,
+        },
+
+        elo_history: {
+            type: DataTypes.TEXT,
+            defaultValue: "1200",
         },
 
         winAsWhite: {
