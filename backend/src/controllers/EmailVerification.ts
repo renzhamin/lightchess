@@ -1,14 +1,28 @@
 import jwt from "jsonwebtoken"
+import Users from "../models/UserModel"
 import sendMail from "../modules/SendEmail"
 
 export const sendEmailVerificationLink = async (req, res) => {
-    const userID = req.user.id
-    const username = req.user.username
-    const email = req.user.email
-    const password = req.user.password
-    const secret = password
+    const email = req.body.email
 
-    console.log(username, email, password)
+    if (!email) {
+        res.json({ msg: "Provide email mfo" })
+        return
+    }
+
+    const user = await Users.findOne({
+        where: { email },
+    })
+
+    if (!user) {
+        res.json({ msg: "No such user" })
+        return
+    }
+
+    const userID = user.id
+    const username = user.username
+    const password = user.password
+    const secret = password
 
     const accessToken = jwt.sign({ userID, username, email }, secret, {
         expiresIn: "30d",
@@ -19,6 +33,6 @@ export const sendEmailVerificationLink = async (req, res) => {
     const verificationLink = `<a target='_blank' href='${url}/${userID}/${accessToken}'>Verify your email</a>`
     await sendMail(email, "Lightchess account verification", verificationLink)
     return res.json({
-        msg: "Register successful, please verify your email before login",
+        msg: "verification link has been sent successfully",
     })
 }

@@ -1,14 +1,15 @@
 # Rest api
 
-| endpoint /api/X            | Method | Required Data                        | Response                                                |
-| -------------------------- | ------ | ------------------------------------ | ------------------------------------------------------- |
-| /login                     | POST   | email,password                       | { accessToken } or failure                              |
-| /token                     | GET    | cookie with refreshToken             | { accessToken } or failure                              |
-| /register                  | POST   | email,username,password,confPassword | Verification email will be sent and success/failure msg |
-| /resetpassword             | POST   | email                                | reset link will be sent to email                        |
-| /users                     | GET    | -                                    | List of registered users                                |
-| /user/:username            | GET    | -                                    | User stats                                              |
-| /user/:username/recents/:n | GET    | -                                    | Get Last n match results of a user                      |
+| endpoint /api/X               | Method | Required Data                        | Response                                                |
+| ----------------------------- | ------ | ------------------------------------ | ------------------------------------------------------- |
+| /login                        | POST   | email,password                       | { accessToken } or failure                              |
+| /token                        | GET    | cookie with refreshToken             | { accessToken } or failure                              |
+| /register                     | POST   | email,username,password,confPassword | Verification email will be sent and success/failure msg |
+| /resetpassword                | POST   | email                                | reset link will be sent to email                        |
+| /send_email_verification_link | POST   | email                                | verification link will be sent to email and { msg }     |
+| /users                        | GET    | -                                    | List of registered users                                |
+| /user/:username               | GET    | -                                    | User stats                                              |
+| /user/:username/recents/:n    | GET    | -                                    | Get Last n match results of a user                      |
 
 # WebSocket
 
