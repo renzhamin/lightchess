@@ -1,25 +1,52 @@
-import { Box, Button, NativeSelect } from "@mui/material"
+import { Box, Button, NativeSelect, Snackbar, Alert, Grid } from "@mui/material"
 import { useContext, useEffect, useState } from "react"
 import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
+
+var playingAgainst
 
 export const Chat = (props) => {
     const { initSocket, socket, updateUserList, userList, userId, username } =
         useContext(AppContext)
     const history = useHistory()
+    const [open, setOpen] = useState(false)
 
     const [receiver, setReceiver] = useState({})
     const [myColor, setMyColor] = useState(0)
     // 1 is black
 
+    const handleClick = () => {
+        setOpen(true)
+    }
+
+    const handleClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return
+        }
+
+        setOpen(false)
+    }
+
     useEffect(() => {
-        socket.on("Challenge", (data) => {
+        initSocket({ username, userId })
+        updateUserList()
+
+        socket.on("Challenge_accepted", (data) => {
+            console.log(data)
             history.push("/play/" + data.from + "/" + data.yourcolor)
-            console.log("Got Challange")
+            console.log("Challenge accepted")
+        })
+
+        socket.on("Challenge", (data) => {
+            console.log("I WAS CHALLENGED")
+            playingAgainst = data.from
+            console.log(playingAgainst)
+            handleClick()
         })
 
         return () => {
             socket.off("Challenge")
+            socket.off("Challenge_accepted")
         }
     }, [])
 
@@ -30,15 +57,27 @@ export const Chat = (props) => {
         setReceiver({ id, username: e.target.value })
     }
 
+    const AcceptChallenge = (e) => {
+        console.log("Challenge Accepted")
+        e.preventDefault()
+        console.log("At accept challenge ", playingAgainst)
+        socket.emit("Challenge_accepted", {
+            to: playingAgainst,
+            msg: "challenge_accepted",
+            yourcolor: myColor == 1 ? 0 : 1,
+        })
+        history.push("/play/" + playingAgainst + "/" + myColor)
+    }
+
     const Challenge = (e) => {
         console.log("Sending challenge")
         e.preventDefault()
         socket.emit("Challenge", {
             to: receiver.id,
             msg: "challenge",
-            yourcolor: myColor == 1 ? 0 : 1,
+            // yourcolor: myColor == 1 ? 0 : 1,
         })
-        history.push("/play/" + receiver.id + "/" + myColor)
+        /* history.push("/play/" + receiver.id + "/" + myColor) */
     }
 
     return (
@@ -68,6 +107,35 @@ export const Chat = (props) => {
                         )
                     })}
             </NativeSelect>
+            <Snackbar
+                open={open}
+                autoHideDuration={15000}
+                onClose={handleClose}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity="info"
+                    sx={{ width: "250%", height: "250%" }}
+                >
+                    Challenge Received!
+                    <Grid>
+                        <Button
+                            color="success"
+                            variant="contained"
+                            onClick={AcceptChallenge}
+                        >
+                            Accept
+                        </Button>
+                        <Button
+                            color="error"
+                            variant="outlined"
+                            onClick={handleClose}
+                        >
+                            Reject
+                        </Button>
+                    </Grid>
+                </Alert>
+            </Snackbar>
             <Button type="submit">Challenge</Button>
         </Box>
     )
