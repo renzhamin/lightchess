@@ -14,6 +14,8 @@ import {
 import CloseIcon from "@mui/icons-material/Close"
 import { Close } from "@material-ui/icons"
 
+var history = "123"
+
 const GameInfo = (props) => {
     function myClockTick() {
         return props.mySide === props.turn && !props.gameOver
@@ -31,7 +33,7 @@ const GameInfo = (props) => {
         <Container component="main" alignItems="center">
             <CssBaseline />
             <TableContainer component={Paper}>
-                <Table sx={{ minWidth: 300 }}>
+                <Table align="center" sx={{ width: 350 }}>
                     <TableBody>
                         <TableRow>
                             <TableCell>
@@ -49,15 +51,40 @@ const GameInfo = (props) => {
                                 </Button>
                             </TableCell>
                         </TableRow>
-                        <TableRow>
-                            <TableCell>
+                        <TableRow sx={{ "& td": { border: 0 } }}>
+                            <TableCell style={{ width: 100 }} align="left">
                                 <Typography variant="h5">
                                     {props.opponentUserName}
+                                </Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{ fontStyle: "italic" }}
+                                    align="left"
+                                >
+                                    {props.opponentELO}
                                 </Typography>
                             </TableCell>
                         </TableRow>
                         <TableRow>
                             <TableCell>
+                                <Typography
+                                    variant="subtitle"
+                                    style={{ width: 10 }}
+                                    align="left"
+                                >
+                                    Past Games:
+                                </Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Typography variant="h6">
+                                    {props.opponentHistory}
+                                </Typography>
+                            </TableCell>
+                        </TableRow>
+                        <TableRow>
+                            <TableCell align="center" width={300}>
                                 <div style={{ overflow: "auto" }}>
                                     <div
                                         style={{
@@ -68,15 +95,16 @@ const GameInfo = (props) => {
                                         <Table
                                             sx={{
                                                 tableLayout: "fixed",
-                                                maxWidth: 300,
+                                                width: 300,
                                             }}
+                                            align="center"
                                         >
                                             <TableBody>
                                                 {props.pgnMoves.map(
                                                     (move, index) => (
                                                         <TableRow
                                                             sx={{
-                                                                height: 5,
+                                                                height: 100,
                                                             }}
                                                         >
                                                             <TableCell>
@@ -98,7 +126,7 @@ const GameInfo = (props) => {
                             </TableCell>
                         </TableRow>
                         <TableRow>
-                            <TableCell align="center">
+                            <TableCell align="center" width={350}>
                                 <IconButton
                                     onClick={() => {
                                         resign()
@@ -106,6 +134,7 @@ const GameInfo = (props) => {
                                     color="primary"
                                     aria-label="resign-button"
                                     component="label"
+                                    disabled={props.gameOver}
                                 >
                                     <Close />
                                 </IconButton>
@@ -113,8 +142,20 @@ const GameInfo = (props) => {
                         </TableRow>
                         <TableRow>
                             <TableCell>
-                                <Typography variant="h5">
+                                <Typography
+                                    variant="h5"
+                                    style={{ width: 100 }}
+                                    align="left"
+                                >
                                     {props.myUsername}
+                                </Typography>
+                            </TableCell>
+                            <TableCell>
+                                <Typography
+                                    variant="subtitle2"
+                                    sx={{ fontStyle: "italic" }}
+                                >
+                                    {props.myELO}
                                 </Typography>
                             </TableCell>
                         </TableRow>

@@ -31,7 +31,9 @@ import { config } from "../config/config_env"
 var myInfo = {}
 var opponentInfo = {}
 
+var myELO, opponentELO
 var whiteElo, blackElo
+var opponentHistory = ""
 
 function Board() {
     const { socket, userMap, username: myUsername } = useContext(AppContext)
@@ -208,12 +210,21 @@ function Board() {
         // fetchData()
         axios.get(`${config.backend}/api/user/` + myUsername).then((data) => {
             myInfo = data
+            myELO = myInfo.data.elo
         })
-
         axios
             .get(`${config.backend}/api/user/` + opponentUserName)
             .then((data) => {
                 opponentInfo = data
+                opponentELO = opponentInfo.data.elo
+            })
+
+        axios
+            .get(
+                `${config.backend}/api/user/` + opponentUserName + "/recents/5"
+            )
+            .then((data) => {
+                opponentHistory = data.data.str
             })
 
         console.log("Opponent is ", opponentUserName)
@@ -379,6 +390,11 @@ function Board() {
                     opponentUserName={opponentUserName}
                     myUsername={myUsername}
                     opponentTimeInfo={opponentTimeInfo}
+                    opponentHistory={opponentHistory}
+                    myELO={myELO}
+                    opponentELO={opponentELO}
+                    // myELO={"5"}
+                    // opponentELO={"6"}
                     myTimeInfo={myTimeInfo}
                     pgnMoves={pgnMoves}
                     mySide={boardOrientation[0]}
