@@ -68,6 +68,9 @@ function Profile(props) {
         },
     ])
 
+    const [leftTableData, setLeftTableData] = useState([])
+    const [rightTableData, setRightTableData] = useState([])
+
     useEffect(() => {
         async function getUserInfo() {
             const response = await axios.get(
@@ -101,6 +104,8 @@ function Profile(props) {
             for (let i = 0; i < eloHistory.length; i++) {
                 eloHistory[i] = parseInt(eloHistory[i])
             }
+            const minELO = Math.min(...eloHistory)
+            const maxELO = Math.max(...eloHistory)
 
             setLineChartSeries([
                 {
@@ -108,21 +113,32 @@ function Profile(props) {
                     data: eloHistory,
                 },
             ])
+
+            // set left table data
+
+            function createData(title, num) {
+                return { title, num }
+            }
+            const ltData = []
+            ltData.push(
+                createData("Total games played", response.data.totalPlayed)
+            )
+            ltData.push(
+                createData("Games won as white", response.data.winAsWhite)
+            )
+            ltData.push(
+                createData("Games won as black", response.data.winAsBlack)
+            )
+            ltData.push(createData("Highest Rating", maxELO))
+            ltData.push(createData("Lowest Rating", minELO))
+
+            setLeftTableData(ltData)
+
+            // set right table data
         }
 
         getUserInfo()
     }, [])
-
-    function getData(title, num) {
-        return { title, num }
-    }
-
-    const realRows = [
-        getData("Total games", 10),
-        getData("Won as white", 2),
-        getData("Won as black", 8),
-        getData("Games drawn", 0),
-    ]
 
     return (
         <Container component="main" alignItems="center">
@@ -130,45 +146,71 @@ function Profile(props) {
                 {username}
             </Typography>
 
-            <Paper
-                container
-                spacing={0}
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
-                elevation={3}
-                align="center"
-                sx={{ width: 300 }}
-            >
-                <TableContainer>
-                    <Table
-                        sx={{ width: 300 }}
-                        size="small"
-                        aria-label="a dense table"
-                        align="center"
-                    >
-                        <TableBody>
-                            {realRows.map((row) => (
-                                <TableRow
-                                    key={row.name}
-                                    sx={{
-                                        "&:last-child td, &:last-child th": {
-                                            border: 0,
-                                        },
-                                    }}
+            <TableContainer>
+                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableBody>
+                        <TableRow>
+                            <TableCell></TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
+            <TableContainer>
+                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                    <TableBody>
+                        <TableRow>
+                            <TableCell>
+                                <Paper
+                                    container
+                                    spacing={0}
+                                    direction="column"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    elevation={3}
+                                    align="center"
+                                    sx={{ width: 300 }}
                                 >
-                                    <TableCell component="th" scope="row">
-                                        {row.title}
-                                    </TableCell>
-                                    <TableCell align="right">
-                                        {row.num}
-                                    </TableCell>
-                                </TableRow>
-                            ))}
-                        </TableBody>
-                    </Table>
-                </TableContainer>
-            </Paper>
+                                    <TableContainer>
+                                        <Table
+                                            sx={{ width: 300 }}
+                                            size="small"
+                                            aria-label="a dense table"
+                                            align="center"
+                                        >
+                                            <TableBody>
+                                                {leftTableData.map((row) => (
+                                                    <TableRow
+                                                        key={row.name}
+                                                        sx={{
+                                                            "&:last-child td, &:last-child th":
+                                                                {
+                                                                    border: 0,
+                                                                },
+                                                        }}
+                                                    >
+                                                        <TableCell
+                                                            component="th"
+                                                            scope="row"
+                                                        >
+                                                            {row.title}
+                                                        </TableCell>
+                                                        <TableCell align="right">
+                                                            {row.num}
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Paper>
+                            </TableCell>
+                            <TableCell>Another table will go here</TableCell>
+                        </TableRow>
+                    </TableBody>
+                </Table>
+            </TableContainer>
+
             <Grid
                 container
                 spacing={0}
@@ -202,7 +244,7 @@ function Profile(props) {
                                     variant="h5"
                                     component="div"
                                 >
-                                    Elo Graph
+                                    Rating Graph
                                 </Typography>
                             </CardContent>
                         </CardActionArea>
