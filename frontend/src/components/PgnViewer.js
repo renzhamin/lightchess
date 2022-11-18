@@ -9,8 +9,10 @@ function PgnViewer(props) {
     const location = useLocation()
     const id = "board-" + uuid.v4()
 
-    const pgn = location.pgn === undefined ? `1. d4 d5 2. Nc3 Nc6 3. Nxd5 Nxd4` : location.pgn
-    console.log(location.pgn, pgn)
+    const pgn =
+        location.pgn === undefined
+            ? `1. d4 d5 2. Nc3 Nc6 3. Nxd5 Nxd4`
+            : location.pgn
 
     useLayoutEffect(() => {
         pgnView(id, {
@@ -27,7 +29,18 @@ function PgnViewer(props) {
         })
     })
 
-    return <div className="pgnviewer" id={id}></div>
+    return (
+        <div
+            className="pgnviewer"
+            id={id}
+            style={{
+                position: "absolute",
+                left: "50%",
+                top: "50%",
+                transform: "translate(-50%, -45%)",
+            }}
+        ></div>
+    )
 }
 
 export default PgnViewer

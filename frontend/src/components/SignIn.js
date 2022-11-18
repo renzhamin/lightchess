@@ -55,7 +55,6 @@ const SignIn = () => {
                 email: email,
                 password: password,
             })
-            // history.push("/dashboard")
             history.push({
                 pathname: "/dashboard",
                 openSnackbar: true,

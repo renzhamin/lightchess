@@ -1,4 +1,4 @@
-import { useLocation } from "react-router-dom"
+import { useLocation, useHistory } from "react-router-dom"
 import axios from "axios"
 import { config } from "../config/config_env"
 import { Container, Grid } from "@mui/material"
@@ -12,16 +12,19 @@ import CardContent from "@mui/material/CardContent"
 import { CardActionArea } from "@mui/material"
 import Typography from "@mui/material/Typography"
 import Table from "@mui/material/Table"
+import TableHead from "@mui/material/Table"
 import TableBody from "@mui/material/TableBody"
 import TableCell from "@mui/material/TableCell"
 import TableContainer from "@mui/material/TableContainer"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
+import Link from "@mui/material/Link"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 function Profile(props) {
     const location = useLocation()
+    const history = useHistory()
     const username = location.pathname.split("/").at(-1)
 
     const [pieChartData, setPieChartData] = useState({
@@ -205,7 +208,89 @@ function Profile(props) {
                                     </TableContainer>
                                 </Paper>
                             </TableCell>
-                            <TableCell>Another table will go here</TableCell>
+                            <TableCell>
+                                <Paper
+                                    container
+                                    spacing={0}
+                                    direction="column"
+                                    alignItems="center"
+                                    justifyContent="center"
+                                    elevation={3}
+                                    align="center"
+                                    sx={{ width: 600 }}
+                                >
+                                    <TableContainer>
+                                        <Table
+                                            sx={{ width: 600 }}
+                                            size="small"
+                                            aria-label="a dense table"
+                                            align="center"
+                                        >
+                                            <TableHead
+                                                sx={{
+                                                    display:
+                                                        "table-header-group",
+                                                }}
+                                            >
+                                                <TableRow>
+                                                    <TableCell align="left">
+                                                        Result
+                                                    </TableCell>
+                                                    <TableCell align="left">
+                                                        Opponent
+                                                    </TableCell>
+                                                    <TableCell align="left">
+                                                        PGN
+                                                    </TableCell>
+                                                </TableRow>
+                                            </TableHead>
+                                            <TableBody>
+                                                {leftTableData.map((row) => (
+                                                    <TableRow
+                                                        key={row.name}
+                                                        sx={{
+                                                            "&:last-child td, &:last-child th":
+                                                                {
+                                                                    border: 0,
+                                                                },
+                                                        }}
+                                                    >
+                                                        <TableCell
+                                                            component="th"
+                                                            scope="row"
+                                                            align="left"
+                                                        >
+                                                            {row.title}
+                                                        </TableCell>
+                                                        <TableCell align="left">
+                                                            {row.num}
+                                                        </TableCell>
+                                                        <TableCell align="left">
+                                                            <Link
+                                                                underline="hover"
+                                                                onClick={() => {
+                                                                    // TODO: also push PGN
+
+                                                                    const pgn = `1. d4 f5 2. c4 e6 3. Nc3 Nf6 4. e3 d5 5. cxd5 Kf7 6. dxe6+ Kg6 7. Bd3 Bb4 8. a3 Ba5 9. b4 b6 10. bxa5 h6 11. axb6 axb6 12. f4 Nc6 13. Nf3 Bxe6 14. Ne5+ Kh7 15. Nxc6 Qc8 16. Ne7 Qe8 `
+                                                                    history.push(
+                                                                        {
+                                                                            pathname:
+                                                                                "/pgnviewer",
+                                                                            pgn: pgn,
+                                                                        }
+                                                                    )
+                                                                }}
+                                                            >
+                                                                {"View"}
+                                                            </Link>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                ))}
+                                            </TableBody>
+                                        </Table>
+                                    </TableContainer>
+                                </Paper>
+                            </TableCell>
                         </TableRow>
                     </TableBody>
                 </Table>
