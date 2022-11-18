@@ -107,16 +107,22 @@ function Profile(props) {
 
     return (
         <Container component="main" alignItems="center">
-            <Grid>
+            <Grid
+                container
+                spacing={0}
+                direction="column"
+                alignItems="center"
+                justifyContent="center"
+            >
                 <Grid item>
                     <Pie
                         data={pieChartData}
-                        width={500}
-                        height={500}
+                        width={350}
+                        height={350}
                         options={{ maintainAspectRatio: false }}
                     />
                 </Grid>
-                <Grid item>
+                <Grid item mt={10}>
                     <Chart
                         options={lineChartOptions}
                         series={lineChartSeries}

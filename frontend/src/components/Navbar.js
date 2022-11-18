@@ -11,9 +11,7 @@ const Navbar = () => {
 
     const Logout = async () => {
         try {
-            await axios.delete(
-                `${config.backend}/api/logout`
-            )
+            await axios.delete(`${config.backend}/api/logout`)
             history.push("/")
             socket.disconnect()
         } catch (error) {
@@ -30,6 +28,7 @@ const Navbar = () => {
             <AppBar position="static">
                 <Toolbar variant="dense">
                     <Button
+                        color="inherit"
                         variant="text"
                         sx={{ marginLeft: "left" }}
                         onClick={Home}
@@ -37,13 +36,13 @@ const Navbar = () => {
                         Home
                     </Button>
                     <Button
+                        color="inherit"
                         variant="outlined"
                         sx={{ marginLeft: "auto" }}
                         onClick={Logout}
                     >
                         Log Out
                     </Button>
-                    
                 </Toolbar>
             </AppBar>
         </React.Fragment>
