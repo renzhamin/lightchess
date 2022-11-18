@@ -1,10 +1,11 @@
 import { useLocation } from "react-router-dom"
 import axios from "axios"
 import { config } from "../config/config_env"
-import { Button, Container, Grid } from "@mui/material"
+import { Container, Grid } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
 import { Pie } from "react-chartjs-2"
+import Chart from "react-apexcharts"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -27,6 +28,34 @@ function Profile(props) {
             },
         ],
     })
+
+    const [lineChartOptions, setLineChartOptions] = useState({
+        chart: {
+            id: "elo",
+        },
+        xaxis: {
+            categories: [],
+        },
+        stroke: {
+            curve: "smooth",
+        },
+        fill: {
+            type: "solid",
+            gradient: {
+                shadeIntensity: 1,
+                opacityFrom: 0.7,
+                opacityTo: 0.9,
+                stops: [0, 90, 100],
+            },
+        },
+    })
+
+    const [lineChartSeries, setLineChartSeries] = useState([
+        {
+            name: "elo",
+            data: [],
+        },
+    ])
 
     useEffect(() => {
         async function getUserInfo() {
@@ -57,6 +86,20 @@ function Profile(props) {
                     },
                 ],
             })
+
+            var eloHistory = response.data.elo_history.split(",")
+            for (let i = 0; i < eloHistory.length; i++) {
+                eloHistory[i] = parseInt(eloHistory[i])
+            }
+
+            setLineChartSeries([
+                {
+                    name: "elo",
+                    data: eloHistory,
+                },
+            ])
+
+            console.log(eloHistory)
         }
 
         getUserInfo()
@@ -71,6 +114,14 @@ function Profile(props) {
                         width={500}
                         height={500}
                         options={{ maintainAspectRatio: false }}
+                    />
+                </Grid>
+                <Grid item>
+                    <Chart
+                        options={lineChartOptions}
+                        series={lineChartSeries}
+                        type="line"
+                        width="500"
                     />
                 </Grid>
             </Grid>
