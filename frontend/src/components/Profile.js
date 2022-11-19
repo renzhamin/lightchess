@@ -126,7 +126,12 @@ function Profile(props) {
             }
             const ltData = []
             ltData.push(
-                createData("Total games played", response.data.totalPlayed)
+                createData(
+                    "Total games played",
+                    parseInt(response.data.wins) +
+                        parseInt(response.data.losses) +
+                        parseInt(response.data.draws)
+                )
             )
             ltData.push(
                 createData("Games won as white", response.data.winAsWhite)
