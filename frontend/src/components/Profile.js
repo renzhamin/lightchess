@@ -1,4 +1,5 @@
 import { useLocation, useHistory } from "react-router-dom"
+import { useCallback } from "react"
 import axios from "axios"
 import { config } from "../config/config_env"
 import { Container, Grid } from "@mui/material"
@@ -19,6 +20,7 @@ import TableContainer from "@mui/material/TableContainer"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import Link from "@mui/material/Link"
+import { HistoryOutlined } from "@material-ui/icons"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -193,6 +195,9 @@ function Profile(props) {
         getUserInfo()
     }, [])
 
+    const [, updateState] = useState()
+    const forceUpdate = useCallback(() => updateState({}), [])
+
     return (
         <Container component="main" alignItems="center">
             <Typography align="center" variant="h3" gutterBottom>
@@ -313,23 +318,41 @@ function Profile(props) {
                                                             {row.result}
                                                         </TableCell>
                                                         <TableCell align="left">
-                                                            {row.opponent}
-                                                        </TableCell>
-                                                        <TableCell align="left">
                                                             <Link
                                                                 underline="hover"
                                                                 onClick={() => {
                                                                     history.push(
-                                                                        {
-                                                                            pathname:
-                                                                                "/pgnviewer",
-                                                                            pgn: row.PGN,
-                                                                        }
+                                                                        "/user/" +
+                                                                            row.opponent
+                                                                    )
+                                                                    history.go(
+                                                                        0
                                                                     )
                                                                 }}
                                                             >
-                                                                {"View"}
+                                                                {row.opponent}
                                                             </Link>
+                                                        </TableCell>
+                                                        <TableCell align="left">
+                                                            {row.PGN !==
+                                                            "--" ? (
+                                                                <Link
+                                                                    underline="hover"
+                                                                    onClick={() => {
+                                                                        history.push(
+                                                                            {
+                                                                                pathname:
+                                                                                    "/pgnviewer",
+                                                                                pgn: row.PGN,
+                                                                            }
+                                                                        )
+                                                                    }}
+                                                                >
+                                                                    {"View"}
+                                                                </Link>
+                                                            ) : (
+                                                                "--"
+                                                            )}
                                                         </TableCell>
                                                     </TableRow>
                                                 ))}
