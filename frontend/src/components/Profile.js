@@ -261,7 +261,9 @@ function Profile(props) {
                 }
 
                 // process rating change
-                var ratingChange = eloHistory[i + 1] - eloHistory[i]
+                var ratingChange =
+                    eloHistory[eloHistory.length - 1 - i] -
+                    eloHistory[eloHistory.length - 1 - i - 1]
                 if (ratingChange > 0) {
                     ratingChange = "+" + ratingChange.toString()
                 } else {
