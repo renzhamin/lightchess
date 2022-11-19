@@ -138,6 +138,56 @@ function Profile(props) {
             setLeftTableData(ltData)
 
             // set right table data
+
+            const games = await axios.get(
+                `${config.backend}/api/user/${username}/games`
+            )
+
+            var gameInfo = games.data.slice(0, 5)
+
+            function genData(
+                id,
+                whiteUserName,
+                blackUserName,
+                winnerUserName,
+                loserUserName,
+                pgn
+            ) {
+                return {
+                    id,
+                    whiteUserName,
+                    blackUserName,
+                    winnerUserName,
+                    loserUserName,
+                    pgn,
+                }
+            }
+            while (gameInfo.length < 5) {
+                gameInfo.push(genData("--", "--", "--", "--", "--", "--"))
+            }
+            console.log(gameInfo)
+
+            function createRtData(result, opponent, PGN) {
+                return { result, opponent, PGN }
+            }
+
+            const rtData = []
+
+            for (let i = 0; i < 5; i++) {
+                var result = ""
+                if (gameInfo[i].winnerUserName === "--") result = "--"
+                else if (gameInfo[i].winnerUserName === username) result = "1-0"
+                else if (gameInfo[i].winnerUserName !== username) result = "0-1"
+
+                var opponent =
+                    gameInfo[i].whiteUserName === username
+                        ? gameInfo[i].blackUserName
+                        : gameInfo[i].whiteUserName
+                rtData.push(createRtData(result, opponent, gameInfo[i].pgn))
+            }
+
+            console.log(rtData)
+            setRightTableData(rtData)
         }
 
         getUserInfo()
@@ -245,9 +295,9 @@ function Profile(props) {
                                                 </TableRow>
                                             </TableHead>
                                             <TableBody>
-                                                {leftTableData.map((row) => (
+                                                {rightTableData.map((row) => (
                                                     <TableRow
-                                                        key={row.name}
+                                                        // key={row.name}
                                                         sx={{
                                                             "&:last-child td, &:last-child th":
                                                                 {
@@ -260,23 +310,20 @@ function Profile(props) {
                                                             scope="row"
                                                             align="left"
                                                         >
-                                                            {row.title}
+                                                            {row.result}
                                                         </TableCell>
                                                         <TableCell align="left">
-                                                            {row.num}
+                                                            {row.opponent}
                                                         </TableCell>
                                                         <TableCell align="left">
                                                             <Link
                                                                 underline="hover"
                                                                 onClick={() => {
-                                                                    // TODO: also push PGN
-
-                                                                    const pgn = `1. d4 f5 2. c4 e6 3. Nc3 Nf6 4. e3 d5 5. cxd5 Kf7 6. dxe6+ Kg6 7. Bd3 Bb4 8. a3 Ba5 9. b4 b6 10. bxa5 h6 11. axb6 axb6 12. f4 Nc6 13. Nf3 Bxe6 14. Ne5+ Kh7 15. Nxc6 Qc8 16. Ne7 Qe8 `
                                                                     history.push(
                                                                         {
                                                                             pathname:
                                                                                 "/pgnviewer",
-                                                                            pgn: pgn,
+                                                                            pgn: row.PGN,
                                                                         }
                                                                     )
                                                                 }}
