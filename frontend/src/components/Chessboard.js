@@ -164,6 +164,8 @@ function Board() {
         socket.emit("game_over", {
             to: opponent_socket_id,
             gameResult,
+            opponentTimeInfo,
+            myTimeInfo,
         })
         console.log("game over")
 
@@ -238,6 +240,8 @@ function Board() {
             // timer
             opponentTimer.current.stopTimer()
             myTimer.current.startTimer()
+            setMyTimeInfo(data.opponentTimeInfo)
+            setOpponentTimeInfo(data.myTimeInfo)
             setPgnMoves(parsePgn(game.pgn()))
 
             // TODO: checkmate sound does not seem to play
@@ -262,6 +266,8 @@ function Board() {
             // NOT CONFIDENT THIS WORKS
             myTimer.current.stopTimer()
             opponentTimer.current.stopTimer()
+            setMyTimeInfo(data.opponentTimeInfo)
+            setOpponentTimeInfo(data.myTimeInfo)
             setEndDialogMessages()
             handleClickOpen()
             console.log("Game over!", data)
@@ -306,7 +312,12 @@ function Board() {
 
     function sendMove(move) {
         console.log("Sending Move", move)
-        socket.emit("send_move", { to: opponent_socket_id, move })
+        socket.emit("send_move", {
+            to: opponent_socket_id,
+            move,
+            opponentTimeInfo,
+            myTimeInfo,
+        })
     }
 
     function onDrop(sourceSquare, targetSquare) {

@@ -10,6 +10,7 @@ import {
     TableCell,
     TableBody,
     IconButton,
+    Tooltip,
 } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import { Close } from "@material-ui/icons"
@@ -98,6 +99,7 @@ const GameInfo = (props) => {
                                                 width: 300,
                                             }}
                                             align="center"
+                                            size="small"
                                         >
                                             <TableBody>
                                                 {props.pgnMoves.map(
@@ -127,17 +129,19 @@ const GameInfo = (props) => {
                         </TableRow>
                         <TableRow>
                             <TableCell align="center" width={350}>
-                                <IconButton
-                                    onClick={() => {
-                                        resign()
-                                    }}
-                                    color="primary"
-                                    aria-label="resign-button"
-                                    component="label"
-                                    disabled={props.gameOver}
-                                >
-                                    <Close />
-                                </IconButton>
+                                <Tooltip title="Resign">
+                                    <IconButton
+                                        onClick={() => {
+                                            resign()
+                                        }}
+                                        color="primary"
+                                        aria-label="resign-button"
+                                        component="label"
+                                        disabled={props.gameOver}
+                                    >
+                                        <Close />
+                                    </IconButton>
+                                </Tooltip>
                             </TableCell>
                         </TableRow>
                         <TableRow>
