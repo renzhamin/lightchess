@@ -27,7 +27,7 @@ function PgnViewer(props) {
             theme: "brown",
             resizable: true,
         })
-    })
+    }, [])
 
     return (
         <div

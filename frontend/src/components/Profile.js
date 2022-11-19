@@ -28,11 +28,11 @@ function Profile(props) {
     const username = location.pathname.split("/").at(-1)
 
     const [pieChartData, setPieChartData] = useState({
-        labels: [],
+        labels: ["Wins", "Losses", "Draws"],
         datasets: [
             {
                 label: "Game History",
-                data: [],
+                data: [0, 0, 0],
                 backgroundColor: [
                     "rgba(255, 99, 132, 0.2)",
                     "rgba(54, 162, 235, 0.2)",
