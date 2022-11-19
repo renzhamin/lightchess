@@ -235,8 +235,6 @@ function Profile(props) {
                         ? gameInfo[i].blackUserName
                         : gameInfo[i].whiteUserName
 
-                var ratingChange = "ratingChange"
-
                 // process date
                 var date = gameInfo[i].createdAt
 
@@ -260,6 +258,14 @@ function Profile(props) {
                     dateString = hoursPassed + " hours ago"
                 } else {
                     dateString = minutesPassed + " minutes ago"
+                }
+
+                // process rating change
+                var ratingChange = eloHistory[i + 1] - eloHistory[i]
+                if (ratingChange > 0) {
+                    ratingChange = "+" + ratingChange.toString()
+                } else {
+                    ratingChange = ratingChange.toString()
                 }
 
                 rtData.push(
@@ -373,13 +379,13 @@ function Profile(props) {
                         justifyContent="center"
                         elevation={3}
                         align="center"
-                        sx={{ width: 1200, maxHeight: 200, overflow: "auto" }}
+                        sx={{ width: 1200, maxHeight: 600, overflow: "auto" }}
                     >
                         <TableContainer>
                             <Table
                                 sx={{
                                     width: 1200,
-                                    maxHeight: 200,
+                                    maxHeight: 600,
                                     tableLayout: "fixed",
                                 }}
                                 size="small"
