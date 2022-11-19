@@ -31,6 +31,50 @@ function Profile(props) {
     const history = useHistory()
     const username = location.pathname.split("/").at(-1)
 
+    // Needed for date calculation
+    var DateDiff = {
+        inMinutes: function (d1, d2) {
+            var t2 = d2.getTime()
+            var t1 = d1.getTime()
+
+            return Math.floor((t2 - t1) / (60 * 1000))
+        },
+
+        inHours: function (d1, d2) {
+            var t2 = d2.getTime()
+            var t1 = d1.getTime()
+
+            return Math.floor((t2 - t1) / (60 * 60 * 1000))
+        },
+
+        inDays: function (d1, d2) {
+            var t2 = d2.getTime()
+            var t1 = d1.getTime()
+
+            return Math.floor((t2 - t1) / (24 * 3600 * 1000))
+        },
+
+        inWeeks: function (d1, d2) {
+            var t2 = d2.getTime()
+            var t1 = d1.getTime()
+
+            return parseInt((t2 - t1) / (24 * 3600 * 1000 * 7))
+        },
+
+        inMonths: function (d1, d2) {
+            var d1Y = d1.getFullYear()
+            var d2Y = d2.getFullYear()
+            var d1M = d1.getMonth()
+            var d2M = d2.getMonth()
+
+            return d2M + 12 * d2Y - (d1M + 12 * d1Y)
+        },
+
+        inYears: function (d1, d2) {
+            return d2.getFullYear() - d1.getFullYear()
+        },
+    }
+
     const [pieChartData, setPieChartData] = useState({
         labels: ["Wins", "Losses", "Draws"],
         datasets: [
@@ -83,7 +127,6 @@ function Profile(props) {
             const response = await axios.get(
                 `${config.backend}/api/user/${username}`
             )
-            console.log("Response from backend", response.data)
 
             const gameHistory = [
                 response.data.wins,
@@ -135,15 +178,11 @@ function Profile(props) {
                         parseInt(response.data.draws)
                 )
             )
-            ltData.push(createData("Games won", response.data.wins))
-            ltData.push(createData("Games lost", response.data.losses))
-            ltData.push(createData("Games drawn", response.data.draws))
-            ltData.push(
-                createData("Games won as white", response.data.winAsWhite)
-            )
-            ltData.push(
-                createData("Games won as black", response.data.winAsBlack)
-            )
+            ltData.push(createData("Won", response.data.wins))
+            ltData.push(createData("Lost", response.data.losses))
+            ltData.push(createData("Drawn", response.data.draws))
+            ltData.push(createData("Won as WHITE", response.data.winAsWhite))
+            ltData.push(createData("Won as BLACK", response.data.winAsBlack))
             ltData.push(createData("Highest Rating", maxELO))
             ltData.push(createData("Lowest Rating", minELO))
 
@@ -155,7 +194,8 @@ function Profile(props) {
                 `${config.backend}/api/user/${username}/games`
             )
 
-            var gameInfo = games.data.slice(0, 5)
+            var gameInfo = games.data
+            gameInfo = gameInfo.reverse()
 
             function genData(
                 id,
@@ -177,15 +217,14 @@ function Profile(props) {
             while (gameInfo.length < 5) {
                 gameInfo.push(genData("--", "--", "--", "--", "--", "--"))
             }
-            console.log(gameInfo)
 
-            function createRtData(result, opponent, PGN) {
-                return { result, opponent, PGN }
+            function createRtData(result, opponent, ratingChange, PGN, date) {
+                return { result, opponent, ratingChange, PGN, date }
             }
 
             const rtData = []
 
-            for (let i = 0; i < 5; i++) {
+            for (let i = 0; i < gameInfo.length; i++) {
                 var result = ""
                 if (gameInfo[i].winnerUserName === "--") result = "--"
                 else if (gameInfo[i].winnerUserName === username) result = "1-0"
@@ -195,10 +234,45 @@ function Profile(props) {
                     gameInfo[i].whiteUserName === username
                         ? gameInfo[i].blackUserName
                         : gameInfo[i].whiteUserName
-                rtData.push(createRtData(result, opponent, gameInfo[i].pgn))
+
+                var ratingChange = "ratingChange"
+
+                // process date
+                var date = gameInfo[i].createdAt
+
+                const now = new Date()
+                const gameDate = new Date(date)
+
+                const daysPassed = DateDiff.inDays(gameDate, now)
+                const weeksPassed = DateDiff.inWeeks(gameDate, now)
+                const yearsPassed = DateDiff.inYears(gameDate, now)
+                const minutesPassed = DateDiff.inMinutes(gameDate, now)
+                const hoursPassed = DateDiff.inHours(gameDate, now)
+
+                var dateString = ""
+                if (yearsPassed > 0) {
+                    dateString = yearsPassed + " years ago"
+                } else if (weeksPassed > 0) {
+                    dateString = weeksPassed + " weeks ago"
+                } else if (daysPassed > 0) {
+                    dateString = daysPassed + " days ago"
+                } else if (hoursPassed > 0) {
+                    dateString = hoursPassed + " hours ago"
+                } else {
+                    dateString = minutesPassed + " minutes ago"
+                }
+
+                rtData.push(
+                    createRtData(
+                        result,
+                        opponent,
+                        ratingChange,
+                        gameInfo[i].pgn,
+                        dateString
+                    )
+                )
             }
 
-            console.log(rtData)
             setRightTableData(rtData)
         }
 
@@ -299,11 +373,15 @@ function Profile(props) {
                         justifyContent="center"
                         elevation={3}
                         align="center"
-                        sx={{ width: 600 }}
+                        sx={{ width: 1200, maxHeight: 200, overflow: "auto" }}
                     >
                         <TableContainer>
                             <Table
-                                sx={{ width: 600 }}
+                                sx={{
+                                    width: 1200,
+                                    maxHeight: 200,
+                                    tableLayout: "fixed",
+                                }}
                                 size="small"
                                 aria-label="a dense table"
                                 align="center"
@@ -320,7 +398,13 @@ function Profile(props) {
                                         <TableCell align="left">
                                             Opponent
                                         </TableCell>
+                                        <TableCell align="left">
+                                            Rating Change
+                                        </TableCell>
                                         <TableCell align="left">PGN</TableCell>
+                                        <TableCell align="left">
+                                            Time Played
+                                        </TableCell>
                                     </TableRow>
                                 </TableHead>
                                 <TableBody>
@@ -356,6 +440,9 @@ function Profile(props) {
                                                 </Link>
                                             </TableCell>
                                             <TableCell align="left">
+                                                {row.ratingChange}
+                                            </TableCell>
+                                            <TableCell align="left">
                                                 {row.PGN !== "--" ? (
                                                     <Link
                                                         underline="hover"
@@ -372,6 +459,9 @@ function Profile(props) {
                                                 ) : (
                                                     "--"
                                                 )}
+                                            </TableCell>
+                                            <TableCell align="left">
+                                                {row.date}
                                             </TableCell>
                                         </TableRow>
                                     ))}
