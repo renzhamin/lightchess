@@ -1,7 +1,7 @@
 import CssBaseline from "@mui/material/CssBaseline"
 import { ThemeProvider } from "@mui/material/styles"
-import React, { useEffect, useState } from "react"
-import { HashRouter, Route, Switch } from "react-router-dom"
+import React, { useEffect, useState, Component } from "react"
+import { HashRouter, Route, Switch, Redirect } from "react-router-dom"
 import { io } from "socket.io-client"
 import Board from "./components/Chessboard"
 import Dashboard from "./components/Dashboard"
@@ -12,6 +12,7 @@ import SignUp from "./components/SignUp"
 import theme from "./theme"
 import Profile from "./components/Profile"
 import { config } from "./config/config_env"
+import { hasValidRefreshToken } from "./utils/cookies"
 
 export const AppContext = React.createContext()
 
@@ -36,6 +37,28 @@ const initReady = (args) => {
     socket.emit("initReady", { username }, (response) => {
         console.log(response)
     })
+}
+
+class ProtectedRoute extends Component {
+    render() {
+        const { component: Component, ...props } = this.props
+        console.log("Do I have valid refresh token?", hasValidRefreshToken())
+        return (
+            <Route
+                {...props}
+                render={(props) =>
+                    hasValidRefreshToken() ? (
+                        <>
+                            <Navbar />
+                            <Component {...props} />
+                        </>
+                    ) : (
+                        <Redirect to="/login" />
+                    )
+                }
+            />
+        )
+    }
 }
 
 function App() {
@@ -104,35 +127,30 @@ function App() {
                 <CssBaseline />
                 <HashRouter>
                     <Switch>
-                        <Route exact path="/">
-                            <SignIn />
-                        </Route>
                         <Route exact path="/login">
                             <SignIn />
                         </Route>
                         <Route path="/register">
                             <SignUp />
                         </Route>
-                        <Route path="/dashboard">
-                            <Navbar />
-                            <Dashboard />
-                        </Route>
-                        <Route path="/pgnviewer">
-                            <Navbar />
-                            <PgnViewer />
-                        </Route>
-                        <Route path="/play/:opponent_socket_id/:mycolor">
-                            <Navbar />
-                            <Board />
-                        </Route>
-                        <Route path="/play">
-                            <Navbar />
-                            <Board />
-                        </Route>
-                        <Route path="/user/:username">
-                            <Navbar />
-                            <Profile />
-                        </Route>
+                        <ProtectedRoute
+                            path="/dashboard"
+                            component={Dashboard}
+                        />
+                        <ProtectedRoute
+                            path="/pgnviewer"
+                            component={PgnViewer}
+                        />
+                        <ProtectedRoute
+                            path="/play/:opponent_socket_id/:mycolor"
+                            component={Board}
+                        />
+                        <ProtectedRoute path="/play" component={Board} />
+                        <ProtectedRoute
+                            path="/user/:username"
+                            component={Profile}
+                        />
+                        <ProtectedRoute path="/" component={Dashboard} />
                     </Switch>
                 </HashRouter>
             </ThemeProvider>
