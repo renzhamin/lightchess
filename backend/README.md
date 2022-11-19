@@ -10,6 +10,7 @@
 | /users                        | GET    | -                                    | List of registered users                                |
 | /user/:username               | GET    | -                                    | User stats                                              |
 | /user/:username/recents/:n    | GET    | -                                    | Get Last n match results of a user                      |
+| /user/:username/games         | GET    | -                                    | Get all games played by user                            |
 
 # WebSocket
 

@@ -45,7 +45,7 @@ router.post(
     verifySpecialAccessToken,
     resetPassword
 )
-router.get("/games", getGames)
+router.get("/user/:username/games", getGames)
 router.post("/games", addGames)
 
 router.post("/login", Login)

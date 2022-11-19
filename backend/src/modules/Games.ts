@@ -1,14 +1,18 @@
 import { updateElo } from "../controllers/updateUserInfo"
 import Games from "../models/GamesModel"
+import { Op } from "sequelize"
 
 export const getGames = async (req, res) => {
-    try {
-        const games = await Games.findAll()
-        console.log(games)
-        return res.json(games)
-    } catch (error) {
-        return res.status(404).json({ msg: "Invalid token, no id" })
-    }
+    const { username } = req.params
+    const games = await Games.findAll({
+        where: {
+            [Op.or]: [{ blackUserName: username }, { whiteUserName: username }],
+        },
+    })
+
+    if (!games) return res.status(400).json({ msg: "No games found" })
+
+    res.json(games)
 }
 
 export const addGames = async (req, res) => {
