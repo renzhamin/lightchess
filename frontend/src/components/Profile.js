@@ -25,6 +25,8 @@ import { HistoryOutlined } from "@material-ui/icons"
 ChartJS.register(ArcElement, Tooltip, Legend)
 
 function Profile(props) {
+    const [, updateState] = useState()
+    const forceUpdate = useCallback(() => updateState({}), [])
     const location = useLocation()
     const history = useHistory()
     const username = location.pathname.split("/").at(-1)
@@ -133,6 +135,9 @@ function Profile(props) {
                         parseInt(response.data.draws)
                 )
             )
+            ltData.push(createData("Games won", response.data.wins))
+            ltData.push(createData("Games lost", response.data.losses))
+            ltData.push(createData("Games drawn", response.data.draws))
             ltData.push(
                 createData("Games won as white", response.data.winAsWhite)
             )
@@ -200,9 +205,6 @@ function Profile(props) {
         getUserInfo()
     }, [])
 
-    const [, updateState] = useState()
-    const forceUpdate = useCallback(() => updateState({}), [])
-
     return (
         <Container component="main" alignItems="center">
             <Typography align="center" variant="h3" gutterBottom>
@@ -269,102 +271,12 @@ function Profile(props) {
                                 </Paper>
                             </TableCell>
                             <TableCell>
-                                <Paper
-                                    container
-                                    spacing={0}
-                                    direction="column"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                    elevation={3}
-                                    align="center"
-                                    sx={{ width: 600 }}
-                                >
-                                    <TableContainer>
-                                        <Table
-                                            sx={{ width: 600 }}
-                                            size="small"
-                                            aria-label="a dense table"
-                                            align="center"
-                                        >
-                                            <TableHead
-                                                sx={{
-                                                    display:
-                                                        "table-header-group",
-                                                }}
-                                            >
-                                                <TableRow>
-                                                    <TableCell align="left">
-                                                        Result
-                                                    </TableCell>
-                                                    <TableCell align="left">
-                                                        Opponent
-                                                    </TableCell>
-                                                    <TableCell align="left">
-                                                        PGN
-                                                    </TableCell>
-                                                </TableRow>
-                                            </TableHead>
-                                            <TableBody>
-                                                {rightTableData.map((row) => (
-                                                    <TableRow
-                                                        // key={row.name}
-                                                        sx={{
-                                                            "&:last-child td, &:last-child th":
-                                                                {
-                                                                    border: 0,
-                                                                },
-                                                        }}
-                                                    >
-                                                        <TableCell
-                                                            component="th"
-                                                            scope="row"
-                                                            align="left"
-                                                        >
-                                                            {row.result}
-                                                        </TableCell>
-                                                        <TableCell align="left">
-                                                            <Link
-                                                                underline="hover"
-                                                                onClick={() => {
-                                                                    history.push(
-                                                                        "/user/" +
-                                                                            row.opponent
-                                                                    )
-                                                                    history.go(
-                                                                        0
-                                                                    )
-                                                                }}
-                                                            >
-                                                                {row.opponent}
-                                                            </Link>
-                                                        </TableCell>
-                                                        <TableCell align="left">
-                                                            {row.PGN !==
-                                                            "--" ? (
-                                                                <Link
-                                                                    underline="hover"
-                                                                    onClick={() => {
-                                                                        history.push(
-                                                                            {
-                                                                                pathname:
-                                                                                    "/pgnviewer",
-                                                                                pgn: row.PGN,
-                                                                            }
-                                                                        )
-                                                                    }}
-                                                                >
-                                                                    {"View"}
-                                                                </Link>
-                                                            ) : (
-                                                                "--"
-                                                            )}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                </Paper>
+                                <Pie
+                                    data={pieChartData}
+                                    width={350}
+                                    height={350}
+                                    options={{ maintainAspectRatio: false }}
+                                />
                             </TableCell>
                         </TableRow>
                     </TableBody>
@@ -379,16 +291,96 @@ function Profile(props) {
                 justifyContent="center"
             >
                 <Grid item>
-                    <Pie
-                        data={pieChartData}
-                        width={350}
-                        height={350}
-                        options={{ maintainAspectRatio: false }}
-                    />
+                    <Paper
+                        container
+                        spacing={0}
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        elevation={3}
+                        align="center"
+                        sx={{ width: 600 }}
+                    >
+                        <TableContainer>
+                            <Table
+                                sx={{ width: 600 }}
+                                size="small"
+                                aria-label="a dense table"
+                                align="center"
+                            >
+                                <TableHead
+                                    sx={{
+                                        display: "table-header-group",
+                                    }}
+                                >
+                                    <TableRow>
+                                        <TableCell align="left">
+                                            Result
+                                        </TableCell>
+                                        <TableCell align="left">
+                                            Opponent
+                                        </TableCell>
+                                        <TableCell align="left">PGN</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {rightTableData.map((row) => (
+                                        <TableRow
+                                            // key={row.name}
+                                            sx={{
+                                                "&:last-child td, &:last-child th":
+                                                    {
+                                                        border: 0,
+                                                    },
+                                            }}
+                                        >
+                                            <TableCell
+                                                component="th"
+                                                scope="row"
+                                                align="left"
+                                            >
+                                                {row.result}
+                                            </TableCell>
+                                            <TableCell align="left">
+                                                <Link
+                                                    underline="hover"
+                                                    onClick={() => {
+                                                        history.push(
+                                                            "/user/" +
+                                                                row.opponent
+                                                        )
+                                                        history.go(0)
+                                                    }}
+                                                >
+                                                    {row.opponent}
+                                                </Link>
+                                            </TableCell>
+                                            <TableCell align="left">
+                                                {row.PGN !== "--" ? (
+                                                    <Link
+                                                        underline="hover"
+                                                        onClick={() => {
+                                                            history.push({
+                                                                pathname:
+                                                                    "/pgnviewer",
+                                                                pgn: row.PGN,
+                                                            })
+                                                        }}
+                                                    >
+                                                        {"View"}
+                                                    </Link>
+                                                ) : (
+                                                    "--"
+                                                )}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
                 </Grid>
-                <Typography gutterBottom variant="h5" component="div">
-                    Win/Loss stats
-                </Typography>
+
                 <Grid item mt={10}>
                     <Card sx={{ maxWidth: 720 }}>
                         <Chart
