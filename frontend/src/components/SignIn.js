@@ -56,7 +56,7 @@ const SignIn = () => {
                 password: password,
             })
             history.push({
-                pathname: "/dashboard",
+                pathname: "/",
                 openSnackbar: true,
             })
         } catch (error) {

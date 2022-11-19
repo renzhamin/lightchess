@@ -23,6 +23,8 @@ import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
 import { config } from "../config/config_env"
 
+var timeControl = "5+0"
+
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
@@ -39,7 +41,13 @@ const Dashboard = () => {
 
     const [open, setOpen] = useState(location.openSnackbar)
 
-    const { initSocket, updateUserList } = useContext(AppContext)
+    const {
+        initSocket,
+        initReady,
+        updateUserList,
+        updateReadyUserList,
+        readyUserList,
+    } = useContext(AppContext)
 
     useEffect(() => {
         refreshToken()
@@ -56,6 +64,7 @@ const Dashboard = () => {
             const response = await axios.get(`${config.backend}/api/token`)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
+            console.log("This works", decoded.username)
             setUserName(decoded.username)
             setExpire(decoded.exp)
         } catch (error) {
@@ -84,6 +93,17 @@ const Dashboard = () => {
             return Promise.reject(error)
         }
     )
+
+    function placeQueue() {
+        console.log("Placing in queue")
+        initReady({ username, timeControl })
+        for (let i = 0; i < readyUserList.length; i++)
+            console.log(
+                readyUserList[i].username,
+                readyUserList[i].elo,
+                readyUserList[i].timeControl
+            )
+    }
 
     const getUsers = async () => {
         const response = await axiosJWT.get(`${config.backend}/api/users`, {
@@ -133,6 +153,7 @@ const Dashboard = () => {
             >
                 Refresh
             </Button>
+            <Button onClick={placeQueue}> Queue for game </Button>
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>

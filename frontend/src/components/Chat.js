@@ -31,6 +31,8 @@ export const Chat = (props) => {
         initSocket({ username })
         updateUserList()
 
+        console.log(username)
+
         socket.on("Challenge_accepted", (data) => {
             console.log(data)
             history.push("/play/" + data.from + "/" + data.yourcolor)

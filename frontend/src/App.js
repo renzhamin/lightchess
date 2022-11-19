@@ -10,6 +10,7 @@ import PgnViewer from "./components/PgnViewer"
 import SignIn from "./components/SignIn"
 import SignUp from "./components/SignUp"
 import theme from "./theme"
+import Home from "./components/Home"
 import Profile from "./components/Profile"
 import { config } from "./config/config_env"
 import { hasValidRefreshToken } from "./utils/cookies"
@@ -34,7 +35,7 @@ const initReady = (args) => {
     if (socket.disconnected) {
         initSocket({ username })
     }
-    socket.emit("initReady", { username }, (response) => {
+    socket.emit("initReady", args, (response) => {
         console.log(response)
     })
 }
@@ -42,7 +43,7 @@ const initReady = (args) => {
 class ProtectedRoute extends Component {
     render() {
         const { component: Component, ...props } = this.props
-        console.log("Do I have valid refresh token?", hasValidRefreshToken())
+        // console.log("Do I have valid refresh token?", hasValidRefreshToken())
         return (
             <Route
                 {...props}
@@ -150,7 +151,7 @@ function App() {
                             path="/user/:username"
                             component={Profile}
                         />
-                        <ProtectedRoute path="/" component={Dashboard} />
+                        <ProtectedRoute path="/" component={Home} />
                     </Switch>
                 </HashRouter>
             </ThemeProvider>
