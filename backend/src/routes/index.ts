@@ -24,6 +24,7 @@ import {
     getLastNMatchResults,
     getPublicUserInfo,
 } from "../controllers/getUserInfo"
+import { getLeaderBoard } from "../controllers/getLeaderBoard"
 const router = express.Router()
 
 router.get("/users", verifyToken, getUsers)
@@ -46,6 +47,7 @@ router.post(
     resetPassword
 )
 router.get("/user/:username/games", getGames)
+router.get("/leaderboard", getLeaderBoard)
 router.post("/games", addGames)
 
 router.post("/login", Login)
