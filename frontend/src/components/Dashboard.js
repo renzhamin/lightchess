@@ -85,23 +85,16 @@ const Dashboard = () => {
         initSocket({ username })
         updateUserList()
 
-        console.log(username)
-
         socket.on("Challenge_accepted", (data) => {
-            console.log(data)
             history.push(
                 "/play/" + data.from + "/" + data.yourcolor + "/" + timeFormat
             )
-            console.log("Challenge accepted")
         })
 
         socket.on("Challenge", (data) => {
-            console.log("I WAS CHALLENGED")
             opponentUsername = data.challenger
             playingAgainst = data.from
-            console.log("playing against", playingAgainst)
             timeFormat = data.timeFormat
-            console.log(playingAgainst)
             handleClick()
         })
 
@@ -156,7 +149,6 @@ const Dashboard = () => {
     }
 
     const Challenge = (receiver) => {
-        console.log("Sending challenge to", receiver)
         // e.preventDefault()
         socket.emit("Challenge", {
             to: receiver.id,
@@ -169,13 +161,11 @@ const Dashboard = () => {
     }
 
     const AcceptChallenge = (e) => {
-        console.log("Challenge Accepted")
         e.preventDefault()
-        console.log("At accept challenge ", playingAgainst)
         socket.emit("Challenge_accepted", {
             to: playingAgainst,
             msg: "challenge_accepted",
-            yourcolor: myColor == 1 ? 0 : 1,
+            yourcolor: myColor === 1 ? 0 : 1,
         })
         history.push(
             "/play/" + playingAgainst + "/" + myColor + "/" + timeFormat
@@ -251,11 +241,15 @@ const Dashboard = () => {
                             >
                                 <TableCell>{index + 1}</TableCell>
                                 <TableCell>{user.username}</TableCell>
-                                <TableCell>ONLINE</TableCell>
+                                <TableCell>
+                                    <Typography sx={{ color: "#71A239" }}>
+                                        ONLINE
+                                    </Typography>
+                                </TableCell>
                                 {/* <TableCell>{user.elo}</TableCell> */}
                                 <TableCell>
                                     <IconButton
-                                        disabled={user.username == username}
+                                        disabled={user.username === username}
                                         onClick={() => Challenge(user)}
                                     >
                                         <CompareArrowsIcon></CompareArrowsIcon>
