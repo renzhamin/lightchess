@@ -27,9 +27,13 @@ const Navbar = () => {
         history.push("/")
     }
 
+    const Dashboard = () => {
+        history.push("/dashboard")
+    }
+
     return (
         <React.Fragment>
-            <AppBar position="static">
+            <AppBar position="static" color="secondary">
                 <Toolbar variant="dense">
                     <img
                         style={{ width: 50, height: 50 }}
@@ -60,6 +64,14 @@ const Navbar = () => {
                         onClick={Home}
                     >
                         Home
+                    </Button>
+                    <Button
+                        color="inherit"
+                        variant="text"
+                        sx={{ marginLeft: "left" }}
+                        onClick={Dashboard}
+                    >
+                        Dashboard
                     </Button>
                     <Button
                         color="inherit"

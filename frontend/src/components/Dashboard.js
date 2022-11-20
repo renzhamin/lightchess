@@ -20,6 +20,7 @@ import {
     Snackbar,
     Grid,
     IconButton,
+    AlertTitle,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
@@ -179,19 +180,21 @@ const Dashboard = () => {
                 open={open}
                 autoHideDuration={15000}
                 onClose={handleClose}
+                color="secondary"
             >
                 <Alert
                     onClose={handleClose}
                     severity="info"
                     sx={{ width: "250%", height: "250%" }}
                 >
-                    Challenge Received from {opponentUsername}
+                    <AlertTitle>Challenge Received</AlertTitle>
+                    Opponent: {opponentUsername}
                     <Grid>
                         <Button
                             color="success"
                             variant="contained"
                             onClick={AcceptChallenge}
-                            sx={{ m: 1 }}
+                            sx={{ mt: 2, m: 1 }}
                         >
                             Accept
                         </Button>
@@ -199,14 +202,14 @@ const Dashboard = () => {
                             color="error"
                             variant="contained"
                             onClick={handleClose}
-                            sx={{ m: 1 }}
+                            sx={{ mt: 2, m: 1 }}
                         >
                             Reject
                         </Button>
                     </Grid>
                 </Alert>
             </Snackbar>
-            <Typography component="h1" variant="h5" sx={{ mt: 1 }}>
+            <Typography component="h1" variant="h5" sx={{ mt: 3 }}>
                 Online Players
             </Typography>
             <Button
