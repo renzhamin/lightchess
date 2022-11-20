@@ -26,6 +26,7 @@ import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
 import { config } from "../config/config_env"
 import CloseIcon from "@mui/icons-material/Close"
+import Quick_Game from "./Quick_Game"
 import Matchmaking from "./Matchmaking"
 import Leaderboard from "./Leaderboard"
 import UserCard from "./UserCard"
@@ -81,9 +82,30 @@ export const Home = () => {
                         Logged in!
                     </Alert>
                 </Snackbar>
-                <Grid>
-                    <Grid item xs={6}>
-                        <Matchmaking />
+                <Grid container spacing={2}>
+                    <Grid
+                        item
+                        xs={8}
+                        // mt={5}
+                        container
+                        spacing={0}
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                    >
+                        <Quick_Game />
+                    </Grid>
+                    <Grid
+                        item
+                        xs={4}
+                        // mt={5}
+                        container
+                        spacing={0}
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                    >
+                        <UserCard />
                     </Grid>
                     <Grid
                         item
@@ -96,9 +118,6 @@ export const Home = () => {
                         justifyContent="center"
                     >
                         <Leaderboard />
-                    </Grid>
-                    <Grid item>
-                        <UserCard />
                     </Grid>
                 </Grid>
             </Container>

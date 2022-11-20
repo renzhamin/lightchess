@@ -41,7 +41,7 @@ var receiver
 var myColor
 var queueStatus = -1
 
-export const Matchmaking = () => {
+export const Quick_Game = () => {
     const location = useLocation()
     const history = useHistory()
 
@@ -208,8 +208,8 @@ export const Matchmaking = () => {
     return (
         <Container component="main">
             <CssBaseline />
-            <Typography variant="h4" sx={{ m: 5 }} align="center">
-                Play A Game
+            <Typography variant="h4" sx={{ m: 2 }} align="center">
+                Quick Game
             </Typography>
             <Grid
                 container
@@ -220,10 +220,10 @@ export const Matchmaking = () => {
                 <LoadingButton
                     sx={{ m: 2 }}
                     style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
+                        maxWidth: "175px",
+                        maxHeight: "200px",
+                        minWidth: "175px",
+                        minHeight: "200px",
                     }}
                     loading={queueStatus === "1+0"}
                     onClick={() => Enqueue("1+0")}
@@ -231,70 +231,15 @@ export const Matchmaking = () => {
                     color="secondary"
                 >
                     {" "}
-                    1+0 {<br />}Bullet{" "}
+                    Bullet{" "}
                 </LoadingButton>
                 <LoadingButton
                     sx={{ m: 2 }}
                     style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
-                    }}
-                    loading={queueStatus === "1+1"}
-                    onClick={() => Enqueue("1+1")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    1+1 {<br />}Bullet{" "}
-                </LoadingButton>
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
-                    }}
-                    loading={queueStatus === "3+0"}
-                    onClick={() => Enqueue("3+0")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    3+0 {<br />}Blitz{" "}
-                </LoadingButton>
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
-                    }}
-                    loading={queueStatus === "3+3"}
-                    onClick={() => Enqueue("3+3")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    3+3{<br />} Blitz{" "}
-                </LoadingButton>
-            </Grid>
-            <Grid
-                container
-                spacing={0}
-                alignItems="center"
-                justifyContent="center"
-            >
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
+                        maxWidth: "175px",
+                        maxHeight: "200px",
+                        minWidth: "175px",
+                        minHeight: "200px",
                     }}
                     loading={queueStatus === "5+0"}
                     onClick={() => Enqueue("5+0")}
@@ -302,31 +247,15 @@ export const Matchmaking = () => {
                     color="secondary"
                 >
                     {" "}
-                    5+0 {<br />} Blitz
+                    Blitz{" "}
                 </LoadingButton>
                 <LoadingButton
                     sx={{ m: 2 }}
                     style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
-                    }}
-                    loading={queueStatus === "5+5"}
-                    onClick={() => Enqueue("5+5")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    5+5 {<br />}Blitz{" "}
-                </LoadingButton>
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
+                        maxWidth: "175px",
+                        maxHeight: "200px",
+                        minWidth: "175px",
+                        minHeight: "200px",
                     }}
                     loading={queueStatus === "10+0"}
                     onClick={() => Enqueue("10+0")}
@@ -334,102 +263,8 @@ export const Matchmaking = () => {
                     color="secondary"
                 >
                     {" "}
-                    10+0 {<br />}Rapid{" "}
+                    Rapid{" "}
                 </LoadingButton>
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
-                    }}
-                    loading={queueStatus === "10+10"}
-                    onClick={() => Enqueue("10+10")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    10+10 {<br />}Rapid{" "}
-                </LoadingButton>
-            </Grid>
-            <Grid
-                container
-                spacing={0}
-                alignItems="center"
-                justifyContent="center"
-            >
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
-                    }}
-                    loading={queueStatus === "30+0"}
-                    onClick={() => Enqueue("30+0")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    30+0{<br />} Classical{" "}
-                </LoadingButton>
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
-                    }}
-                    loading={queueStatus === "30+30"}
-                    onClick={() => Enqueue("30+30")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    30+30{<br />} Classical{" "}
-                </LoadingButton>
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
-                    }}
-                    loading={queueStatus === "60+0"}
-                    onClick={() => Enqueue("60+0")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    60+0{<br />} Classical{" "}
-                </LoadingButton>
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "150px",
-                        maxHeight: "150px",
-                        minWidth: "150px",
-                        minHeight: "150px",
-                    }}
-                    loading={queueStatus === "60+60"}
-                    onClick={() => Enqueue("60+60")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    60+60 {<br />}Classical{" "}
-                </LoadingButton>
-            </Grid>
-            <Grid
-                container
-                spacing={0}
-                alignItems="center"
-                justifyContent="center"
-            >
                 <Grid item>
                     <IconButton
                         color="primary"
@@ -455,4 +290,4 @@ export const Matchmaking = () => {
     )
 }
 
-export default Matchmaking
+export default Quick_Game

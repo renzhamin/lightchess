@@ -15,6 +15,7 @@ import Profile from "./components/Profile"
 import { config } from "./config/config_env"
 import { hasValidRefreshToken } from "./utils/cookies"
 import NotFound from "./components/NotFound"
+import Matchmaking from "./components/Matchmaking"
 
 export const AppContext = React.createContext()
 
@@ -139,6 +140,10 @@ function App() {
                         <ProtectedRoute
                             path="/pgnviewer"
                             component={PgnViewer}
+                        />
+                        <ProtectedRoute
+                            path="/matchmaking"
+                            component={Matchmaking}
                         />
                         <ProtectedRoute
                             path="/play/:opponent_socket_id/:mycolor/:time_format"

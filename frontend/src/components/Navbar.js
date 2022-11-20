@@ -31,6 +31,14 @@ const Navbar = () => {
         history.push("/dashboard")
     }
 
+    const PGNViewer = () => {
+        history.push("/pgnviewer")
+    }
+
+    const Matchmaking = () => {
+        history.push("/matchmaking")
+    }
+
     return (
         <React.Fragment>
             <AppBar position="static" color="secondary">
@@ -60,7 +68,7 @@ const Navbar = () => {
                     <Button
                         color="inherit"
                         variant="text"
-                        sx={{ marginLeft: "left" }}
+                        sx={{ marginLeft: "left", mx: 2 }}
                         onClick={Home}
                     >
                         Home
@@ -68,10 +76,26 @@ const Navbar = () => {
                     <Button
                         color="inherit"
                         variant="text"
-                        sx={{ marginLeft: "left" }}
+                        sx={{ marginLeft: "left", mx: 2 }}
                         onClick={Dashboard}
                     >
                         Dashboard
+                    </Button>
+                    <Button
+                        color="inherit"
+                        variant="text"
+                        sx={{ marginLeft: "left", mx: 2 }}
+                        onClick={PGNViewer}
+                    >
+                        PGNViewer
+                    </Button>
+                    <Button
+                        color="inherit"
+                        variant="text"
+                        sx={{ marginLeft: "left", mx: 2 }}
+                        onClick={Matchmaking}
+                    >
+                        Matchmaking
                     </Button>
                     <Button
                         color="inherit"

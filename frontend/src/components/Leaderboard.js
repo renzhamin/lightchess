@@ -64,7 +64,7 @@ const Leaderboard = () => {
                         justifyContent="center"
                         elevation={3}
                         align="center"
-                        sx={{ width: 400, maxHeight: 600, overflow: "auto" }}
+                        sx={{ width: 400, maxHeight: 400, overflow: "auto" }}
                     >
                         <TableContainer>
                             <Table
