@@ -28,6 +28,7 @@ function Profile(props) {
     const location = useLocation()
     const history = useHistory()
     const username = location.pathname.split("/").at(-1)
+    const [currentElo, setCurrentElo] = useState()
 
     // Needed for date calculation
     var DateDiff = {
@@ -256,7 +257,7 @@ function Profile(props) {
                     } else if (daysPassed > 0) {
                         dateString =
                             daysPassed +
-                            " day " +
+                            " day" +
                             (daysPassed === 1 ? "" : "s") +
                             " ago"
                     } else if (hoursPassed > 0) {
@@ -273,6 +274,8 @@ function Profile(props) {
                             " ago"
                     }
                 }
+
+                setCurrentElo(eloHistory.at(-1))
 
                 // process rating change
                 var ratingChange =
@@ -305,9 +308,47 @@ function Profile(props) {
 
     return (
         <Container component="main" alignItems="center">
-            <Typography align="center" variant="h3" gutterBottom>
-                {username}
+            <Typography align="center" variant="h3" gutterBottom mt={5}>
+                User Statistics <br></br>
             </Typography>
+            <Grid
+                xs={12}
+                // mt={5}
+                container
+                spacing={0}
+                direction="row"
+                alignItems="center"
+                justifyContent="center"
+            >
+                <Grid
+                    item
+                    sx={6}
+                    alignItems="center"
+                    justifyContent="center"
+                    direction="column"
+                >
+                    <Typography
+                        align="center"
+                        variant="h4"
+                        gutterBottom
+                        mt={5}
+                        mx={5}
+                    >
+                        {username}
+                    </Typography>
+                </Grid>
+                <Grid item sx={6}>
+                    <Typography
+                        align="center"
+                        variant="h5"
+                        gutterBottom
+                        mt={5}
+                        sx={{ fontStyle: "italic" }}
+                    >
+                        ({currentElo})
+                    </Typography>
+                </Grid>
+            </Grid>
 
             <TableContainer>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
@@ -388,12 +429,13 @@ function Profile(props) {
                 alignContent="center"
                 align="center"
             >
-                Recet game history
+                Recent game history
             </Typography>
 
             <Grid
                 container
                 spacing={0}
+                mt={5}
                 direction="column"
                 alignItems="center"
                 justifyContent="center"

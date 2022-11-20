@@ -21,6 +21,7 @@ import {
     Grid,
     IconButton,
     AlertTitle,
+    Link,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
@@ -243,7 +244,19 @@ const Dashboard = () => {
                                 }}
                             >
                                 <TableCell>{index + 1}</TableCell>
-                                <TableCell>{user.username}</TableCell>
+                                <TableCell>
+                                    <Link
+                                        underline="hover"
+                                        onClick={() => {
+                                            history.push(
+                                                "/user/" + user.username
+                                            )
+                                            // history.go(0)
+                                        }}
+                                    >
+                                        {user.username}
+                                    </Link>
+                                </TableCell>
                                 <TableCell>
                                     <Typography sx={{ color: "#71A239" }}>
                                         ONLINE

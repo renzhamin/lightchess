@@ -20,11 +20,11 @@ const UserCard = () => {
         <React.Fragment>
             <CardContent>
                 <Typography
-                    sx={{ fontSize: 14 }}
+                    sx={{ fontSize: 16, fontFamily: "monospace" }}
                     color="text.secondary"
                     gutterBottom
                 >
-                    User Card
+                    USER CARD
                 </Typography>
                 <Typography variant="h5" component="div">
                     {username}
