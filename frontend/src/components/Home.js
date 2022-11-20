@@ -144,6 +144,7 @@ export const Home = () => {
                     myTimeControl
             )
             console.log("Challenge accepted")
+            socket.emit("rmReady")
             inQueue = false
         })
 
@@ -177,7 +178,9 @@ export const Home = () => {
                 console.log("Can match with ", readyUserList[i].username)
                 myColor = Math.floor(Math.random() * 2)
                 receiver = readyUserList[i]
+                console.log("Challenging socket", receiver)
                 Challenge()
+                socket.emit("rmReady")
             }
         }
     }
@@ -202,6 +205,7 @@ export const Home = () => {
             <CssBaseline />
             <Button onClick={() => Enqueue("5+0")}> 5+0 </Button>
             <Button onClick={() => Enqueue("10+0")}> 10+0 </Button>
+            <Button onClick={() => Enqueue("5+5")}> 5+5 </Button>
         </Container>
     )
 }

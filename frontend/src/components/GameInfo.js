@@ -14,9 +14,7 @@ import {
 } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import { Close } from "@material-ui/icons"
-
-var history = "123"
-
+    
 const GameInfo = (props) => {
     function myClockTick() {
         return props.mySide === props.turn && !props.gameOver

@@ -34,6 +34,10 @@ var opponentInfo = {}
 var myELO, opponentELO
 var whiteElo, blackElo
 var opponentHistory = ""
+var initialMinute,
+    initialSeconds,
+    increment = 0
+var timeUpdated = false
 
 function Board() {
     const { socket, userMap, username: myUsername } = useContext(AppContext)
@@ -42,15 +46,15 @@ function Board() {
     const [position, setPosition] = useState(game.fen())
     const [boardOrientation, setBoardOrientation] = useState("white")
 
-    const [opponentTimeInfo, setOpponentTimeInfo] = useState("05:00")
-    const [myTimeInfo, setMyTimeInfo] = useState("05:00")
+    const [opponentTimeInfo, setOpponentTimeInfo] = useState()
+    const [myTimeInfo, setMyTimeInfo] = useState()
 
     const [pgnMoves, setPgnMoves] = useState([])
     const [gameEndMessage, setGameEndMessage] = useState("")
     const [gameEndTitle, setGameEndTitle] = useState("")
     const [isGameOver, setIsGameOver] = useState(false)
 
-    const { opponent_socket_id, mycolor } = useParams()
+    const { opponent_socket_id, mycolor, time_format } = useParams()
     const [opponentUserName] = useState(
         userMap.get(opponent_socket_id)?.username
     )
@@ -80,9 +84,27 @@ function Board() {
         setOpen(false)
     }
 
+    function setTimeControl() {
+        let parsed = time_format.split("+")
+        initialMinute = parseInt(parsed[0])
+        initialSeconds = 0
+        increment = parseInt(parsed[1])
+        console.log("Time Control: ", initialMinute, initialSeconds)
+        setOpponentTimeInfo(
+            convertTimeToString(initialMinute) +
+                ":" +
+                convertTimeToString(initialSeconds)
+        )
+        setMyTimeInfo(
+            convertTimeToString(initialMinute) +
+                ":" +
+                convertTimeToString(initialSeconds)
+        )
+        opponentTimer.current.startMinutes(initialMinute)
+        myTimer.current.startMinutes(initialMinute)
+    }
+
     function setEndDialogMessages() {
-        // console.log(myInfo.data)
-        // console.log(opponentInfo.data)
         console.log("at setEndDialogMessages", myInfo.data)
 
         console.log("Stopped timer, now updating deltas")
@@ -121,6 +143,13 @@ function Board() {
             `${config.backend}/api/user/` + opponentUserName
         )
         console.log(myInfo, opponentInfo)
+    }
+
+    function convertTimeToString(time) {
+        var time_ = time.toString()
+        if (time < 10) time_ = "0" + time_
+
+        return time_
     }
 
     function gameEndHandler(iResigned) {
@@ -167,6 +196,7 @@ function Board() {
             opponentTimeInfo,
             myTimeInfo,
         })
+        console.log(opponent_socket_id)
         console.log("game over")
 
         // send gameResult through "game_over"
@@ -209,6 +239,16 @@ function Board() {
     }
 
     useEffect(() => {
+        const interval = setInterval(() => {
+            // assuming I am white
+            if (!timeUpdated) {
+                setTimeControl()
+                timeUpdated = true
+            }
+        }, 1000)
+    }, [])
+
+    useEffect(() => {
         // fetchData()
         axios.get(`${config.backend}/api/user/` + myUsername).then((data) => {
             myInfo = data
@@ -240,7 +280,15 @@ function Board() {
             // timer
             opponentTimer.current.stopTimer()
             myTimer.current.startTimer()
-            setMyTimeInfo(data.opponentTimeInfo)
+            console.log(
+                "Time infos: ",
+                data.myMinutes,
+                data.mySeconds,
+                data.opponentMinutes,
+                data.opponentSeconds
+            )
+            myTimer.current.setAll(data.opponentMinutes, data.opponentSeconds)
+            opponentTimer.current.setAll(data.myMinutes, data.mySeconds)
             setOpponentTimeInfo(data.myTimeInfo)
             setPgnMoves(parsePgn(game.pgn()))
 
@@ -261,8 +309,6 @@ function Board() {
 
         socket.on("game_over", (data) => {
             setIsGameOver(true)
-            // console.log(myInfo.data)
-            // console.log(opponentInfo.data)
             // NOT CONFIDENT THIS WORKS
             myTimer.current.stopTimer()
             opponentTimer.current.stopTimer()
@@ -270,37 +316,35 @@ function Board() {
             setOpponentTimeInfo(data.myTimeInfo)
             setEndDialogMessages()
             handleClickOpen()
-            console.log("Game over!", data)
+            console.log("Received Game over!", data)
         })
-
-        function convertTimeToString(time) {
-            var time_ = time.toString()
-            if (time < 10) time_ = "0" + time_
-
-            return time_
-        }
 
         const interval = setInterval(() => {
             // assuming I am white
-            const blackTime =
-                convertTimeToString(myTimer.current.getMinutes()) +
-                ":" +
-                convertTimeToString(myTimer.current.getSeconds())
-            setOpponentTimeInfo(blackTime)
+            if (!timeUpdated) {
+                setTimeControl()
+            }
+            if (myTimer && opponentTimer && initialMinute) {
+                const blackTime =
+                    convertTimeToString(myTimer.current.getMinutes()) +
+                    ":" +
+                    convertTimeToString(myTimer.current.getSeconds())
+                setOpponentTimeInfo(blackTime)
 
-            const opponentTime =
-                convertTimeToString(opponentTimer.current.getMinutes()) +
-                ":" +
-                convertTimeToString(opponentTimer.current.getSeconds())
-            setMyTimeInfo(opponentTime)
+                const opponentTime =
+                    convertTimeToString(opponentTimer.current.getMinutes()) +
+                    ":" +
+                    convertTimeToString(opponentTimer.current.getSeconds())
+                setMyTimeInfo(opponentTime)
 
-            if (
-                !isGameOver &&
-                myTimer.current.getMinutes() === 0 &&
-                myTimer.current.getSeconds() === 0
-            ) {
-                console.log("My time is over")
-                gameEndHandler(true)
+                if (
+                    !isGameOver &&
+                    myTimer.current.getMinutes() === 0 &&
+                    myTimer.current.getSeconds() === 0
+                ) {
+                    console.log("My time is over")
+                    gameEndHandler(true)
+                }
             }
         }, 500)
 
@@ -312,11 +356,17 @@ function Board() {
 
     function sendMove(move) {
         console.log("Sending Move", move)
+        var myMinutes = myTimer.current.getMinutes(),
+            mySeconds = myTimer.current.getSeconds()
+        var opponentMinutes = opponentTimer.current.getMinutes(),
+            opponentSeconds = opponentTimer.current.getSeconds()
         socket.emit("send_move", {
             to: opponent_socket_id,
             move,
-            opponentTimeInfo,
-            myTimeInfo,
+            myMinutes,
+            mySeconds,
+            opponentMinutes,
+            opponentSeconds,
         })
     }
 
@@ -345,6 +395,7 @@ function Board() {
 
         playMoveSfx()
 
+        myTimer.current.incrementTimer(increment)
         opponentTimer.current.startTimer()
         myTimer.current.stopTimer()
 
@@ -404,8 +455,6 @@ function Board() {
                     opponentHistory={opponentHistory}
                     myELO={myELO}
                     opponentELO={opponentELO}
-                    // myELO={"5"}
-                    // opponentELO={"6"}
                     myTimeInfo={myTimeInfo}
                     pgnMoves={pgnMoves}
                     mySide={boardOrientation[0]}
@@ -414,14 +463,14 @@ function Board() {
                 />
             </Grid>
             <Timer
-                initialMinute={5}
-                initialSeconds={0}
+                initialMinute={initialMinute}
+                initialSeconds={initialSeconds}
                 isTicking={0}
                 ref={opponentTimer}
             />
             <Timer
-                initialMinute={5}
-                initialSeconds={0}
+                initialMinute={initialMinute}
+                initialSeconds={initialSeconds}
                 isTicking={0}
                 ref={myTimer}
             />
