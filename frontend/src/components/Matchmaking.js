@@ -208,8 +208,8 @@ export const Matchmaking = () => {
     return (
         <Container component="main">
             <CssBaseline />
-            <Typography variant="h4" sx={{ m: 5 }} align="center">
-                Play A Game
+            <Typography variant="h3" sx={{ m: 5 }} align="center">
+                Find Game
             </Typography>
             <Grid
                 container
