@@ -4,6 +4,7 @@ import jwt_decode from "jwt-decode"
 import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
 import { Chat } from "./Chat.js"
+import LoadingButton from "@mui/lab/LoadingButton"
 import {
     Table,
     Button,
@@ -17,10 +18,12 @@ import {
     TableCell,
     TableBody,
     Snackbar,
+    IconButton,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
 import { config } from "../config/config_env"
+import CloseIcon from "@mui/icons-material/Close"
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -35,6 +38,7 @@ var myTimeControl = "-1"
 var inQueue = false
 var receiver
 var myColor
+var queueStatus = -1
 
 export const Home = () => {
     const location = useLocation()
@@ -135,6 +139,7 @@ export const Home = () => {
 
         socket.on("Challenge", (data) => {
             console.log(data)
+            Dequeue()
             history.push(
                 "/play/" +
                     data.from +
@@ -144,7 +149,6 @@ export const Home = () => {
                     myTimeControl
             )
             console.log("Challenge accepted")
-            socket.emit("rmReady")
             inQueue = false
         })
 
@@ -157,6 +161,7 @@ export const Home = () => {
     const Challenge = () => {
         console.log("Sending challenge")
         // e.preventDefault()
+        Dequeue()
         socket.emit("Challenge", {
             to: receiver.id,
             msg: "challenge",
@@ -186,7 +191,10 @@ export const Home = () => {
     }
 
     function Enqueue(timeControl) {
+        socket.emit("rmReady")
         inQueue = true
+        if (queueStatus == timeControl) queueStatus = -1
+        else queueStatus = timeControl
         myTimeControl = timeControl
         console.log("Placing in queue")
         myELO = myInfo.data.elo
@@ -200,12 +208,170 @@ export const Home = () => {
             )
     }
 
+    function Dequeue() {
+        socket.emit("rmReady")
+        inQueue = false
+        queueStatus = -1
+    }
+
+    function customHandler() {
+        if ((queueStatus = "custom")) queueStatus = -1
+        else queueStatus = "custom"
+        console.log("Custom check")
+    }
+
     return (
-        <Container component="main" maxWidth="xs">
+        <Container component="main">
             <CssBaseline />
-            <Button onClick={() => Enqueue("5+0")}> 5+0 </Button>
-            <Button onClick={() => Enqueue("10+0")}> 10+0 </Button>
-            <Button onClick={() => Enqueue("5+5")}> 5+5 </Button>
+            <Typography variant="h4" sx={{ m: 2 }}>
+                Quick Game
+            </Typography>
+            <LoadingButton
+                sx={{ m: 2 }}
+                style={{
+                    maxWidth: "100px",
+                    maxHeight: "100px",
+                    minWidth: "100px",
+                    minHeight: "100px",
+                }}
+                loading={queueStatus == "1+0"}
+                onClick={() => Enqueue("1+0")}
+                variant="contained"
+                color="secondary"
+            >
+                {" "}
+                1+0 Bullet{" "}
+            </LoadingButton>
+            <LoadingButton
+                sx={{ m: 2 }}
+                style={{
+                    maxWidth: "100px",
+                    maxHeight: "100px",
+                    minWidth: "100px",
+                    minHeight: "100px",
+                }}
+                loading={queueStatus == "3+0"}
+                onClick={() => Enqueue("3+0")}
+                variant="contained"
+                color="secondary"
+            >
+                {" "}
+                3+0 Blitz{" "}
+            </LoadingButton>
+            <LoadingButton
+                sx={{ m: 2 }}
+                style={{
+                    maxWidth: "100px",
+                    maxHeight: "100px",
+                    minWidth: "100px",
+                    minHeight: "100px",
+                }}
+                loading={queueStatus == "5+0"}
+                onClick={() => Enqueue("5+0")}
+                variant="contained"
+                color="secondary"
+            >
+                {" "}
+                5+0 Blitz{" "}
+            </LoadingButton>
+            <LoadingButton
+                sx={{ m: 2 }}
+                style={{
+                    maxWidth: "100px",
+                    maxHeight: "100px",
+                    minWidth: "100px",
+                    minHeight: "100px",
+                }}
+                loading={queueStatus == "5+5"}
+                onClick={() => Enqueue("5+5")}
+                variant="contained"
+                color="secondary"
+            >
+                {" "}
+                5+5 Blitz{" "}
+            </LoadingButton>
+            <LoadingButton
+                sx={{ m: 2 }}
+                style={{
+                    maxWidth: "100px",
+                    maxHeight: "100px",
+                    minWidth: "100px",
+                    minHeight: "100px",
+                }}
+                loading={queueStatus == "10+0"}
+                onClick={() => Enqueue("10+0")}
+                variant="contained"
+                color="secondary"
+            >
+                {" "}
+                10+0 Rapid{" "}
+            </LoadingButton>
+            <LoadingButton
+                sx={{ m: 2 }}
+                style={{
+                    maxWidth: "100px",
+                    maxHeight: "100px",
+                    minWidth: "100px",
+                    minHeight: "100px",
+                }}
+                loading={queueStatus == "10+10"}
+                onClick={() => Enqueue("10+10")}
+                variant="contained"
+                color="secondary"
+            >
+                {" "}
+                10+10 Rapid{" "}
+            </LoadingButton>
+            <LoadingButton
+                sx={{ m: 2 }}
+                style={{
+                    maxWidth: "100px",
+                    maxHeight: "100px",
+                    minWidth: "100px",
+                    minHeight: "100px",
+                }}
+                loading={queueStatus == "30+0"}
+                onClick={() => Enqueue("30+0")}
+                variant="contained"
+                color="secondary"
+            >
+                {" "}
+                30+0 Classical{" "}
+            </LoadingButton>
+            <LoadingButton
+                sx={{ m: 2 }}
+                style={{
+                    maxWidth: "100px",
+                    maxHeight: "100px",
+                    minWidth: "100px",
+                    minHeight: "100px",
+                }}
+                loading={queueStatus == "30+30"}
+                onClick={() => Enqueue("30+30")}
+                variant="contained"
+                color="secondary"
+            >
+                {" "}
+                30+30 Classical{" "}
+            </LoadingButton>
+            <IconButton
+                color="primary"
+                aria-label="Cancel Queue"
+                component="label"
+                disabled={queueStatus === -1}
+                onClick={Dequeue}
+                style={{}}
+            >
+                <CloseIcon
+                    color="inherit"
+                    style={{
+                        maxWidth: "50px",
+                        maxHeight: "50px",
+                        minWidth: "50px",
+                        minHeight: "50px",
+                    }}
+                />{" "}
+            </IconButton>
         </Container>
     )
 }
