@@ -14,6 +14,7 @@ import Home from "./components/Home"
 import Profile from "./components/Profile"
 import { config } from "./config/config_env"
 import { hasValidRefreshToken } from "./utils/cookies"
+import NotFound from "./components/NotFound"
 
 export const AppContext = React.createContext()
 
@@ -123,6 +124,8 @@ function App() {
                 <CssBaseline />
                 <HashRouter>
                     <Switch>
+                        <Route path="/notfound" component={NotFound}></Route>
+
                         <Route exact path="/login">
                             <SignIn />
                         </Route>

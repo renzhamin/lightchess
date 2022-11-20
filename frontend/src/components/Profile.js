@@ -117,6 +117,10 @@ function Profile(props) {
                 `${config.backend}/api/user/${username}`
             )
 
+            if (response.data === null) {
+                history.push("/notfound")
+            }
+
             const gameHistory = [
                 response.data.wins,
                 response.data.losses,
