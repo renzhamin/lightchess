@@ -20,6 +20,7 @@ import {
     Snackbar,
     IconButton,
     Grid,
+    Link,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
@@ -27,10 +28,28 @@ import { config } from "../config/config_env"
 import CloseIcon from "@mui/icons-material/Close"
 import Matchmaking from "./Matchmaking"
 import Leaderboard from "./Leaderboard"
-
+import UserCard from "./UserCard"
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
+
+function Copyright(props) {
+    return (
+        <Typography
+            variant="body2"
+            color="text.secondary"
+            align="center"
+            {...props}
+        >
+            {"Copyright © "}
+            <Link color="inherit" href="https://github.com/l1ghtweight/">
+                Lightweight
+            </Link>{" "}
+            {new Date().getFullYear()}
+            {"."}
+        </Typography>
+    )
+}
 
 export const Home = () => {
     const location = useLocation()
@@ -43,42 +62,48 @@ export const Home = () => {
         setOpen(false)
     }
     return (
-        <Container component="main">
-            <CssBaseline />
+        <>
+            <Container component="main">
+                <CssBaseline />
 
-            <Snackbar
-                open={open}
-                autoHideDuration={3000}
-                onClose={handleClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                key={"bottomright"}
-            >
-                <Alert
+                <Snackbar
+                    open={open}
+                    autoHideDuration={3000}
                     onClose={handleClose}
-                    severity="success"
-                    sx={{ width: "100%" }}
+                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                    key={"bottomright"}
                 >
-                    Logged in!
-                </Alert>
-            </Snackbar>
-            <Grid>
-                <Grid item xs={6}>
-                    <Matchmaking />
+                    <Alert
+                        onClose={handleClose}
+                        severity="success"
+                        sx={{ width: "100%" }}
+                    >
+                        Logged in!
+                    </Alert>
+                </Snackbar>
+                <Grid>
+                    <Grid item xs={6}>
+                        <Matchmaking />
+                    </Grid>
+                    <Grid
+                        item
+                        xs={12}
+                        mt={5}
+                        container
+                        spacing={0}
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                    >
+                        <Leaderboard />
+                    </Grid>
+                    <Grid item>
+                        <UserCard />
+                    </Grid>
                 </Grid>
-                <Grid
-                    item
-                    xs={12}
-                    mt={5}
-                    container
-                    spacing={0}
-                    direction="column"
-                    alignItems="center"
-                    justifyContent="center"
-                >
-                    <Leaderboard />
-                </Grid>
-            </Grid>
-        </Container>
+            </Container>
+            <Copyright sx={{ mt: 8, mb: 4 }} />
+        </>
     )
 }
 
