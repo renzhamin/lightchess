@@ -19,18 +19,36 @@ import {
     TableBody,
     Snackbar,
     IconButton,
+    Grid,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
 import { config } from "../config/config_env"
 import CloseIcon from "@mui/icons-material/Close"
 import Matchmaking from "./Matchmaking"
+import Leaderboard from "./Leaderboard"
 
 export const Home = () => {
     return (
         <Container component="main">
             <CssBaseline />
-            <Matchmaking align="center" />
+            <Grid>
+                <Grid item xs={6}>
+                    <Matchmaking />
+                </Grid>
+                <Grid
+                    item
+                    xs={12}
+                    mt={5}
+                    container
+                    spacing={0}
+                    direction="column"
+                    alignItems="center"
+                    justifyContent="center"
+                >
+                    <Leaderboard />
+                </Grid>
+            </Grid>
         </Container>
     )
 }
