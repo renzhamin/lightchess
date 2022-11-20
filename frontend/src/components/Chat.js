@@ -4,6 +4,7 @@ import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
 
 var playingAgainst
+var timeFormat = "5+0"
 
 export const Chat = (props) => {
     const { initSocket, socket, updateUserList, userList, username } =
@@ -35,13 +36,16 @@ export const Chat = (props) => {
 
         socket.on("Challenge_accepted", (data) => {
             console.log(data)
-            history.push("/play/" + data.from + "/" + data.yourcolor)
+            history.push(
+                "/play/" + data.from + "/" + data.yourcolor + "/" + timeFormat
+            )
             console.log("Challenge accepted")
         })
 
         socket.on("Challenge", (data) => {
             console.log("I WAS CHALLENGED")
             playingAgainst = data.from
+            timeFormat = data.timeFormat
             console.log(playingAgainst)
             handleClick()
         })
@@ -68,7 +72,9 @@ export const Chat = (props) => {
             msg: "challenge_accepted",
             yourcolor: myColor == 1 ? 0 : 1,
         })
-        history.push("/play/" + playingAgainst + "/" + myColor)
+        history.push(
+            "/play/" + playingAgainst + "/" + myColor + "/" + timeFormat
+        )
     }
 
     const Challenge = (e) => {
@@ -76,6 +82,7 @@ export const Chat = (props) => {
         e.preventDefault()
         socket.emit("Challenge", {
             to: receiver.id,
+            timeFormat: timeFormat,
             msg: "challenge",
             // yourcolor: myColor == 1 ? 0 : 1,
         })

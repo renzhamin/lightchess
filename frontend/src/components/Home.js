@@ -135,7 +135,14 @@ export const Home = () => {
 
         socket.on("Challenge", (data) => {
             console.log(data)
-            history.push("/play/" + data.from + "/" + data.yourcolor)
+            history.push(
+                "/play/" +
+                    data.from +
+                    "/" +
+                    data.yourcolor +
+                    "/" +
+                    myTimeControl
+            )
             console.log("Challenge accepted")
             inQueue = false
         })
@@ -155,7 +162,9 @@ export const Home = () => {
             yourcolor: myColor == 1 ? 0 : 1,
         })
         inQueue = false
-        history.push("/play/" + receiver.id + "/" + myColor)
+        history.push(
+            "/play/" + receiver.id + "/" + myColor + "/" + myTimeControl
+        )
     }
 
     function findOpponent() {
@@ -191,7 +200,8 @@ export const Home = () => {
     return (
         <Container component="main" maxWidth="xs">
             <CssBaseline />
-            <Button onClick={() => Enqueue("5+0")}> Queue for Game </Button>
+            <Button onClick={() => Enqueue("5+0")}> 5+0 </Button>
+            <Button onClick={() => Enqueue("10+0")}> 10+0 </Button>
         </Container>
     )
 }

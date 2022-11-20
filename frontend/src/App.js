@@ -143,7 +143,7 @@ function App() {
                             component={PgnViewer}
                         />
                         <ProtectedRoute
-                            path="/play/:opponent_socket_id/:mycolor"
+                            path="/play/:opponent_socket_id/:mycolor/:time_format"
                             component={Board}
                         />
                         <ProtectedRoute path="/play" component={Board} />
