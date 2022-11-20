@@ -57,6 +57,7 @@ export const Chat = (props) => {
     }, [])
 
     const handleReceiverChange = (e) => {
+        console.log(e.target.options.selectedIndex)
         e.preventDefault()
         const selectedIndex = e.target.options.selectedIndex
         const id = e.target.options[selectedIndex].getAttribute("id")

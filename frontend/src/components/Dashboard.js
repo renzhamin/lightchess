@@ -18,12 +18,19 @@ import {
     TableCell,
     TableBody,
     Snackbar,
+    Grid,
+    IconButton,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
 import { useLocation } from "react-router-dom"
 import { config } from "../config/config_env"
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
 
 var timeControl = "5+0"
+var playingAgainst
+var opponentUsername
+var timeFormat = "5+0"
+var myColor
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -42,16 +49,31 @@ const Dashboard = () => {
     const [open, setOpen] = useState(location.openSnackbar)
 
     const {
+        socket,
         initSocket,
         initReady,
+        userList,
         updateUserList,
         updateReadyUserList,
         readyUserList,
     } = useContext(AppContext)
 
+    const handleClick = () => {
+        setOpen(true)
+    }
+
+    const handleClose = (event, reason) => {
+        if (reason === "clickaway") {
+            return
+        }
+
+        setOpen(false)
+    }
+
     useEffect(() => {
         refreshToken()
         getUsers()
+        updateUserList()
     }, [])
 
     useEffect(() => {
@@ -59,12 +81,41 @@ const Dashboard = () => {
         updateUserList()
     }, [username])
 
+    useEffect(() => {
+        initSocket({ username })
+        updateUserList()
+
+        console.log(username)
+
+        socket.on("Challenge_accepted", (data) => {
+            console.log(data)
+            history.push(
+                "/play/" + data.from + "/" + data.yourcolor + "/" + timeFormat
+            )
+            console.log("Challenge accepted")
+        })
+
+        socket.on("Challenge", (data) => {
+            console.log("I WAS CHALLENGED")
+            opponentUsername = data.challenger
+            playingAgainst = data.from
+            console.log("playing against", playingAgainst)
+            timeFormat = data.timeFormat
+            console.log(playingAgainst)
+            handleClick()
+        })
+
+        return () => {
+            socket.off("Challenge")
+            socket.off("Challenge_accepted")
+        }
+    }, [])
+
     const refreshToken = async () => {
         try {
             const response = await axios.get(`${config.backend}/api/token`)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
-            console.log("This works", decoded.username)
             setUserName(decoded.username)
             setExpire(decoded.exp)
         } catch (error) {
@@ -94,17 +145,6 @@ const Dashboard = () => {
         }
     )
 
-    function placeQueue() {
-        console.log("Placing in queue")
-        initReady({ username, timeControl })
-        for (let i = 0; i < readyUserList.length; i++)
-            console.log(
-                readyUserList[i].username,
-                readyUserList[i].elo,
-                readyUserList[i].timeControl
-            )
-    }
-
     const getUsers = async () => {
         const response = await axiosJWT.get(`${config.backend}/api/users`, {
             headers: {
@@ -115,12 +155,31 @@ const Dashboard = () => {
         initSocket({ username })
     }
 
-    const handleClose = (event, reason) => {
-        if (reason === "clickaway") {
-            return
-        }
+    const Challenge = (receiver) => {
+        console.log("Sending challenge to", receiver)
+        // e.preventDefault()
+        socket.emit("Challenge", {
+            to: receiver.id,
+            timeFormat: timeFormat,
+            msg: "challenge",
+            challenger: username,
+            // yourcolor: myColor == 1 ? 0 : 1,
+        })
+        /* history.push("/play/" + receiver.id + "/" + myColor) */
+    }
 
-        setOpen(false)
+    const AcceptChallenge = (e) => {
+        console.log("Challenge Accepted")
+        e.preventDefault()
+        console.log("At accept challenge ", playingAgainst)
+        socket.emit("Challenge_accepted", {
+            to: playingAgainst,
+            msg: "challenge_accepted",
+            yourcolor: myColor == 1 ? 0 : 1,
+        })
+        history.push(
+            "/play/" + playingAgainst + "/" + myColor + "/" + timeFormat
+        )
     }
 
     return (
@@ -128,21 +187,37 @@ const Dashboard = () => {
             <CssBaseline />
             <Snackbar
                 open={open}
-                autoHideDuration={3000}
+                autoHideDuration={15000}
                 onClose={handleClose}
-                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                key={"bottomright"}
             >
                 <Alert
                     onClose={handleClose}
-                    severity="success"
-                    sx={{ width: "100%" }}
+                    severity="info"
+                    sx={{ width: "250%", height: "250%" }}
                 >
-                    Logged in!
+                    Challenge Received from {opponentUsername}
+                    <Grid>
+                        <Button
+                            color="success"
+                            variant="contained"
+                            onClick={AcceptChallenge}
+                            sx={{ m: 1 }}
+                        >
+                            Accept
+                        </Button>
+                        <Button
+                            color="error"
+                            variant="contained"
+                            onClick={handleClose}
+                            sx={{ m: 1 }}
+                        >
+                            Reject
+                        </Button>
+                    </Grid>
                 </Alert>
             </Snackbar>
             <Typography component="h1" variant="h5" sx={{ mt: 1 }}>
-                Welcome Back: {username}
+                Online Players
             </Typography>
             <Button
                 size="large"
@@ -153,18 +228,19 @@ const Dashboard = () => {
             >
                 Refresh
             </Button>
-            <Button onClick={placeQueue}> Queue for game </Button>
             <TableContainer component={Paper}>
                 <Table sx={{ minWidth: 650 }} aria-label="simple table">
                     <TableHead>
                         <TableRow>
                             <TableCell>No</TableCell>
-                            <TableCell>Name</TableCell>
-                            <TableCell>Email</TableCell>
+                            <TableCell>Username</TableCell>
+                            <TableCell>Status</TableCell>
+                            {/* <TableCell>ELO</TableCell> */}
+                            <TableCell>Challenge</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {users.map((user, index) => (
+                        {userList.map((user, index) => (
                             <TableRow
                                 key={user.id}
                                 sx={{
@@ -175,13 +251,21 @@ const Dashboard = () => {
                             >
                                 <TableCell>{index + 1}</TableCell>
                                 <TableCell>{user.username}</TableCell>
-                                <TableCell>{user.email}</TableCell>
+                                <TableCell>ONLINE</TableCell>
+                                {/* <TableCell>{user.elo}</TableCell> */}
+                                <TableCell>
+                                    <IconButton
+                                        disabled={user.username == username}
+                                        onClick={() => Challenge(user)}
+                                    >
+                                        <CompareArrowsIcon></CompareArrowsIcon>
+                                    </IconButton>
+                                </TableCell>
                             </TableRow>
                         ))}
                     </TableBody>
                 </Table>
             </TableContainer>
-            <Chat name={username} />
         </Container>
     )
 }
