@@ -5,9 +5,8 @@ import { config } from "../config/config_env"
 import { Container, Grid } from "@mui/material"
 import { useEffect, useState } from "react"
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
-import { Pie } from "react-chartjs-2"
+import { Pie, Line } from "react-chartjs-2"
 import Chart from "react-apexcharts"
-import Box from "@mui/material/Box"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import { CardActionArea } from "@mui/material"
@@ -20,7 +19,6 @@ import TableContainer from "@mui/material/TableContainer"
 import TableRow from "@mui/material/TableRow"
 import Paper from "@mui/material/Paper"
 import Link from "@mui/material/Link"
-import { HistoryOutlined } from "@material-ui/icons"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -100,15 +98,6 @@ function Profile(props) {
         },
         stroke: {
             curve: "smooth",
-        },
-        fill: {
-            type: "solid",
-            gradient: {
-                shadeIntensity: 1,
-                opacityFrom: 0.7,
-                opacityTo: 0.9,
-                stops: [0, 90, 100],
-            },
         },
     })
 
@@ -249,15 +238,35 @@ function Profile(props) {
 
                 var dateString = ""
                 if (yearsPassed > 0) {
-                    dateString = yearsPassed + " years ago"
+                    dateString =
+                        yearsPassed +
+                        " year" +
+                        (yearsPassed === 1 ? "" : "s") +
+                        " ago"
                 } else if (weeksPassed > 0) {
-                    dateString = weeksPassed + " weeks ago"
+                    dateString =
+                        weeksPassed +
+                        " week" +
+                        (weeksPassed === 1 ? "" : "s") +
+                        " ago"
                 } else if (daysPassed > 0) {
-                    dateString = daysPassed + " days ago"
+                    dateString =
+                        daysPassed +
+                        " day " +
+                        (daysPassed === 1 ? "" : "s") +
+                        " ago"
                 } else if (hoursPassed > 0) {
-                    dateString = hoursPassed + " hours ago"
+                    dateString =
+                        hoursPassed +
+                        " hour" +
+                        (hoursPassed === 1 ? "" : "s") +
+                        " ago"
                 } else {
-                    dateString = minutesPassed + " minutes ago"
+                    dateString =
+                        minutesPassed +
+                        " minute" +
+                        (minutesPassed === 1 ? "" : "s") +
+                        " ago"
                 }
 
                 // process rating change
@@ -364,6 +373,16 @@ function Profile(props) {
                     </TableBody>
                 </Table>
             </TableContainer>
+            <Typography
+                variant="h5"
+                gutterBottom
+                mt={5}
+                mb={1}
+                alignContent="center"
+                align="center"
+            >
+                Recet game history
+            </Typography>
 
             <Grid
                 container
@@ -484,7 +503,7 @@ function Profile(props) {
                         <Chart
                             options={lineChartOptions}
                             series={lineChartSeries}
-                            type="line"
+                            type="area"
                             width="720"
                         />
                         <CardActionArea>
