@@ -25,9 +25,7 @@ const initSocket = (args) => {
     const { username } = args
     if (socket.connected === true || username === "") return
     socket.connect()
-    socket.emit("initSocket", { username }, (response) => {
-        console.log(response)
-    })
+    socket.emit("initSocket", { username }, (response) => {})
 }
 const initReady = (args) => {
     const { username } = args
@@ -35,15 +33,12 @@ const initReady = (args) => {
     if (socket.disconnected) {
         initSocket({ username })
     }
-    socket.emit("initReady", args, (response) => {
-        console.log(response)
-    })
+    socket.emit("initReady", args, (response) => {})
 }
 
 class ProtectedRoute extends Component {
     render() {
         const { component: Component, ...props } = this.props
-        // console.log("Do I have valid refresh token?", hasValidRefreshToken())
         return (
             <Route
                 {...props}

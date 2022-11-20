@@ -13,15 +13,13 @@ import {
 import axios from "axios"
 import { useEffect, useState } from "react"
 import { config } from "../config/config_env"
-import { useLocation, useHistory } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 
 const Leaderboard = () => {
     const [leaderBoardTable, setLeaderBoardTable] = useState([])
     const history = useHistory()
 
     useEffect(() => {
-        console.log("asdased")
-
         async function getLeaderboard() {
             const response = await axios.get(
                 `${config.backend}/api/leaderboard`
@@ -45,7 +43,6 @@ const Leaderboard = () => {
                 )
             }
 
-            console.log(table)
             setLeaderBoardTable(table)
         }
 

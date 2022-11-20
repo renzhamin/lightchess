@@ -123,7 +123,6 @@ export const Matchmaking = () => {
                 axios
                     .get(`${config.backend}/api/user/` + username)
                     .then((data) => {
-                        console.log("Fetching data")
                         myInfo = data
                         myELO = myInfo.data.elo
                     })
@@ -133,13 +132,11 @@ export const Matchmaking = () => {
             updateReadyUserList()
 
             if (inQueue) {
-                console.log("Trying to find opponent")
                 findOpponent()
             }
         }, 1000)
 
         socket.on("Challenge", (data) => {
-            console.log(data)
             Dequeue()
             history.push(
                 "/play/" +
@@ -149,7 +146,6 @@ export const Matchmaking = () => {
                     "/" +
                     myTimeControl
             )
-            console.log("Challenge accepted")
             inQueue = false
         })
 
@@ -160,7 +156,6 @@ export const Matchmaking = () => {
     }, [myInfo, myELO, readyUserList])
 
     const Challenge = () => {
-        console.log("Sending challenge")
         // e.preventDefault()
         Dequeue()
         socket.emit("Challenge", {
@@ -181,10 +176,8 @@ export const Matchmaking = () => {
                 myTimeControl === readyUserList[i].timeControl &&
                 username != readyUserList[i].username
             ) {
-                console.log("Can match with ", readyUserList[i].username)
                 myColor = Math.floor(Math.random() * 2)
                 receiver = readyUserList[i]
-                console.log("Challenging socket", receiver)
                 Challenge()
                 socket.emit("rmReady")
             }
@@ -197,16 +190,8 @@ export const Matchmaking = () => {
         if (queueStatus == timeControl) queueStatus = -1
         else queueStatus = timeControl
         myTimeControl = timeControl
-        console.log("Placing in queue")
         myELO = myInfo.data.elo
         initReady({ username, timeControl })
-        console.log(myELO, myTimeControl)
-        for (let i = 0; i < readyUserList.length; i++)
-            console.log(
-                readyUserList[i].username,
-                readyUserList[i].elo,
-                readyUserList[i].timeControl
-            )
     }
 
     function Dequeue() {
@@ -218,7 +203,6 @@ export const Matchmaking = () => {
     function customHandler() {
         if ((queueStatus = "custom")) queueStatus = -1
         else queueStatus = "custom"
-        console.log("Custom check")
     }
 
     return (
