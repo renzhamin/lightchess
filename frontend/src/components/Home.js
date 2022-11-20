@@ -30,7 +30,7 @@ export const Home = () => {
     return (
         <Container component="main">
             <CssBaseline />
-            <Matchmaking />
+            <Matchmaking align="center" />
         </Container>
     )
 }

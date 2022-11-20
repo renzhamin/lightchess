@@ -9,7 +9,7 @@ import Navbar from "./components/Navbar"
 import PgnViewer from "./components/PgnViewer"
 import SignIn from "./components/SignIn"
 import SignUp from "./components/SignUp"
-import theme from "./theme"
+import { themeLight, themeDark } from "./theme"
 import Home from "./components/Matchmaking"
 import Profile from "./components/Profile"
 import { config } from "./config/config_env"
@@ -124,7 +124,7 @@ function App() {
                 setUserName,
             }}
         >
-            <ThemeProvider theme={theme}>
+            <ThemeProvider theme={themeLight}>
                 <CssBaseline />
                 <HashRouter>
                     <Switch>
