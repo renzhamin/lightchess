@@ -226,47 +226,48 @@ function Profile(props) {
 
                 // process date
                 var date = gameInfo[i].createdAt
+                var dateString = "--"
+                if (date !== undefined) {
+                    const now = new Date()
+                    const gameDate = new Date(date)
 
-                const now = new Date()
-                const gameDate = new Date(date)
+                    const daysPassed = DateDiff.inDays(gameDate, now)
+                    const weeksPassed = DateDiff.inWeeks(gameDate, now)
+                    const yearsPassed = DateDiff.inYears(gameDate, now)
+                    const minutesPassed = DateDiff.inMinutes(gameDate, now)
+                    const hoursPassed = DateDiff.inHours(gameDate, now)
 
-                const daysPassed = DateDiff.inDays(gameDate, now)
-                const weeksPassed = DateDiff.inWeeks(gameDate, now)
-                const yearsPassed = DateDiff.inYears(gameDate, now)
-                const minutesPassed = DateDiff.inMinutes(gameDate, now)
-                const hoursPassed = DateDiff.inHours(gameDate, now)
-
-                var dateString = ""
-                if (yearsPassed > 0) {
-                    dateString =
-                        yearsPassed +
-                        " year" +
-                        (yearsPassed === 1 ? "" : "s") +
-                        " ago"
-                } else if (weeksPassed > 0) {
-                    dateString =
-                        weeksPassed +
-                        " week" +
-                        (weeksPassed === 1 ? "" : "s") +
-                        " ago"
-                } else if (daysPassed > 0) {
-                    dateString =
-                        daysPassed +
-                        " day " +
-                        (daysPassed === 1 ? "" : "s") +
-                        " ago"
-                } else if (hoursPassed > 0) {
-                    dateString =
-                        hoursPassed +
-                        " hour" +
-                        (hoursPassed === 1 ? "" : "s") +
-                        " ago"
-                } else {
-                    dateString =
-                        minutesPassed +
-                        " minute" +
-                        (minutesPassed === 1 ? "" : "s") +
-                        " ago"
+                    if (yearsPassed > 0) {
+                        dateString =
+                            yearsPassed +
+                            " year" +
+                            (yearsPassed === 1 ? "" : "s") +
+                            " ago"
+                    } else if (weeksPassed > 0) {
+                        dateString =
+                            weeksPassed +
+                            " week" +
+                            (weeksPassed === 1 ? "" : "s") +
+                            " ago"
+                    } else if (daysPassed > 0) {
+                        dateString =
+                            daysPassed +
+                            " day " +
+                            (daysPassed === 1 ? "" : "s") +
+                            " ago"
+                    } else if (hoursPassed > 0) {
+                        dateString =
+                            hoursPassed +
+                            " hour" +
+                            (hoursPassed === 1 ? "" : "s") +
+                            " ago"
+                    } else {
+                        dateString =
+                            minutesPassed +
+                            " minute" +
+                            (minutesPassed === 1 ? "" : "s") +
+                            " ago"
+                    }
                 }
 
                 // process rating change
@@ -278,6 +279,8 @@ function Profile(props) {
                 } else {
                     ratingChange = ratingChange.toString()
                 }
+
+                if (isNaN(ratingChange)) ratingChange = "--"
 
                 rtData.push(
                     createRtData(
