@@ -49,15 +49,12 @@ const SignUp = () => {
     const SignUp = async (e) => {
         e.preventDefault()
         try {
-            await axios.post(
-                `${config.backend}/api/register`,
-                {
-                    username,
-                    email,
-                    password,
-                    confPassword,
-                }
-            )
+            await axios.post(`${config.backend}/api/register`, {
+                username,
+                email,
+                password,
+                confPassword,
+            })
             // history.push("/")
             history.push({
                 pathname: "/login",

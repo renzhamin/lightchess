@@ -13,7 +13,10 @@ const Navbar = () => {
     const Logout = async () => {
         try {
             await axios.delete(`${config.backend}/api/logout`)
-            history.push("/")
+            history.push({
+                pathname: "/login",
+                openLogoutSnackBar: true,
+            })
             socket.disconnect()
         } catch (error) {
             console.log(error)
