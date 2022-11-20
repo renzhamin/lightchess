@@ -82,6 +82,8 @@ io.on("connection", (socket) => {
             /* console.log("args", username, userId) */
             userMap.set(String(socket.id), { username })
             fn(`welcome ${username} from SERVER [initSocket successfull]`)
+        } else if (eventName == "rmReady") {
+            readyMap.delete(socket.id)
         } else if (eventName == "initReady") {
             const fn = args[args.length - 1]
             const data = args[0]
