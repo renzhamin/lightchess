@@ -11,9 +11,9 @@
     "scripts": {
         "start": "DEBUG_MODE=1 npm run dev",
         "tsc": "tsc",
-        "postinstall": "npm run tsc",
+        "build": "npm run tsc; cp -r src/build/* dist/build;",
         "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
-        "production": "npm run tsc;cp -r src/build/* dist/build; PRODUCTION=1 node dist/index.js"
+        "production": "PRODUCTION=1 node dist/index.js"
     },
     "author": "",
     "license": "ISC",
