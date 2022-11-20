@@ -30,6 +30,7 @@ import Quick_Game from "./Quick_Game"
 import Matchmaking from "./Matchmaking"
 import Leaderboard from "./Leaderboard"
 import UserCard from "./UserCard"
+import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
@@ -82,14 +83,14 @@ export const Home = () => {
                         Logged in!
                     </Alert>
                 </Snackbar>
-                <Grid container spacing={2}>
+                <Grid container spacing={2} mt={3}>
                     <Grid
                         item
                         xs={8}
                         // mt={5}
                         container
                         spacing={0}
-                        direction="column"
+                        direction="row"
                         alignItems="center"
                         justifyContent="center"
                     >
@@ -107,9 +108,36 @@ export const Home = () => {
                     >
                         <UserCard />
                     </Grid>
+                </Grid>
+                <Grid
+                    container
+                    spacing={0}
+                    alignItems="center"
+                    justifyContent="center"
+                    mt={5}
+                >
                     <Grid
                         item
-                        xs={12}
+                        xs={8}
+                        mt={5}
+                        container
+                        spacing={0}
+                        direction="column"
+                        justifyContent="center"
+                        alignItems="center"
+                    >
+                        <img
+                            style={{ width: 250, height: 250 }}
+                            src={lightchess_logo_blue}
+                            alt="lightchess-logo"
+                        />
+                        {/* <Typography>
+                            Number of online users {userList.length}
+                        </Typography> */}
+                    </Grid>
+                    <Grid
+                        item
+                        xs={4}
                         mt={5}
                         container
                         spacing={0}

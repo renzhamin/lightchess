@@ -175,8 +175,8 @@ function Profile(props) {
             ltData.push(createData("Won", response.data.wins))
             ltData.push(createData("Lost", response.data.losses))
             ltData.push(createData("Drawn", response.data.draws))
-            ltData.push(createData("Won as WHITE", response.data.winAsWhite))
-            ltData.push(createData("Won as BLACK", response.data.winAsBlack))
+            ltData.push(createData("Won as White", response.data.winAsWhite))
+            ltData.push(createData("Won as Black", response.data.winAsBlack))
             ltData.push(createData("Highest Rating", maxELO))
             ltData.push(createData("Lowest Rating", minELO))
 
@@ -332,7 +332,7 @@ function Profile(props) {
                         variant="h4"
                         gutterBottom
                         mt={5}
-                        mx={5}
+                        mx={2}
                     >
                         {username}
                     </Typography>
@@ -429,7 +429,7 @@ function Profile(props) {
                 alignContent="center"
                 align="center"
             >
-                Recent game history
+                Recent Game History
             </Typography>
 
             <Grid
@@ -561,6 +561,7 @@ function Profile(props) {
                                     gutterBottom
                                     variant="h5"
                                     component="div"
+                                    align="center"
                                 >
                                     Rating Graph
                                 </Typography>

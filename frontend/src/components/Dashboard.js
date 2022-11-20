@@ -181,12 +181,12 @@ const Dashboard = () => {
                 open={open}
                 autoHideDuration={15000}
                 onClose={handleClose}
-                color="secondary"
             >
                 <Alert
                     onClose={handleClose}
                     severity="info"
                     sx={{ width: "250%", height: "250%" }}
+                    color="secondary"
                 >
                     <AlertTitle>Challenge Received</AlertTitle>
                     Opponent: {opponentUsername}

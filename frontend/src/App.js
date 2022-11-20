@@ -16,6 +16,7 @@ import { config } from "./config/config_env"
 import { hasValidRefreshToken } from "./utils/cookies"
 import NotFound from "./components/NotFound"
 import Matchmaking from "./components/Matchmaking"
+import lightchess_logo_grey from "./components/static/images/lightchess_logo_grey.png"
 
 export const AppContext = React.createContext()
 
@@ -123,40 +124,49 @@ function App() {
         >
             <ThemeProvider theme={themeLight}>
                 <CssBaseline />
-                <HashRouter>
-                    <Switch>
-                        <Route path="/notfound" component={NotFound}></Route>
+                <div
+                    style={{
+                        backgroundImage: lightchess_logo_grey,
+                    }}
+                >
+                    <HashRouter>
+                        <Switch>
+                            <Route
+                                path="/notfound"
+                                component={NotFound}
+                            ></Route>
 
-                        <Route exact path="/login">
-                            <SignIn />
-                        </Route>
-                        <Route path="/register">
-                            <SignUp />
-                        </Route>
-                        <ProtectedRoute
-                            path="/dashboard"
-                            component={Dashboard}
-                        />
-                        <ProtectedRoute
-                            path="/pgnviewer"
-                            component={PgnViewer}
-                        />
-                        <ProtectedRoute
-                            path="/matchmaking"
-                            component={Matchmaking}
-                        />
-                        <ProtectedRoute
-                            path="/play/:opponent_socket_id/:mycolor/:time_format"
-                            component={Board}
-                        />
-                        <ProtectedRoute path="/play" component={Board} />
-                        <ProtectedRoute
-                            path="/user/:username"
-                            component={Profile}
-                        />
-                        <ProtectedRoute path="/" component={Home} />
-                    </Switch>
-                </HashRouter>
+                            <Route exact path="/login">
+                                <SignIn />
+                            </Route>
+                            <Route path="/register">
+                                <SignUp />
+                            </Route>
+                            <ProtectedRoute
+                                path="/dashboard"
+                                component={Dashboard}
+                            />
+                            <ProtectedRoute
+                                path="/pgnviewer"
+                                component={PgnViewer}
+                            />
+                            <ProtectedRoute
+                                path="/matchmaking"
+                                component={Matchmaking}
+                            />
+                            <ProtectedRoute
+                                path="/play/:opponent_socket_id/:mycolor/:time_format"
+                                component={Board}
+                            />
+                            <ProtectedRoute path="/play" component={Board} />
+                            <ProtectedRoute
+                                path="/user/:username"
+                                component={Profile}
+                            />
+                            <ProtectedRoute path="/" component={Home} />
+                        </Switch>
+                    </HashRouter>
+                </div>
             </ThemeProvider>
         </AppContext.Provider>
     )
