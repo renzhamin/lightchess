@@ -1,5 +1,4 @@
 import { Grid, Typography } from "@mui/material"
-import { Box } from "@mui/system"
 import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
 
 const NotFound = () => {
