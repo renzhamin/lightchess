@@ -74,7 +74,7 @@ function App() {
             newUserMap.forEach((value, key) => {
                 users.push({
                     id: key,
-                    username: value.username,
+                    ...value,
                 })
             })
             setUserMap(newUserMap)

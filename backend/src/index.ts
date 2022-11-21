@@ -78,10 +78,24 @@ io.on("connection", (socket) => {
             callback(dMap)
         } else if (eventName == "initSocket") {
             const fn = args[args.length - 1]
-            const { username } = args[0]
-            /* console.log("args", username, userId) */
-            userMap.set(String(socket.id), { username })
-            fn(`welcome ${username} from SERVER [initSocket successfull]`)
+            const data = args[0]
+
+            Users.findOne({
+                attributes: ["elo"],
+                where: {
+                    username: data.username,
+                },
+            }).then((user) => {
+                if (!user) {
+                    console.log("Got invalid username in initSocket")
+                    return
+                }
+                data.elo = user.elo
+                userMap.set(String(socket.id), data)
+                fn(
+                    `welcome ${data.username} from SERVER [initSocket successfull]`
+                )
+            })
         } else if (eventName == "rmReady") {
             readyMap.delete(socket.id)
         } else if (eventName == "initReady") {
