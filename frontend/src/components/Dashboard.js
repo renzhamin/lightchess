@@ -229,7 +229,7 @@ const Dashboard = () => {
                             <TableCell>No</TableCell>
                             <TableCell>Username</TableCell>
                             <TableCell>Status</TableCell>
-                            {/* <TableCell>ELO</TableCell> */}
+                            <TableCell>ELO</TableCell>
                             <TableCell>Challenge</TableCell>
                         </TableRow>
                     </TableHead>
@@ -262,7 +262,7 @@ const Dashboard = () => {
                                         ONLINE
                                     </Typography>
                                 </TableCell>
-                                {/* <TableCell>{user.elo}</TableCell> */}
+                                <TableCell>{user.elo}</TableCell>
                                 <TableCell>
                                     <IconButton
                                         disabled={user.username === username}
