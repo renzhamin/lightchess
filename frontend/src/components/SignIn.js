@@ -50,6 +50,7 @@ const SignIn = () => {
 
     const Auth = async (e) => {
         e.preventDefault()
+        if (email === "") return
         try {
             await axios.post(`${config.backend}/api/login`, {
                 email: email,
