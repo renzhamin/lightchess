@@ -36,7 +36,7 @@ function Copyright(props) {
     )
 }
 
-const SignIn = () => {
+const ForgotPassword = () => {
     const history = useHistory()
     const location = useLocation()
 
@@ -44,16 +44,15 @@ const SignIn = () => {
     const [password, setPassword] = useState("")
     const [msg, setMsg] = useState("")
     const [open, setOpen] = useState(false)
-    const [openSignUpSnackbar, setOpenSignUpSnackbar] = useState(
+    const [openSentSnackbar, setopenSentSnackbar] = useState(
         location.openSnackbar
     )
 
-    const Auth = async (e) => {
+    const ForgotPasswordRequest = async (e) => {
         e.preventDefault()
         try {
-            await axios.post(`${config.backend}/api/login`, {
+            await axios.get(`${config.backend}/api/resetpassword`, {
                 email: email,
-                password: password,
             })
             history.push({
                 pathname: "/",
@@ -61,6 +60,7 @@ const SignIn = () => {
             })
         } catch (error) {
             setOpen(true)
+            console.log(error.response)
             if (error.response) {
                 setMsg(error.response.data.msg)
             }
@@ -80,7 +80,7 @@ const SignIn = () => {
             return
         }
 
-        setOpenSignUpSnackbar(false)
+        setopenSentSnackbar(false)
     }
 
     return (
@@ -102,7 +102,7 @@ const SignIn = () => {
                 </Alert>
             </Snackbar>
             <Snackbar
-                open={openSignUpSnackbar}
+                open={openSentSnackbar}
                 autoHideDuration={3000}
                 onClose={handleSnackBarClose}
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
@@ -113,7 +113,7 @@ const SignIn = () => {
                     severity="success"
                     sx={{ width: "100%" }}
                 >
-                    Sign up complete!
+                    Password Reset E-mail Sent
                 </Alert>
             </Snackbar>
             <Box
@@ -130,9 +130,14 @@ const SignIn = () => {
                     alt="lightchess-logo"
                 />
                 <Typography component="h1" variant="h5" sx={{ mt: 1 }}>
-                    Sign in
+                    Reset Password
                 </Typography>
-                <Box component="form" onSubmit={Auth} noValidate sx={{ mt: 1 }}>
+                <Box
+                    component="form"
+                    onSubmit={ForgotPasswordRequest}
+                    noValidate
+                    sx={{ mt: 1 }}
+                >
                     <TextField
                         margin="normal"
                         required
@@ -144,17 +149,6 @@ const SignIn = () => {
                         onChange={(e) => setEmail(e.target.value)}
                         autoFocus
                     />
-                    <TextField
-                        margin="normal"
-                        required
-                        fullWidth
-                        name="password"
-                        label="Password"
-                        type="password"
-                        id="password"
-                        onChange={(e) => setPassword(e.target.value)}
-                        autoComplete="current-password"
-                    />
                     {/* <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
@@ -165,35 +159,13 @@ const SignIn = () => {
                         variant="contained"
                         sx={{ mt: 3, mb: 2 }}
                     >
-                        Sign In
+                        Send Password Reset Email
                     </Button>
-                    <Grid container>
-                        <Grid item xs>
-                            <Link href="#/forgotpassword" variant="body2">
-                                Forgot password?
-                            </Link>
-                        </Grid>
-                        <Grid item>
-                            <Link href="#/register" variant="body2">
-                                {"Don't have an account? Sign Up"}
-                            </Link>
-                        </Grid>
-                    </Grid>
                 </Box>
-                {/* <Link
-                    href={
-                        config.backend +
-                        "/api/login/federated/google"
-                    }
-                    variant="body2"
-                    sx={{ mt: 2 }}
-                >
-                    {"Login with Google"}
-                </Link> */}
             </Box>
             <Copyright sx={{ mt: 8, mb: 4 }} />
         </Container>
     )
 }
 
-export default SignIn
+export default ForgotPassword

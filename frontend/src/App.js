@@ -16,6 +16,7 @@ import { config } from "./config/config_env"
 import { hasValidRefreshToken } from "./utils/cookies"
 import NotFound from "./components/NotFound"
 import Matchmaking from "./components/Matchmaking"
+import ForgotPassword from "./components/ForgotPassword"
 import lightchess_logo_grey from "./components/static/images/lightchess_logo_grey.png"
 
 export const AppContext = React.createContext()
@@ -141,6 +142,9 @@ function App() {
                             </Route>
                             <Route path="/register">
                                 <SignUp />
+                            </Route>
+                            <Route exact path="/forgotpassword">
+                                <ForgotPassword />
                             </Route>
                             <ProtectedRoute
                                 path="/dashboard"
