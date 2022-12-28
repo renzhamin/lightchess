@@ -53,6 +53,9 @@ router.post("/games", addGames)
 router.post("/login", Login)
 router.delete("/logout", Logout)
 router.get("/login/federated/google", passport.authenticate("google"))
+router.get("/health", (_, res) => {
+    return res.status(200).json({ msg: "Ok" })
+})
 
 const finalRouter = express.Router()
 

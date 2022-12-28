@@ -136,7 +136,7 @@ const router_google = express.Router()
 router_google.get(
     "/oauth2/redirect/google",
     passport.authenticate("google", {
-        failureRedirect: "http://localhost:3000/",
+        failureRedirect: process.env.FRONTEND_URL || "/",
         session: false,
     }),
     async function (req, res) {
@@ -152,7 +152,7 @@ router_google.get(
             maxAge: 24 * 60 * 60 * 30 * 1000,
         })
 
-        return res.redirect("http://localhost:3000/")
+        return res.redirect(process.env.FRONTEND_URL || "/")
     }
 )
 

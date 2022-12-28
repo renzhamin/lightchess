@@ -1,11 +1,10 @@
 #!/bin/sh
 
 mkdir -p ./backend/src/build/
-rm ./frontend/package-lock.json
-rm ./backend/package-lock.json
 
 cd ./frontend
 yarn
+yarn add chart.js
 yarn run build
 
 cd ../backend
