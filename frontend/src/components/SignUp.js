@@ -124,7 +124,7 @@ const SignUp = () => {
                                 required
                                 fullWidth
                                 id="Name"
-                                label="Name"
+                                label="Username"
                                 autoFocus
                                 onChange={(e) => setUserName(e.target.value)}
                             />

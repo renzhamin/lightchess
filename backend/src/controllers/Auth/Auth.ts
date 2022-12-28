@@ -8,6 +8,7 @@ import {
     getAccessTokenFromUserDetails,
     getRefreshToken,
 } from "../../modules/Tokens"
+import { get_url_from_req } from "../../modules/Utils"
 dotenv.config()
 
 const { Op } = Sequelize
@@ -40,7 +41,7 @@ export const getPasswordResetLink = async (req, res) => {
             expiresIn: "5m",
         })
 
-        const url = req.protocol + "://" + req.get("host") + req.originalUrl
+        const url = get_url_from_req(req)
 
         const resetLink = `<a target='_blank' href='${url}/${id}/${accessToken}'>Password Reset Link</a>`
         sendMail(email, "Reset Password for Lightchess", resetLink)
@@ -102,7 +103,7 @@ export const Login = async (req, res) => {
             maxAge: 24 * 60 * 60 * 30 * 1000,
         })
 
-        return res.json({ accessToken })
+        return res.json({ msg: "Successfull Login" })
     } catch (error) {
         return res.status(404).json({ msg: "Internal Error" })
     }

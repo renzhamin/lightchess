@@ -1,10 +1,15 @@
+import dotenv from "dotenv"
 import express from "express"
 import passport from "passport"
 import GoogleStrategy from "passport-google-oauth20"
+import { Op } from "sequelize"
 import FUsers from "../models/FederatedUserModel"
 import Users from "../models/UserModel"
-import dotenv from "dotenv"
-import { getRefreshToken } from "../modules/Tokens"
+import {
+    getAccessTokenFromUserDetails,
+    getRefreshToken,
+} from "../modules/Tokens"
+import { get_url_from_req } from "../modules/Utils"
 
 dotenv.config()
 // Configure the Google strategy for use by Passport.
@@ -14,6 +19,33 @@ dotenv.config()
 // behalf, along with the user's profile.  The function must invoke `cb`
 // with a user object, which will be set at `req.user` in route handlers after
 // authentication.
+
+const get_available_username = async (username: string) => {
+    const users = await Users.findAll({
+        attributes: ["username"],
+        where: {
+            username: {
+                [Op.like]: username + "%",
+            },
+        },
+    })
+    const userSet: Set<string> = new Set()
+    users.forEach((user) => userSet.add(user.username))
+
+    if (!userSet.has(username)) return username
+
+    console.log(userSet, "somehow got here")
+    for (let i = 1; ; i++) {
+        if (!userSet.has(username + i)) {
+            return username + i
+        }
+    }
+}
+
+const get_username_from_email = (email: string) => {
+    return email.substring(0, email.indexOf("@"))
+}
+
 passport.use(
     new GoogleStrategy(
         {
@@ -46,9 +78,14 @@ passport.use(
                 return cb(null, existing_user)
             }
 
+            const email = profile.emails[0].value
+            const username = await get_available_username(
+                get_username_from_email(email)
+            )
             const user = await Users.create({
                 displayname: profile.displayName,
-                email: profile.emails[0].value,
+                username,
+                email,
                 role: 1,
             }).catch((err) => {
                 return cb(err, false)
@@ -96,24 +133,27 @@ const router_google = express.Router()
    automatically created and their Google account is linked.  When an existing
    user returns, they are signed in to their linked account.
    */
-/* router_google.get( */
-/*     "/oauth2/redirect/google", */
-/*     passport.authenticate("google", { */
-/*         failureRedirect: "http://localhost:3000", */
-/*         session: false, */
-/*     }), */
-/*     async function (req, res) { */
-/*         const { id, username, email } = req.user */
-/**/
-/*         const refreshToken = getRefreshToken({ id, username, email }) */
-/**/
-/*         res.cookie("refreshToken", refreshToken, { */
-/*             httpOnly: true, */
-/*             maxAge: 24 * 60 * 60 * 30 * 1000, */
-/*         }) */
-/**/
-/*         return res.redirect("http://localhost:3000/dashboard") */
-/*     } */
-/* ) */
+router_google.get(
+    "/oauth2/redirect/google",
+    passport.authenticate("google", {
+        failureRedirect: "http://localhost:3000/",
+        session: false,
+    }),
+    async function (req, res) {
+        if (!req.user) {
+            return res.json({ msg: "user info not found" })
+        }
+
+        const { id, username, email } = req.user as any
+
+        const refreshToken = getRefreshToken({ id, username, email })
+
+        res.cookie("refreshToken", refreshToken, {
+            maxAge: 24 * 60 * 60 * 30 * 1000,
+        })
+
+        return res.redirect("http://localhost:3000/")
+    }
+)
 
 export default router_google
