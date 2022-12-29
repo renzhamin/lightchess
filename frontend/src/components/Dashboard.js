@@ -38,7 +38,7 @@ const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-const Dashboard = () => {
+const Dashboard = (props) => {
     const location = useLocation()
     const history = useHistory()
 
@@ -49,6 +49,10 @@ const Dashboard = () => {
     const [users, setUsers] = useState([])
 
     const [open, setOpen] = useState(location.openSnackbar)
+
+    if (location.refresh == true) {
+        window.location.reload()
+    }
 
     const {
         socket,

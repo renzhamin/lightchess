@@ -21,7 +21,7 @@ function GameEndDialog(props) {
     }
 
     const Home = () => {
-        history.push("/")
+        history.push({ pathname: "/", refresh: true })
     }
 
     return (

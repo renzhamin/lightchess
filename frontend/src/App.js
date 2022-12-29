@@ -135,6 +135,7 @@ function App() {
                             <Route
                                 path="/notfound"
                                 component={NotFound}
+                                refresh="true"
                             ></Route>
 
                             <Route exact path="/login">
@@ -149,6 +150,7 @@ function App() {
                             <ProtectedRoute
                                 path="/dashboard"
                                 component={Dashboard}
+                                refresh="true"
                             />
                             <ProtectedRoute
                                 path="/pgnviewer"

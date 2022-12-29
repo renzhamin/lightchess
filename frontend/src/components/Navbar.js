@@ -24,11 +24,11 @@ const Navbar = () => {
     }
 
     const Home = () => {
-        history.push("/")
+        history.push({ pathname: "/", refresh: true })
     }
 
     const Dashboard = () => {
-        history.push("/dashboard")
+        history.push({ pathname: "/dashboard", refresh: true })
     }
 
     const PGNViewer = () => {
