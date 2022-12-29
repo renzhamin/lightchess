@@ -304,7 +304,7 @@ function Profile(props) {
         }
 
         getUserInfo()
-    }, [])
+    }, [username])
 
     return (
         <Container component="main" alignItems="center">
