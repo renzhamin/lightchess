@@ -190,6 +190,7 @@ function Board() {
             }
         }
 
+        console.log("opponent socket", opponent_socket_id)
         socket.emit("game_over", {
             to: opponent_socket_id,
             gameResult,

@@ -93,7 +93,7 @@ const Dashboard = () => {
             )
         })
 
-        socket.on("Challenge", (data) => {
+        socket.on("Challenge_dashboard", (data) => {
             opponentUsername = data.challenger
             playingAgainst = data.from
             timeFormat = data.timeFormat
@@ -101,7 +101,7 @@ const Dashboard = () => {
         })
 
         return () => {
-            socket.off("Challenge")
+            socket.off("Challenge_dashboard")
             socket.off("Challenge_accepted")
         }
     }, [])
@@ -150,9 +150,9 @@ const Dashboard = () => {
         initSocket({ username })
     }
 
-    const Challenge = (receiver) => {
+    const Challenge_dashboard = (receiver) => {
         // e.preventDefault()
-        socket.emit("Challenge", {
+        socket.emit("Challenge_dashboard", {
             to: receiver.id,
             timeFormat: timeFormat,
             msg: "challenge",
@@ -266,7 +266,9 @@ const Dashboard = () => {
                                 <TableCell>
                                     <IconButton
                                         disabled={user.username === username}
-                                        onClick={() => Challenge(user)}
+                                        onClick={() =>
+                                            Challenge_dashboard(user)
+                                        }
                                     >
                                         <CompareArrowsIcon></CompareArrowsIcon>
                                     </IconButton>
