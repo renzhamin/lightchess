@@ -181,13 +181,13 @@ const SignIn = () => {
                         </Grid>
                     </Grid>
                 </Box>
-                {/* <Link */}
-                {/*     href={config.backend + "/api/login/federated/google"} */}
-                {/*     variant="body2" */}
-                {/*     sx={{ mt: 2 }} */}
-                {/* > */}
-                {/*     {"Login with Google"} */}
-                {/* </Link> */}
+                <Link
+                    href={config.backend + "/api/login/federated/google"}
+                    variant="body2"
+                    sx={{ mt: 2 }}
+                >
+                    {"Login with Google"}
+                </Link>
             </Box>
             <Copyright sx={{ mt: 8, mb: 4 }} />
         </Container>
