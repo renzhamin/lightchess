@@ -32,23 +32,23 @@ export const validateRegistrationData = async (req, res, next) => {
     if (password !== confPassword)
         return res.status(400).json({ msg: "Passwords don't match" })
 
-    const schema = new PasswordValidator()
-    schema
-        .is()
-        .min(8)
-        .max(30)
-        .has()
-        .uppercase()
-        .has()
-        .lowercase()
-        .has()
-        .digits()
-
-    if (schema.validate(password) == false) {
-        return res
-            .status(400)
-            .json(schema.validate(password, { details: true }))
-    }
+    /* const schema = new PasswordValidator() */
+    /* schema */
+    /*     .is() */
+    /*     .min(8) */
+    /*     .max(30) */
+    /*     .has() */
+    /*     .uppercase() */
+    /*     .has() */
+    /*     .lowercase() */
+    /*     .has() */
+    /*     .digits() */
+    /**/
+    /* if (schema.validate(password) == false) { */
+    /*     return res */
+    /*         .status(400) */
+    /*         .json(schema.validate(password, { details: true })) */
+    /* } */
 
     const validity = await validateEmail(email)
 
@@ -69,7 +69,6 @@ export const createUser = async (req, res, next) => {
             email: email,
             password: hashPassword,
         }).catch((err) => {
-            console.log(err, "Failed to create user")
             return res.json({ msg: "Error creating user" })
         })
         req.user = createdUser
