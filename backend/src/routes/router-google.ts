@@ -34,7 +34,6 @@ const get_available_username = async (username: string) => {
 
     if (!userSet.has(username)) return username
 
-    console.log(userSet, "somehow got here")
     for (let i = 1; ; i++) {
         if (!userSet.has(username + i)) {
             return username + i

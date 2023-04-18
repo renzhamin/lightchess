@@ -6,7 +6,6 @@ export const updateElo = async (username: string, elo: number) => {
     })
 
     if (!user) {
-        console.log(username, " not found for elo update")
         return
     }
 
@@ -39,7 +38,6 @@ export const updateStatsAfterMatchEnd = async (
     })
 
     if (!user) {
-        console.log(username, "not found for updateStatsAfterMatchEnd")
         return
     }
 

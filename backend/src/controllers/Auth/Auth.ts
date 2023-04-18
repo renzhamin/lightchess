@@ -26,6 +26,10 @@ export const getUsers = async (req, res) => {
 
 export const getPasswordResetLink = async (req, res) => {
     try {
+        if (!req.body.email) {
+            return res.status(400).json({ msg: "No email provided" })
+        }
+
         const user: Users | null = await Users.findOne({
             where: {
                 email: req.body.email,
@@ -33,8 +37,8 @@ export const getPasswordResetLink = async (req, res) => {
         })
 
         if (!user) return res.json({ msg: "Email not found" })
-
         const { id, username, email } = user
+
         const secret = user.password
 
         const accessToken = jwt.sign({ id, username, email }, secret, {

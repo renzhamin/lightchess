@@ -39,7 +39,7 @@ router.post(
 router.get("/register/:userID/:token", verifySpecialAccessToken, verifyEmail)
 router.get("/token", refreshToken)
 router.post("/send_email_verification_link", sendEmailVerificationLink)
-router.get("/resetpassword", getPasswordResetLink)
+router.post("/resetpassword", getPasswordResetLink)
 router.get("/resetpassword/:userID/:token", getPasswordResetPage)
 router.post(
     "/resetpassword/:userID/:token",

@@ -57,7 +57,7 @@ const ForgotPassword = () => {
         console.log(xmail)
         try {
             console.log("Sending ", xmail)
-            await axios.get(`${config.backend}/api/resetpassword`, {
+            await axios.post(`${config.backend}/api/resetpassword`, {
                 email: xmail,
             })
             history.push({
