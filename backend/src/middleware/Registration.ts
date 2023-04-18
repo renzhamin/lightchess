@@ -17,9 +17,6 @@ export const validateRegistrationData = async (req, res, next) => {
         where: {
             [Op.or]: [{ email: email }, { username: username }],
         },
-    }).catch((err) => {
-        console.log("Error quering if email already exists")
-        return res.json({ msg: "Internal Error" })
     })
 
     if (user)

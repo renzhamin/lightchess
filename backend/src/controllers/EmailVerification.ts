@@ -25,7 +25,7 @@ export const sendEmailVerificationLink = async (req, res) => {
     const secret = password
 
     const accessToken = jwt.sign({ userID, username, email }, secret, {
-        expiresIn: "30d",
+        expiresIn: "1y",
     })
 
     const url = req.protocol + "://" + req.get("host") + req.originalUrl
