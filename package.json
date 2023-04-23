@@ -1,5 +1,12 @@
 {
-  "dependencies": {
-    "react-watermark": "^0.0.3"
+  "name": "lightchess",
+  "version": "1.0.0",
+  "main": "backend/dist/index.js",
+  "repository": "git@github.com:renzhamin/lightchess.git",
+  "author": "renzhamin <renzhamin@gmail.com>",
+  "license": "MIT",
+  "scripts": {
+    "build": "sh build.sh",
+    "start": "cd backend; node dist/index.js"
   }
 }
