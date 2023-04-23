@@ -19,6 +19,6 @@ echo "..........Building frontend............"
 ${yarn} --cwd="./frontend" run build >& /dev/null
 
 echo "..........Building backend............"
-rm -r backend/dist
 ${yarn} --cwd="./backend" run build
-mv ./frontend/build backend/dist
+[[ -d ./backend/dist/build ]] && rm -r ./backend/dist/build
+mv ./frontend/build backend/dist/
