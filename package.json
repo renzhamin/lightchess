@@ -6,7 +6,7 @@
   "author": "renzhamin <renzhamin@gmail.com>",
   "license": "MIT",
   "scripts": {
-    "build": "sh build.sh",
-    "start": "cd backend; node dist/index.js"
+    "build": "bash ./build.sh",
+    "start": "node backend/dist/index.js"
   }
 }

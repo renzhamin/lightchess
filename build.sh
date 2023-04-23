@@ -1,16 +1,9 @@
 #!/bin/sh
 
-mkdir -p ./backend/src/build/
+echo "Installing Packages....."
+yarn --cwd="./frontend" & 
+yarn --cwd="./backend" 
 
-cd ./frontend
-yarn
-yarn add chart.js
-yarn run build
-
-cd ../backend
-yarn
-yarn run build
-
-cd ..
-
-ln -sf ../.env ./backend/
+echo "Building app......"
+yarn --cwd="./backend" build &
+yarn --cwd="./frontend" build && mv ./frontend/build backend/dist
