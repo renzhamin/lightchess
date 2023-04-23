@@ -9,7 +9,7 @@
     "description": "",
     "main": "dist/index.js",
     "scripts": {
-        "start": "npm run dev",
+        "start": "NODE_ENV=dev npm run dev",
         "build": "tsc",
         "dev": "ts-node-dev --respawn --pretty --transpile-only src/index.ts",
         "production": "node dist/index.js"

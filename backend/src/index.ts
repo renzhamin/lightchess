@@ -14,9 +14,11 @@ dotenv.config()
 const app = express()
 const server = createServer(app)
 
+const inDevEnv = process.env.NODE_ENV == "dev"
+
 export const io = new Server(server, {
     cors: {
-        origin: true,
+        origin: inDevEnv,
     },
 })
 ;(async () => {
@@ -34,7 +36,7 @@ export const io = new Server(server, {
 
 app.use(
     cors({
-        origin: true,
+        origin: inDevEnv,
         credentials: true,
     })
 )
@@ -135,6 +137,6 @@ io.on("connection", (socket) => {
 const PORT = process.env.PORT || "5000"
 const HOST = "0.0.0.0"
 
-server.listen(parseInt(PORT), HOST, () =>
+server.listen(parseInt(PORT), HOST, () => {
     console.log("Server running at port", PORT)
-)
+})

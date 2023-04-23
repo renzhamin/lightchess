@@ -1,13 +1,9 @@
 #!/bin/bash
 
-rm -r ./frontend/node_modules
-rm -r ./backend/node_modules
-
 echo "..........Installing yarn..........."
 npm install yarn
 
 yarn="./node_modules/yarn/bin/yarn"
-
 
 
 echo ".........Installing frontend packages........."
