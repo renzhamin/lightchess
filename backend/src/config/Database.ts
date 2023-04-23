@@ -3,12 +3,12 @@ import dotenv from "dotenv"
 
 dotenv.config()
 
-const DB_URL = process.env.DB_URL
+const DATABASE_URL = process.env.DATABASE_URL
 
-if (!DB_URL) {
+if (!DATABASE_URL) {
     throw Error("database env vars are not set")
 }
 
-const db = new Sequelize(DB_URL)
+const db = new Sequelize(DATABASE_URL)
 
 export default db
