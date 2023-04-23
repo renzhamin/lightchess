@@ -7,6 +7,10 @@
   "license": "MIT",
   "scripts": {
     "build": "bash ./build.sh",
-    "start": "node backend/dist/index.js"
+    "start": "node backend/dist/index.js",
+    "test": "bash ./test.sh"
+  },
+  "dependencies": {
+    "yarn": "^1.22.19"
   }
 }
