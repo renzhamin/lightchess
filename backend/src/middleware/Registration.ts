@@ -1,8 +1,7 @@
 import Users from "../models/UserModel"
 import bcrypt from "bcrypt"
-import { validate as validateEmail } from "deep-email-validator"
-import PasswordValidator from "password-validator"
 import { Op } from "sequelize"
+import verifalia = require("verifalia")
 
 export const validateRegistrationData = async (req, res, next) => {
     const { email, username, password, confPassword } = req.body
@@ -29,31 +28,36 @@ export const validateRegistrationData = async (req, res, next) => {
     if (password !== confPassword)
         return res.status(400).json({ msg: "Passwords don't match" })
 
-    /* const schema = new PasswordValidator() */
-    /* schema */
-    /*     .is() */
-    /*     .min(8) */
-    /*     .max(30) */
-    /*     .has() */
-    /*     .uppercase() */
-    /*     .has() */
-    /*     .lowercase() */
-    /*     .has() */
-    /*     .digits() */
-    /**/
-    /* if (schema.validate(password) == false) { */
-    /*     return res */
-    /*         .status(400) */
-    /*         .json(schema.validate(password, { details: true })) */
-    /* } */
+    const verifalia_username = process.env.verifalia_username
+    const verifalia_password = process.env.verifalia_password
 
-    const validity = await validateEmail(email)
-
-    if (validity.valid == false) {
-        return res.json({ msg: "Invalid Email" })
+    if (!verifalia_username || !verifalia_password) {
+        return res
+            .status(503)
+            .json({ msg: "Server can't verify email right now" })
     }
 
-    next()
+    const verifier = new verifalia.VerifaliaRestClient({
+        username: verifalia_username,
+        password: verifalia_password,
+    })
+
+    verifier.emailValidations
+        .submit(email)
+        .then((result) => {
+            if (
+                result?.entries[0].classification != "Undeliverable" &&
+                result?.entries[0].isDisposableEmailAddress == false
+            ) {
+                next()
+            } else {
+                console.log(result?.entries[0])
+                return res.status(400).json({ msg: "Invalid Email" })
+            }
+        })
+        .catch(() => {
+            return res.status(400).json({ msg: "Error verifying email" })
+        })
 }
 
 export const createUser = async (req, res, next) => {

@@ -22,7 +22,7 @@ const sendMail = async (receiverEmail, subject, body) => {
         if (error) {
             console.log("Failed to send email to", receiverEmail)
         } else {
-            console.log("Email sent: " + info.response)
+            /* console.log("Email sent: " + info.response) */
         }
     })
 }
