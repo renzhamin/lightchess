@@ -1,24 +1,17 @@
-#!/bin/bash
+#!/bin/sh
 
-echo "..........Installing yarn..........."
-npm install yarn
-
-yarn="./node_modules/yarn/bin/yarn"
-
-
-echo ".........Installing frontend packages........."
-${yarn} --cwd="./frontend"
-
-echo ".........Installing backend packages........."
-${yarn} --cwd="./backend"
+frontend(){
+    yarn --cwd="./frontend" install
+    yarn --cwd="./frontend" run build
+    mkdir -p backend/dist
+    mv ./frontend/build backend/dist/
+}
 
 
+backend(){
+    yarn --cwd="./backend" install
+    yarn --cwd="./backend" run build
+}
 
-
-echo "..........Building frontend............"
-${yarn} --cwd="./frontend" run build >& /dev/null
-
-echo "..........Building backend............"
-${yarn} --cwd="./backend" run build
-[[ -d ./backend/dist/build ]] && rm -r ./backend/dist/build
-mv ./frontend/build backend/dist/
+backend
+frontend

@@ -3483,7 +3483,7 @@ chess.js@^1.0.0-alpha.0:
   resolved "https://registry.yarnpkg.com/chess.js/-/chess.js-1.0.0-beta.5.tgz#807cedb6dd77d6271161b8280d6face46d025447"
   integrity sha512-ZmSBraFoGrLCiC7m5vwPax02KoKFjC+3uQrlDYKoORUi8MY+7qceDXQW1ho0Gt6pylGCzTTTBa6gy55bOXp2Jw==
 
-"chessground@github:mliebelt/Chessground":
+chessground@mliebelt/Chessground:
   version "8.2.0"
   resolved "https://codeload.github.com/mliebelt/Chessground/tar.gz/2043d46eea121cfa8c6a6b84897bc98b5d74950c"
 

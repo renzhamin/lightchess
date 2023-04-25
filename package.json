@@ -4,13 +4,9 @@
   "main": "backend/dist/index.js",
   "repository": "git@github.com:renzhamin/lightchess.git",
   "author": "renzhamin <renzhamin@gmail.com>",
-  "license": "MIT",
   "scripts": {
     "build": "bash ./build.sh",
     "start": "node backend/dist/index.js",
     "test": "bash ./test.sh"
-  },
-  "dependencies": {
-    "yarn": "^1.22.19"
   }
 }
