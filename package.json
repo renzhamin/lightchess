@@ -6,7 +6,9 @@
   "author": "renzhamin <renzhamin@gmail.com>",
   "scripts": {
     "build": "bash ./build.sh",
-    "start": "node backend/dist/index.js",
-    "test": "bash ./test.sh"
+    "start": "node backend/dist/index.js"
+  },
+  "engines": {
+    "node": ">=16"
   }
 }
