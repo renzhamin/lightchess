@@ -1,5 +1,7 @@
 #!/bin/sh
 
+export NODE_ENV="production"
+
 frontend(){
     yarn --cwd="./frontend" install
     yarn --cwd="./frontend" run build
