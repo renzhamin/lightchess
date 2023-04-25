@@ -140,7 +140,7 @@ router_google.get(
     }),
     async function (req, res) {
         if (!req.user) {
-            return res.json({ msg: "user info not found" })
+            return res.status(400).json({ msg: "user info not found" })
         }
 
         const { id, username, email } = req.user as any

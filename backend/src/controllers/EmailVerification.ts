@@ -6,7 +6,7 @@ export const sendEmailVerificationLink = async (req, res) => {
     const email = req.body.email
 
     if (!email) {
-        res.json({ msg: "Provide email mfo" })
+        res.status(400).json({ msg: "No email provided in body" })
         return
     }
 
@@ -15,7 +15,7 @@ export const sendEmailVerificationLink = async (req, res) => {
     })
 
     if (!user) {
-        res.json({ msg: "No such user" })
+        res.status(400).json({ msg: "No such user" })
         return
     }
 

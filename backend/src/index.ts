@@ -89,7 +89,7 @@ io.on("connection", (socket) => {
                 },
             }).then((user) => {
                 if (!user) {
-                    console.log("Got invalid username in initSocket")
+                    // Got invalid username in initSocket
                     return
                 }
                 data.elo = user.elo
@@ -105,7 +105,8 @@ io.on("connection", (socket) => {
             const data = args[0]
 
             if (!data || !data.username) {
-                console.log("Improper Data Found")
+                // Improper Data Found
+                return
             } else {
                 Users.findOne({
                     attributes: ["elo"],
@@ -114,7 +115,7 @@ io.on("connection", (socket) => {
                     },
                 }).then((user) => {
                     if (!user) {
-                        console.log("Got invalid username in initReady")
+                        // Got invalid username in initReady
                         return
                     }
                     data.elo = user.elo

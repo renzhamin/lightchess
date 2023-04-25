@@ -1,14 +1,14 @@
 {
-  "name": "lightchess",
-  "version": "1.0.0",
-  "main": "backend/dist/index.js",
-  "repository": "git@github.com:renzhamin/lightchess.git",
-  "author": "renzhamin <renzhamin@gmail.com>",
-  "scripts": {
-    "build": "bash ./build.sh",
-    "start": "node backend/dist/index.js"
-  },
-  "engines": {
-    "node": ">=16"
-  }
+    "name": "lightchess",
+    "version": "1.0.0",
+    "main": "backend/dist/index.js",
+    "repository": "git@github.com:renzhamin/lightchess.git",
+    "author": "renzhamin <renzhamin@gmail.com>",
+    "scripts": {
+        "build": "bash ./build.sh",
+        "start": "node backend/dist/index.js"
+    },
+    "engines": {
+        "node": ">=16"
+    }
 }

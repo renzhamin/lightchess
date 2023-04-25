@@ -55,7 +55,7 @@ export const validateRegistrationData = async (req, res, next) => {
             }
         })
         .catch(() => {
-            return res.status(400).json({ msg: "Error verifying email" })
+            return res.status(500).json({ msg: "Error verifying email" })
         })
 }
 
@@ -68,12 +68,10 @@ export const createUser = async (req, res, next) => {
             username: username,
             email: email,
             password: hashPassword,
-        }).catch((err) => {
-            return res.json({ msg: "Error creating user" })
         })
         req.user = createdUser
         next()
     } catch (error) {
-        console.log(error)
+        res.status(500).json({ msg: "Database Error: Could not create user" })
     }
 }

@@ -27,7 +27,6 @@ export const verifyEmail = async (req, res) => {
         await Users.update({ role: 1 }, { where: { id: req.params.userID } })
         res.json({ msg: "Email verification successful" })
     } catch (error) {
-        res.json({ msg: "couldnt verify email" })
-        console.log(error)
+        res.json({ msg: "Could not verify email" })
     }
 }

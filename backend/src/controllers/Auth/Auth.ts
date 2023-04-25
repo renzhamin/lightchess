@@ -20,7 +20,7 @@ export const getUsers = async (req, res) => {
         })
         return res.json(users)
     } catch (error) {
-        console.log(error)
+        return res.json({ msg: "Database Error : in getUsers()" })
     }
 }
 
@@ -34,9 +34,13 @@ export const getPasswordResetLink = async (req, res) => {
             where: {
                 email: req.body.email,
             },
+        }).catch(() => {
+            return res
+                .status(500)
+                .json({ msg: "Database Error : Can't query user" })
         })
 
-        if (!user) return res.json({ msg: "Email not found" })
+        if (!user || !user.email) return res.json({ msg: "Email not found" })
         const { id, username, email } = user
 
         const secret = user.password
@@ -51,7 +55,7 @@ export const getPasswordResetLink = async (req, res) => {
         sendMail(email, "Reset Password for Lightchess", resetLink)
         res.json({ msg: "Email sent" })
     } catch (error) {
-        res.status(400).json({ msg: "Failed to send email" })
+        res.status(500).json({ msg: "Failed to send email" })
     }
 }
 
@@ -68,15 +72,16 @@ export const Login = async (req, res) => {
     try {
         const email = req.body.email
 
-        if (!email) res.status(401).json({ msg: "Provide Email" })
+        if (!email) res.status(400).json({ msg: "Provide Email" })
 
         const user = await Users.findOne({
             where: {
                 [Op.or]: [{ email: email }, { username: email }],
             },
-        }).catch((err) => {
-            console.log(err)
-            return res.json({ msg: "Internal Error" })
+        }).catch(() => {
+            return res
+                .status(500)
+                .json({ msg: "Database Error : Can't query user" })
         })
 
         if (!user) {
@@ -109,7 +114,7 @@ export const Login = async (req, res) => {
 
         return res.json({ msg: "Successfull Login" })
     } catch (error) {
-        return res.status(404).json({ msg: "Internal Error" })
+        return res.status(500).json({ msg: "Internal Error" })
     }
 }
 
