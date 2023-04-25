@@ -51,7 +51,6 @@ export const validateRegistrationData = async (req, res, next) => {
             ) {
                 next()
             } else {
-                console.log(result?.entries[0])
                 return res.status(400).json({ msg: "Invalid Email" })
             }
         })

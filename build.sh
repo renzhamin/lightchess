@@ -4,7 +4,7 @@ frontend(){
     yarn --cwd="./frontend" install
     yarn --cwd="./frontend" run build
     mkdir -p backend/dist
-    mv ./frontend/build backend/dist/
+    cp -r ./frontend/build backend/dist/
 }
 
 
