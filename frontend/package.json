@@ -15,9 +15,6 @@
         "@mui/icons-material": "^5.10.9",
         "@mui/lab": "^5.0.0-alpha.108",
         "@mui/material": "^5.10.11",
-        "@testing-library/jest-dom": "^5.14.1",
-        "@testing-library/react": "^11.2.7",
-        "@testing-library/user-event": "^12.8.3",
         "apexcharts": "^3.36.3",
         "axios": "^0.24.0",
         "bulma": "^0.9.3",
@@ -33,8 +30,7 @@
         "react-scripts": "^5.0.1",
         "socket.io-client": "^4.5.2",
         "typescript": "^4.9.4",
-        "use-sound": "^4.0.1",
-        "web-vitals": "^1.1.2"
+        "use-sound": "^4.0.1"
     },
     "scripts": {
         "start": "react-scripts start",
