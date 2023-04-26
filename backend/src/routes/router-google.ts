@@ -3,22 +3,14 @@ import express from "express"
 import passport from "passport"
 import GoogleStrategy from "passport-google-oauth20"
 import { Op } from "sequelize"
+import { BACKEND_URL, FRONTEND_URL } from "../config/Hosts"
 import FUsers from "../models/FederatedUserModel"
 import Users from "../models/UserModel"
-import {
-    getAccessTokenFromUserDetails,
-    getRefreshToken,
-} from "../modules/Tokens"
-import { get_url_from_req } from "../modules/Utils"
+import { getRefreshToken } from "../modules/Tokens"
 
 dotenv.config()
-// Configure the Google strategy for use by Passport.
-//
-// OAuth 2.0-based strategies require a `verify` function which receives the
-// credential (`accessToken`) for accessing the Facebook API on the user's
-// behalf, along with the user's profile.  The function must invoke `cb`
-// with a user object, which will be set at `req.user` in route handlers after
-// authentication.
+
+const route_prefix = "/api/login/google"
 
 const get_available_username = async (username: string) => {
     const users = await Users.findAll({
@@ -50,7 +42,7 @@ passport.use(
         {
             clientID: process.env["GOOGLE_CLIENT_ID"],
             clientSecret: process.env["GOOGLE_CLIENT_SECRET"],
-            callbackURL: "/oauth2/redirect/google",
+            callbackURL: `${BACKEND_URL}${route_prefix}/callback`,
         },
 
         // verify function
@@ -126,7 +118,7 @@ passport.use(
 const router_google = express.Router()
 
 router_google.get(
-    "/oauth2/redirect",
+    route_prefix,
     passport.authenticate("google", { scope: ["email", "profile"] })
 )
 
@@ -137,13 +129,12 @@ router_google.get(
    user returns, they are signed in to their linked account.
    */
 router_google.get(
-    "/oauth2/redirect/google",
+    `${route_prefix}/callback`,
     passport.authenticate("google", {
-        successRedirect: process.env.FRONTEND_URL || "/",
-        failureRedirect: process.env.FRONTEND_URL || "/",
+        failureRedirect: FRONTEND_URL,
         session: false,
     }),
-    async function (req, res) {
+    function (req, res) {
         if (!req.user) {
             return res.status(400).json({ msg: "user info not found" })
         }
@@ -156,7 +147,7 @@ router_google.get(
             maxAge: 24 * 60 * 60 * 30 * 1000,
         })
 
-        return res.redirect(process.env.FRONTEND_URL || "/")
+        return res.redirect(FRONTEND_URL)
     }
 )
 

@@ -1,7 +1,6 @@
 import express from "express"
 import dotenv from "dotenv"
 import cookieParser from "cookie-parser"
-import cors from "cors"
 import db from "./config/Database"
 import router from "./routes/index"
 import path from "path"
@@ -14,18 +13,9 @@ dotenv.config()
 const app = express()
 const server = createServer(app)
 
-const inDevEnv = process.env.NODE_ENV == "development"
-
-export const io = new Server(server, {
-    cors: {
-        origin: inDevEnv,
-    },
-})
+export const io = new Server(server)
 ;(async () => {
     try {
-        // TODO: db.sync() does not sync everything on ./models
-        // db are only being synced when they are imported
-        // in other files
         await db.sync()
         await db.authenticate()
         console.log("Database Connected...")
@@ -34,12 +24,6 @@ export const io = new Server(server, {
     }
 })()
 
-app.use(
-    cors({
-        origin: inDevEnv,
-        credentials: true,
-    })
-)
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
