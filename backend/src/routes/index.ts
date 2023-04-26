@@ -1,13 +1,19 @@
 import express from "express"
 import {
-    getUsers,
     Login,
     Logout,
     getPasswordResetLink,
     getPasswordResetPage,
+    getUsers,
 } from "../controllers/Auth/Auth"
 import { resetPassword, verifyEmail } from "../controllers/Auth/Updates"
 import { sendEmailVerificationLink } from "../controllers/EmailVerification"
+import { refreshToken } from "../controllers/RefreshToken"
+import { getLeaderBoard } from "../controllers/getLeaderBoard"
+import {
+    getLastNMatchResults,
+    getPublicUserInfo,
+} from "../controllers/getUserInfo"
 import {
     createUser,
     validateRegistrationData,
@@ -16,15 +22,8 @@ import {
     verifySpecialAccessToken,
     verifyToken,
 } from "../middleware/VerifyToken"
-import { refreshToken } from "../controllers/RefreshToken"
-import { getGames, addGames } from "../modules/Games"
-import passport from "passport"
+import { addGames, getGames } from "../modules/Games"
 import router_google from "./router-google"
-import {
-    getLastNMatchResults,
-    getPublicUserInfo,
-} from "../controllers/getUserInfo"
-import { getLeaderBoard } from "../controllers/getLeaderBoard"
 const router = express.Router()
 
 router.get("/users", verifyToken, getUsers)
@@ -52,7 +51,6 @@ router.post("/games", addGames)
 
 router.post("/login", Login)
 router.delete("/logout", Logout)
-router.get("/login/federated/google", passport.authenticate("google"))
 router.get("/health", (_, res) => {
     return res.status(200).json({ msg: "Ok" })
 })

@@ -51,7 +51,6 @@ passport.use(
             clientID: process.env["GOOGLE_CLIENT_ID"],
             clientSecret: process.env["GOOGLE_CLIENT_SECRET"],
             callbackURL: "/oauth2/redirect/google",
-            scope: ["profile", "email"],
         },
 
         // verify function
@@ -126,6 +125,11 @@ passport.use(
 
 const router_google = express.Router()
 
+router_google.get(
+    "/oauth2/redirect",
+    passport.authenticate("google", { scope: ["email", "profile"] })
+)
+
 /*
    This route completes the authentication sequence when Google redirects the
    user back to the application.  When a new user signs in, a user account is
@@ -135,6 +139,7 @@ const router_google = express.Router()
 router_google.get(
     "/oauth2/redirect/google",
     passport.authenticate("google", {
+        successRedirect: process.env.FRONTEND_URL || "/",
         failureRedirect: process.env.FRONTEND_URL || "/",
         session: false,
     }),

@@ -182,7 +182,7 @@ const SignIn = () => {
                     </Grid>
                 </Box>
                 <Link
-                    href={config.backend + "/api/login/federated/google"}
+                    href={config.backend + "/oauth2/redirect"}
                     variant="body2"
                     sx={{ mt: 2 }}
                 >

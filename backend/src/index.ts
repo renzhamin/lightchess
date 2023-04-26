@@ -14,7 +14,7 @@ dotenv.config()
 const app = express()
 const server = createServer(app)
 
-const inDevEnv = process.env.NODE_ENV == "dev"
+const inDevEnv = process.env.NODE_ENV == "development"
 
 export const io = new Server(server, {
     cors: {
