@@ -89,7 +89,6 @@ function Board() {
         initialMinute = parseInt(parsed[0])
         initialSeconds = 0
         increment = parseInt(parsed[1])
-        console.log("Time Control: ", initialMinute, initialSeconds)
         setOpponentTimeInfo(
             convertTimeToString(initialMinute) +
                 ":" +
@@ -105,10 +104,6 @@ function Board() {
     }
 
     function setEndDialogMessages() {
-        console.log("at setEndDialogMessages", myInfo.data)
-
-        console.log("Stopped timer, now updating deltas")
-
         var delta = ratingDelta(
             myInfo.data.elo,
             opponentInfo.data.elo,
@@ -133,7 +128,6 @@ function Board() {
             ;[whiteElo, blackElo] = [blackElo, whiteElo]
         }
 
-        console.log(myNewElo, opponentNewElo)
         // UPDATE DATABASE HERE WITH THESE NEW VALUES
     }
 
@@ -142,7 +136,6 @@ function Board() {
         opponentInfo = await axios.get(
             `${config.backend}/api/user/` + opponentUserName
         )
-        console.log(myInfo, opponentInfo)
     }
 
     function convertTimeToString(time) {
@@ -160,7 +153,6 @@ function Board() {
         opponentTimer.current.stopTimer()
         setEndDialogMessages()
         handleClickOpen()
-        console.log(gameResult)
 
         setIsGameOver(true)
         var gameResult = ""
@@ -190,15 +182,12 @@ function Board() {
             }
         }
 
-        console.log("opponent socket", opponent_socket_id)
         socket.emit("game_over", {
             to: opponent_socket_id,
             gameResult,
             opponentTimeInfo,
             myTimeInfo,
         })
-        console.log(opponent_socket_id)
-        console.log("game over")
 
         // send gameResult through "game_over"
 
@@ -216,11 +205,8 @@ function Board() {
     }
 
     const addGame = async () => {
-        console.log("Adding Game")
-        console.log("add game", whiteElo, blackElo)
         try {
             // TODO: set game values properly
-            console.log(game.pgn())
             await axios.post(`${config.backend}/api/games`, {
                 whiteUserName: mycolor == 1 ? opponentUserName : myUsername,
                 blackUserName: mycolor == 1 ? myUsername : opponentUserName,
@@ -235,7 +221,7 @@ function Board() {
                 blackUserElo: blackElo,
             })
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 
@@ -270,24 +256,15 @@ function Board() {
                 opponentHistory = data.data.str
             })
 
-        console.log("Opponent is ", opponentUserName)
         if (mycolor == 1) setBoardOrientation("black")
 
         socket.on("send_move", (data) => {
-            console.log(data.move)
             game.move(data.move)
             setPosition(game.fen())
 
             // timer
             opponentTimer.current.stopTimer()
             myTimer.current.startTimer()
-            console.log(
-                "Time infos: ",
-                data.myMinutes,
-                data.mySeconds,
-                data.opponentMinutes,
-                data.opponentSeconds
-            )
             myTimer.current.setAll(data.opponentMinutes, data.opponentSeconds)
             opponentTimer.current.setAll(data.myMinutes, data.mySeconds)
             setOpponentTimeInfo(data.myTimeInfo)
@@ -317,7 +294,6 @@ function Board() {
             setOpponentTimeInfo(data.myTimeInfo)
             setEndDialogMessages()
             handleClickOpen()
-            console.log("Received Game over!", data)
         })
 
         const interval = setInterval(() => {
@@ -343,7 +319,6 @@ function Board() {
                     myTimer.current.getMinutes() === 0 &&
                     myTimer.current.getSeconds() === 0
                 ) {
-                    console.log("My time is over")
                     gameEndHandler(true)
                 }
             }
@@ -356,7 +331,6 @@ function Board() {
     }, [isGameOver])
 
     function sendMove(move) {
-        console.log("Sending Move", move)
         var myMinutes = myTimer.current.getMinutes(),
             mySeconds = myTimer.current.getSeconds()
         var opponentMinutes = opponentTimer.current.getMinutes(),
@@ -373,25 +347,26 @@ function Board() {
 
     function onDrop(sourceSquare, targetSquare) {
         if (isGameOver) {
-            console.log("Game is already over")
             return
         } else if (game.turn() !== boardOrientation[0]) {
-            console.log("Not your turn!")
             return
         }
 
-        var move = { from: sourceSquare, to: targetSquare }
-        var result = game.move(move)
-
-        if (result == null) {
-            move = { from: sourceSquare, to: targetSquare, promotion: "q" }
-            result = game.move(move)
-
+        let move = { from: sourceSquare, to: targetSquare }
+        try {
+            let result = game.move(move)
             if (result == null) {
-                console.log("Invalid move")
-                return
+                move = { from: sourceSquare, to: targetSquare, promotion: "q" }
+                result = game.move(move)
+
+                if (result == null) {
+                    return
+                }
             }
+        } catch (err) {
+            console.error(err)
         }
+
         // if valid move
 
         playMoveSfx()
@@ -401,11 +376,9 @@ function Board() {
         myTimer.current.stopTimer()
 
         setPgnMoves(parsePgn(game.pgn()))
-        console.log(parsePgn(game.pgn()))
 
         setPosition(game.fen())
         sendMove(move)
-        console.log(isGameOver)
 
         if (game.isGameOver()) {
             gameEndHandler()
@@ -413,9 +386,7 @@ function Board() {
         }
     }
 
-    function onSquareClick(square) {
-        console.log(square)
-    }
+    function onSquareClick(square) {}
 
     return (
         <Grid

@@ -190,7 +190,7 @@ export const Quick_Game = () => {
         if (queueStatus == timeControl) queueStatus = -1
         else queueStatus = timeControl
         myTimeControl = timeControl
-        myELO = myInfo.data.elo
+        myELO = myInfo?.data?.elo
         initReady({ username, timeControl })
     }
 
