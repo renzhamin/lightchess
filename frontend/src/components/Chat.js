@@ -32,21 +32,15 @@ export const Chat = (props) => {
         initSocket({ username })
         updateUserList()
 
-        console.log(username)
-
         socket.on("Challenge_accepted", (data) => {
-            console.log(data)
             history.push(
                 "/play/" + data.from + "/" + data.yourcolor + "/" + timeFormat
             )
-            console.log("Challenge accepted")
         })
 
         socket.on("Challenge", (data) => {
-            console.log("I WAS CHALLENGED")
             playingAgainst = data.from
             timeFormat = data.timeFormat
-            console.log(playingAgainst)
             handleClick()
         })
 
@@ -57,7 +51,6 @@ export const Chat = (props) => {
     }, [])
 
     const handleReceiverChange = (e) => {
-        console.log(e.target.options.selectedIndex)
         e.preventDefault()
         const selectedIndex = e.target.options.selectedIndex
         const id = e.target.options[selectedIndex].getAttribute("id")
@@ -65,9 +58,7 @@ export const Chat = (props) => {
     }
 
     const AcceptChallenge = (e) => {
-        console.log("Challenge Accepted")
         e.preventDefault()
-        console.log("At accept challenge ", playingAgainst)
         socket.emit("Challenge_accepted", {
             to: playingAgainst,
             msg: "challenge_accepted",
@@ -79,10 +70,9 @@ export const Chat = (props) => {
     }
 
     const Challenge = (e) => {
-        console.log("Sending challenge")
         e.preventDefault()
         socket.emit("Challenge", {
-            to: receiver.id,
+            to: receiver.username,
             timeFormat: timeFormat,
             msg: "challenge",
             // yourcolor: myColor == 1 ? 0 : 1,

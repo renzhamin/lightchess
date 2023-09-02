@@ -50,9 +50,9 @@ const Dashboard = (props) => {
 
     const [open, setOpen] = useState(location.openSnackbar)
 
-    if (location.refresh == true) {
-        window.location.reload()
-    }
+    /* if (location.refresh == true) { */
+    /*     window.location.reload() */
+    /* } */
 
     const {
         socket,
@@ -110,9 +110,29 @@ const Dashboard = (props) => {
         }
     }, [])
 
+    const axiosJWT = axios.create()
+
+    axiosJWT.interceptors.request.use(
+        async (axiosConfig) => {
+            const currentDate = new Date()
+            if (expire * 1000 < currentDate.getTime()) {
+                const response = await axios.get(`${config.backend}/api/token`)
+                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
+                setToken(response.data.accessToken)
+                const decoded = jwt_decode(response.data.accessToken)
+                setUserName(decoded.username)
+                setExpire(decoded.exp)
+            }
+            return axiosConfig
+        },
+        (error) => {
+            return Promise.reject(error)
+        }
+    )
+
     const refreshToken = async () => {
         try {
-            const response = await axios.get(`${config.backend}/api/token`)
+            const response = await axiosJWT.get(`${config.backend}/api/token`)
             setToken(response.data.accessToken)
             const decoded = jwt_decode(response.data.accessToken)
             setUserName(decoded.username)
@@ -123,26 +143,6 @@ const Dashboard = (props) => {
             }
         }
     }
-
-    const axiosJWT = axios.create()
-
-    axiosJWT.interceptors.request.use(
-        async (config) => {
-            const currentDate = new Date()
-            if (expire * 1000 < currentDate.getTime()) {
-                const response = await axios.get(`${config.backend}/api/token`)
-                config.headers.Authorization = `Bearer ${response.data.accessToken}`
-                setToken(response.data.accessToken)
-                const decoded = jwt_decode(response.data.accessToken)
-                setUserName(decoded.username)
-                setExpire(decoded.exp)
-            }
-            return config
-        },
-        (error) => {
-            return Promise.reject(error)
-        }
-    )
 
     const getUsers = async () => {
         const response = await axiosJWT.get(`${config.backend}/api/users`, {
@@ -157,7 +157,7 @@ const Dashboard = (props) => {
     const Challenge_dashboard = (receiver) => {
         // e.preventDefault()
         socket.emit("Challenge_dashboard", {
-            to: receiver.id,
+            to: receiver.username,
             timeFormat: timeFormat,
             msg: "challenge",
             challenger: username,

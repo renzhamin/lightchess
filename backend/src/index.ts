@@ -38,6 +38,7 @@ interface UserData {
 
 const userMap: Map<string, UserData> = new Map()
 const readyMap: Map<string, UserData> = new Map()
+const socketMap: Map<string, string> = new Map()
 
 function serialiseMap<K, V>(x: Map<K, V>) {
     const dMap = Object.fromEntries(x.entries())
@@ -46,6 +47,10 @@ function serialiseMap<K, V>(x: Map<K, V>) {
 
 io.on("connection", (socket) => {
     socket.on("disconnect", () => {
+        const username = userMap.get(socket.id)?.username
+        if (username) {
+            socketMap.delete(username)
+        }
         userMap.delete(socket.id)
         readyMap.delete(socket.id)
     })
@@ -78,6 +83,7 @@ io.on("connection", (socket) => {
                 }
                 data.elo = user.elo
                 userMap.set(String(socket.id), data)
+                socketMap.set(data.username, socket.id)
                 fn(
                     `welcome ${data.username} from SERVER [initSocket successfull]`
                 )
@@ -111,9 +117,13 @@ io.on("connection", (socket) => {
             }
         } else {
             if (!args || !args.length) return
-            const { to } = args[0]
+            let { to } = args[0]
+            to = socketMap.get(to)
+            const senderUsername = userMap.get(socket.id)?.username
             if (to) {
-                socket.to(to).emit(eventName, { from: socket.id, ...args[0] })
+                socket
+                    .to(to)
+                    .emit(eventName, { ...args[0], from: senderUsername })
             }
         }
     })

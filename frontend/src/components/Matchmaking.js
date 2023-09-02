@@ -65,17 +65,17 @@ export const Matchmaking = () => {
     const axiosJWT = axios.create()
 
     axiosJWT.interceptors.request.use(
-        async (config) => {
+        async (axiosConfig) => {
             const currentDate = new Date()
             if (expire * 1000 < currentDate.getTime()) {
                 const response = await axios.get(`${config.backend}/api/token`)
-                config.headers.Authorization = `Bearer ${response.data.accessToken}`
+                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
                 setToken(response.data.accessToken)
                 const decoded = jwt_decode(response.data.accessToken)
                 setUserName(decoded.username)
                 setExpire(decoded.exp)
             }
-            return config
+            return axiosConfig
         },
         (error) => {
             return Promise.reject(error)
@@ -159,13 +159,13 @@ export const Matchmaking = () => {
         // e.preventDefault()
         Dequeue()
         socket.emit("Challenge", {
-            to: receiver.id,
+            to: receiver.username,
             msg: "challenge",
             yourcolor: myColor == 1 ? 0 : 1,
         })
         inQueue = false
         history.push(
-            "/play/" + receiver.id + "/" + myColor + "/" + myTimeControl
+            "/play/" + receiver.username + "/" + myColor + "/" + myTimeControl
         )
     }
 
@@ -190,7 +190,7 @@ export const Matchmaking = () => {
         if (queueStatus == timeControl) queueStatus = -1
         else queueStatus = timeControl
         myTimeControl = timeControl
-        myELO = myInfo.data.elo
+        myELO = myInfo?.data.elo
         initReady({ username, timeControl })
     }
 

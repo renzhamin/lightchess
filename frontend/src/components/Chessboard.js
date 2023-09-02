@@ -54,10 +54,7 @@ function Board() {
     const [gameEndTitle, setGameEndTitle] = useState("")
     const [isGameOver, setIsGameOver] = useState(false)
 
-    const { opponent_socket_id, mycolor, time_format } = useParams()
-    const [opponentUserName] = useState(
-        userMap.get(opponent_socket_id)?.username
-    )
+    const { opponentUserName, mycolor, time_format } = useParams()
 
     const myTimer = useRef()
     const opponentTimer = useRef()
@@ -105,8 +102,8 @@ function Board() {
 
     function setEndDialogMessages() {
         var delta = ratingDelta(
-            myInfo.data.elo,
-            opponentInfo.data.elo,
+            myInfo?.data.elo,
+            opponentInfo?.data?.elo,
             areYouWinningSon()
         )
         if (areYouWinningSon()) {
@@ -116,8 +113,8 @@ function Board() {
             setGameEndTitle("Defeat!")
             setGameEndMessage("ELO " + delta)
         }
-        let myNewElo = myInfo.data.elo + delta
-        let opponentNewElo = opponentInfo.data.elo - delta
+        let myNewElo = myInfo?.data.elo + delta
+        let opponentNewElo = opponentInfo?.data.elo - delta
 
         // I am white
         whiteElo = myNewElo
@@ -183,7 +180,7 @@ function Board() {
         }
 
         socket.emit("game_over", {
-            to: opponent_socket_id,
+            to: opponentUserName,
             gameResult,
             opponentTimeInfo,
             myTimeInfo,
@@ -233,19 +230,23 @@ function Board() {
                 timeUpdated = true
             }
         }, 1000)
+
+        return () => {
+            clearInterval(interval)
+        }
     }, [])
 
     useEffect(() => {
         // fetchData()
         axios.get(`${config.backend}/api/user/` + myUsername).then((data) => {
             myInfo = data
-            myELO = myInfo.data.elo
+            myELO = myInfo?.data.elo
         })
         axios
             .get(`${config.backend}/api/user/` + opponentUserName)
             .then((data) => {
                 opponentInfo = data
-                opponentELO = opponentInfo.data.elo
+                opponentELO = opponentInfo?.data.elo
             })
 
         axios
@@ -288,8 +289,8 @@ function Board() {
         socket.on("game_over", (data) => {
             setIsGameOver(true)
             // NOT CONFIDENT THIS WORKS
-            myTimer.current.stopTimer()
-            opponentTimer.current.stopTimer()
+            myTimer?.current?.stopTimer()
+            opponentTimer?.current?.stopTimer()
             setMyTimeInfo(data.opponentTimeInfo)
             setOpponentTimeInfo(data.myTimeInfo)
             setEndDialogMessages()
@@ -336,7 +337,7 @@ function Board() {
         var opponentMinutes = opponentTimer.current.getMinutes(),
             opponentSeconds = opponentTimer.current.getSeconds()
         socket.emit("send_move", {
-            to: opponent_socket_id,
+            to: opponentUserName,
             move,
             myMinutes,
             mySeconds,

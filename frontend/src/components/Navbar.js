@@ -19,7 +19,7 @@ const Navbar = () => {
             })
             socket.disconnect()
         } catch (error) {
-            console.log(error)
+            console.error(error)
         }
     }
 

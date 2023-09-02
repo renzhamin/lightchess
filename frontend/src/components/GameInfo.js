@@ -14,7 +14,7 @@ import {
 } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import { Close } from "@material-ui/icons"
-    
+
 const GameInfo = (props) => {
     function myClockTick() {
         return props.mySide === props.turn && !props.gameOver
@@ -103,6 +103,7 @@ const GameInfo = (props) => {
                                                 {props.pgnMoves.map(
                                                     (move, index) => (
                                                         <TableRow
+                                                            key={index}
                                                             sx={{
                                                                 height: 100,
                                                             }}

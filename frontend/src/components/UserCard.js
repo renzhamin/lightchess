@@ -22,17 +22,17 @@ const UserCard = () => {
     const axiosJWT = axios.create()
 
     axiosJWT.interceptors.request.use(
-        async (config) => {
+        async (axiosConfig) => {
             const currentDate = new Date()
             if (expire * 1000 < currentDate.getTime()) {
                 const response = await axios.get(`${config.backend}/api/token`)
-                config.headers.Authorization = `Bearer ${response.data.accessToken}`
+                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
                 setToken(response.data.accessToken)
                 const decoded = jwt_decode(response.data.accessToken)
                 setUserName(decoded.username)
                 setExpire(decoded.exp)
             }
-            return config
+            return axiosConfig
         },
         (error) => {
             return Promise.reject(error)
@@ -113,20 +113,6 @@ const UserCard = () => {
             </CardActions>
         </React.Fragment>
     )
-
-    // useEffect(() => {
-    //     const interval = setInterval(() => {
-    //         if (isEmpty(cardInfo)) {
-    //             console.log("Re-getting leaderboard", cardInfo)
-    //             refreshToken()
-    //             getLeaderboard()
-    //         }
-    //     }, 1000)
-
-    //     return () => {
-    //         clearInterval(interval)
-    //     }
-    // }, [cardInfo])
 
     useEffect(() => {
         refreshToken()

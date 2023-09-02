@@ -55,9 +55,9 @@ function Copyright(props) {
 
 export const Home = () => {
     const location = useLocation()
-    if (location.refresh == true) {
-        window.location.reload()
-    }
+    /* if (location.refresh == true) { */
+    /*     window.location.reload() */
+    /* } */
     const [open, setOpen] = useState(location.openSnackbar)
     const handleClose = (event, reason) => {
         if (reason === "clickaway") {

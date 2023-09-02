@@ -54,9 +54,7 @@ const ForgotPassword = () => {
         e.preventDefault()
         emailToSend = email
         const xmail = email
-        console.log(xmail)
         try {
-            console.log("Sending ", xmail)
             await axios.post(`${config.backend}/api/resetpassword`, {
                 email: xmail,
             })
@@ -66,7 +64,7 @@ const ForgotPassword = () => {
             })
         } catch (error) {
             setOpen(true)
-            console.log(error.response)
+            console.error(error.response)
             if (error.response) {
                 setMsg(error.response.data.msg)
             }

@@ -2,7 +2,6 @@ import { Grid, Typography } from "@mui/material"
 import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
 
 const NotFound = (props) => {
-    console.log(props.refresh)
     return (
         <Grid container align="center" justify="center" alignItems="center">
             <Grid item>

@@ -65,17 +65,17 @@ export const Quick_Game = () => {
     const axiosJWT = axios.create()
 
     axiosJWT.interceptors.request.use(
-        async (config) => {
+        async (axiosConfig) => {
             const currentDate = new Date()
             if (expire * 1000 < currentDate.getTime()) {
                 const response = await axios.get(`${config.backend}/api/token`)
-                config.headers.Authorization = `Bearer ${response.data.accessToken}`
+                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
                 setToken(response.data.accessToken)
                 const decoded = jwt_decode(response.data.accessToken)
                 setUserName(decoded.username)
                 setExpire(decoded.exp)
             }
-            return config
+            return axiosConfig
         },
         (error) => {
             return Promise.reject(error)
@@ -83,7 +83,6 @@ export const Quick_Game = () => {
     )
 
     useEffect(() => {
-        refreshToken()
         getUsers()
     }, [])
 
@@ -91,20 +90,6 @@ export const Quick_Game = () => {
         initSocket({ username })
         updateUserList()
     }, [username])
-
-    const refreshToken = async () => {
-        try {
-            const response = await axios.get(`${config.backend}/api/token`)
-            setToken(response.data.accessToken)
-            const decoded = jwt_decode(response.data.accessToken)
-            setUserName(decoded.username)
-            setExpire(decoded.exp)
-        } catch (error) {
-            if (error.response) {
-                history.push("/")
-            }
-        }
-    }
 
     const getUsers = async () => {
         const response = await axiosJWT.get(`${config.backend}/api/users`, {
@@ -159,13 +144,13 @@ export const Quick_Game = () => {
         // e.preventDefault()
         Dequeue()
         socket.emit("Challenge", {
-            to: receiver.id,
+            to: receiver.username,
             msg: "challenge",
             yourcolor: myColor == 1 ? 0 : 1,
         })
         inQueue = false
         history.push(
-            "/play/" + receiver.id + "/" + myColor + "/" + myTimeControl
+            "/play/" + receiver.username + "/" + myColor + "/" + myTimeControl
         )
     }
 
