@@ -58,11 +58,9 @@ const UserCard = () => {
     }
 
     async function getLeaderboard() {
-        console.log("Username is, ", username)
         const response = await axios.get(
             `${config.backend}/api/user/${username}`
         )
-        console.log(response.data)
         const elo = response.data.elo
         const gamesWon = response.data.wins
         const gamesLost = response.data.losses

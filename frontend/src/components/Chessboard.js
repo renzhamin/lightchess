@@ -364,7 +364,7 @@ function Board() {
                 }
             }
         } catch (err) {
-            console.error(err)
+            return
         }
 
         // if valid move
