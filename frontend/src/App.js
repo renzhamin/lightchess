@@ -21,9 +21,19 @@ import lightchess_logo_grey from "./components/static/images/lightchess_logo_gre
 
 export const AppContext = React.createContext()
 
-const socket = io(config.backend, {
-    autoConnect: false,
-})
+let socket
+
+if (process.env.NODE_ENV === "development") {
+    socket = io(config.backend, {
+        rememberUpgrade: true,
+        autoConnect: false,
+    })
+} else {
+    socket = io({
+        rememberUpgrade: true,
+        autoConnect: false,
+    })
+}
 
 const initSocket = (args) => {
     const { username } = args
