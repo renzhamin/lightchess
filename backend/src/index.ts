@@ -47,12 +47,12 @@ function serialiseMap<K, V>(x: Map<K, V>) {
 
 io.on("connection", (socket) => {
     socket.on("disconnect", () => {
-        const username = userMap.get(socket.id)?.username
+        const username = userMap.get(String(socket.id))?.username
         if (username) {
             socketMap.delete(username)
         }
-        userMap.delete(socket.id)
-        readyMap.delete(socket.id)
+        userMap.delete(String(socket.id))
+        readyMap.delete(String(socket.id))
     })
 
     socket.onAny((eventName, ...args: any) => {
@@ -68,6 +68,9 @@ io.on("connection", (socket) => {
             const dMap = serialiseMap(readyMap)
             callback(dMap)
         } else if (eventName == "initSocket") {
+            if (userMap.get(String(socket.id))) {
+                return
+            }
             const fn = args[args.length - 1]
             const data = args[0]
 
@@ -83,14 +86,15 @@ io.on("connection", (socket) => {
                 }
                 data.elo = user.elo
                 userMap.set(String(socket.id), data)
-                socketMap.set(data.username, socket.id)
+                socketMap.set(data.username, String(socket.id))
                 fn(
                     `welcome ${data.username} from SERVER [initSocket successfull]`
                 )
             })
         } else if (eventName == "rmReady") {
-            readyMap.delete(socket.id)
+            readyMap.delete(String(socket.id))
         } else if (eventName == "initReady") {
+            if (readyMap.get(String(socket.id))) return
             const fn = args[args.length - 1]
             const data = args[0]
 
@@ -119,7 +123,7 @@ io.on("connection", (socket) => {
             if (!args || !args.length) return
             let { to } = args[0]
             to = socketMap.get(to)
-            const senderUsername = userMap.get(socket.id)?.username
+            const senderUsername = userMap.get(String(socket.id))?.username
             if (to) {
                 socket
                     .to(to)

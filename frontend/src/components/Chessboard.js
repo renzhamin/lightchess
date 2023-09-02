@@ -146,8 +146,8 @@ function Board() {
         if (iResigned) {
             resigned = true
         }
-        myTimer.current.stopTimer()
-        opponentTimer.current.stopTimer()
+        myTimer?.current.stopTimer()
+        opponentTimer?.current.stopTimer()
         setEndDialogMessages()
         handleClickOpen()
 

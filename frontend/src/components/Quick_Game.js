@@ -83,33 +83,15 @@ export const Quick_Game = () => {
     )
 
     useEffect(() => {
-        getUsers()
-    }, [])
-
-    useEffect(() => {
-        initSocket({ username })
-        updateUserList()
-    }, [username])
-
-    const getUsers = async () => {
-        const response = await axiosJWT.get(`${config.backend}/api/users`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
-        initSocket({ username })
-    }
-
-    useEffect(() => {
         // fetchData()
 
         const interval = setInterval(() => {
-            if (!myInfo) {
+            if (!myInfo && username) {
                 axios
                     .get(`${config.backend}/api/user/` + username)
                     .then((data) => {
                         myInfo = data
-                        myELO = myInfo.data.elo
+                        myELO = myInfo?.data.elo
                     })
             }
 
@@ -119,7 +101,7 @@ export const Quick_Game = () => {
             if (inQueue) {
                 findOpponent()
             }
-        }, 1000)
+        }, 2000)
 
         socket.on("Challenge", (data) => {
             Dequeue()

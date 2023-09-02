@@ -21,13 +21,13 @@ import lightchess_logo_grey from "./components/static/images/lightchess_logo_gre
 
 export const AppContext = React.createContext()
 
-const socket = io(config.backend_ws, {
+const socket = io(config.backend, {
     autoConnect: false,
 })
 
 const initSocket = (args) => {
     const { username } = args
-    if (socket.connected === true || username === "") return
+    if (socket.connected || username === "") return
     socket.connect()
     socket.emit("initSocket", { username }, (response) => {})
 }
