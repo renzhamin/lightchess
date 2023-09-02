@@ -40,7 +40,7 @@ var initialMinute,
 var timeUpdated = false
 
 function Board() {
-    const { socket, userMap, username: myUsername } = useContext(AppContext)
+    const { socket, userMap, username, initSocket } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
     const [game, setGame] = useState(new Chess())
     const [position, setPosition] = useState(game.fen())
@@ -129,7 +129,7 @@ function Board() {
     }
 
     const fetchData = async () => {
-        myInfo = await axios.get(`${config.backend}/api/user/` + myUsername)
+        myInfo = await axios.get(`${config.backend}/api/user/` + username)
         opponentInfo = await axios.get(
             `${config.backend}/api/user/` + opponentUserName
         )
@@ -161,7 +161,7 @@ function Board() {
         // - Draw
 
         if (iResigned) {
-            gameResult += myUsername + " Lost"
+            gameResult += username + " Lost"
             addGame()
         } else if (game.isCheckmate()) {
             if (game.inCheck() && game.turn() === boardOrientation) {
@@ -179,6 +179,7 @@ function Board() {
             }
         }
 
+        initSocket({ username })
         socket.emit("game_over", {
             to: opponentUserName,
             gameResult,
@@ -205,14 +206,12 @@ function Board() {
         try {
             // TODO: set game values properly
             await axios.post(`${config.backend}/api/games`, {
-                whiteUserName: mycolor == 1 ? opponentUserName : myUsername,
-                blackUserName: mycolor == 1 ? myUsername : opponentUserName,
+                whiteUserName: mycolor == 1 ? opponentUserName : username,
+                blackUserName: mycolor == 1 ? username : opponentUserName,
                 winnerUserName: areYouWinningSon()
-                    ? myUsername
+                    ? username
                     : opponentUserName,
-                loserUserName: areYouWinningSon()
-                    ? opponentUserName
-                    : myUsername,
+                loserUserName: areYouWinningSon() ? opponentUserName : username,
                 pgn: game.pgn(),
                 whiteUserElo: whiteElo,
                 blackUserElo: blackElo,
@@ -238,7 +237,7 @@ function Board() {
 
     useEffect(() => {
         // fetchData()
-        axios.get(`${config.backend}/api/user/` + myUsername).then((data) => {
+        axios.get(`${config.backend}/api/user/` + username).then((data) => {
             myInfo = data
             myELO = myInfo?.data.elo
         })
@@ -336,6 +335,7 @@ function Board() {
             mySeconds = myTimer.current.getSeconds()
         var opponentMinutes = opponentTimer.current.getMinutes(),
             opponentSeconds = opponentTimer.current.getSeconds()
+        initSocket({ username })
         socket.emit("send_move", {
             to: opponentUserName,
             move,
@@ -423,7 +423,7 @@ function Board() {
                 <GameInfo
                     gameEndHandler={gameEndHandler}
                     opponentUserName={opponentUserName}
-                    myUsername={myUsername}
+                    myUsername={username}
                     opponentTimeInfo={opponentTimeInfo}
                     opponentHistory={opponentHistory}
                     myELO={myELO}

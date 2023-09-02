@@ -158,6 +158,7 @@ export const Matchmaking = () => {
     const Challenge = () => {
         // e.preventDefault()
         Dequeue()
+        initSocket({ username })
         socket.emit("Challenge", {
             to: receiver.username,
             msg: "challenge",
@@ -179,12 +180,14 @@ export const Matchmaking = () => {
                 myColor = Math.floor(Math.random() * 2)
                 receiver = readyUserList[i]
                 Challenge()
+                initSocket({ username })
                 socket.emit("rmReady")
             }
         }
     }
 
     function Enqueue(timeControl) {
+        initSocket({ username })
         socket.emit("rmReady")
         inQueue = true
         if (queueStatus == timeControl) queueStatus = -1
@@ -195,6 +198,7 @@ export const Matchmaking = () => {
     }
 
     function Dequeue() {
+        initSocket({ username })
         socket.emit("rmReady")
         inQueue = false
         queueStatus = -1

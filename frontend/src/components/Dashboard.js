@@ -83,12 +83,10 @@ const Dashboard = (props) => {
     }, [])
 
     useEffect(() => {
-        initSocket({ username })
         updateUserList()
     }, [username])
 
     useEffect(() => {
-        initSocket({ username })
         updateUserList()
 
         socket.on("Challenge_accepted", (data) => {
@@ -151,11 +149,11 @@ const Dashboard = (props) => {
             },
         })
         setUsers(response.data)
-        initSocket({ username })
     }
 
     const Challenge_dashboard = (receiver) => {
         // e.preventDefault()
+        initSocket({ username })
         socket.emit("Challenge_dashboard", {
             to: receiver.username,
             timeFormat: timeFormat,
@@ -168,6 +166,7 @@ const Dashboard = (props) => {
 
     const AcceptChallenge = (e) => {
         e.preventDefault()
+        initSocket({ username })
         socket.emit("Challenge_accepted", {
             to: playingAgainst,
             msg: "challenge_accepted",

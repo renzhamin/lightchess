@@ -59,6 +59,7 @@ export const Chat = (props) => {
 
     const AcceptChallenge = (e) => {
         e.preventDefault()
+        initSocket({ username })
         socket.emit("Challenge_accepted", {
             to: playingAgainst,
             msg: "challenge_accepted",
@@ -71,6 +72,7 @@ export const Chat = (props) => {
 
     const Challenge = (e) => {
         e.preventDefault()
+        initSocket({ username })
         socket.emit("Challenge", {
             to: receiver.username,
             timeFormat: timeFormat,
