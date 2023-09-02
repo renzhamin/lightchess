@@ -122,12 +122,16 @@ io.on("connection", (socket) => {
         } else {
             if (!args || !args.length) return
             let { to } = args[0]
+            const fn = args[args.length - 1]
             to = socketMap.get(to)
             const senderUsername = userMap.get(String(socket.id))?.username
             if (to) {
                 socket
                     .to(to)
                     .emit(eventName, { ...args[0], from: senderUsername })
+                if (typeof fn === "function") {
+                    fn("success")
+                }
             }
         }
     })

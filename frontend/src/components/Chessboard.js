@@ -128,13 +128,6 @@ function Board() {
         // UPDATE DATABASE HERE WITH THESE NEW VALUES
     }
 
-    const fetchData = async () => {
-        myInfo = await axios.get(`${config.backend}/api/user/` + username)
-        opponentInfo = await axios.get(
-            `${config.backend}/api/user/` + opponentUserName
-        )
-    }
-
     function convertTimeToString(time) {
         var time_ = time.toString()
         if (time < 10) time_ = "0" + time_
@@ -330,22 +323,6 @@ function Board() {
         }
     }, [isGameOver])
 
-    function sendMove(move) {
-        var myMinutes = myTimer.current.getMinutes(),
-            mySeconds = myTimer.current.getSeconds()
-        var opponentMinutes = opponentTimer.current.getMinutes(),
-            opponentSeconds = opponentTimer.current.getSeconds()
-        initSocket({ username })
-        socket.emit("send_move", {
-            to: opponentUserName,
-            move,
-            myMinutes,
-            mySeconds,
-            opponentMinutes,
-            opponentSeconds,
-        })
-    }
-
     function onDrop(sourceSquare, targetSquare) {
         if (isGameOver) {
             return
@@ -353,38 +330,54 @@ function Board() {
             return
         }
 
-        let move = { from: sourceSquare, to: targetSquare }
+        let move = { from: sourceSquare, to: targetSquare, promotion: "q" }
         try {
             let result = game.move(move)
             if (result == null) {
-                move = { from: sourceSquare, to: targetSquare, promotion: "q" }
-                result = game.move(move)
-
-                if (result == null) {
-                    return
-                }
+                return
             }
         } catch (err) {
             return
         }
 
-        // if valid move
+        const myMinutes = myTimer.current.getMinutes(),
+            mySeconds = myTimer.current.getSeconds()
+        const opponentMinutes = opponentTimer.current.getMinutes(),
+            opponentSeconds = opponentTimer.current.getSeconds()
+        initSocket({ username })
+        socket.emit(
+            "send_move",
+            {
+                to: opponentUserName,
+                move,
+                myMinutes,
+                mySeconds,
+                opponentMinutes,
+                opponentSeconds,
+            },
+            (res) => {
+                if (res !== "success") {
+                    game.undo()
+                    return
+                }
+                // if valid move
 
-        playMoveSfx()
+                playMoveSfx()
 
-        myTimer.current.incrementTimer(increment)
-        opponentTimer.current.startTimer()
-        myTimer.current.stopTimer()
+                myTimer.current.incrementTimer(increment)
+                opponentTimer.current.startTimer()
+                myTimer.current.stopTimer()
 
-        setPgnMoves(parsePgn(game.pgn()))
+                setPgnMoves(parsePgn(game.pgn()))
 
-        setPosition(game.fen())
-        sendMove(move)
+                setPosition(game.fen())
 
-        if (game.isGameOver()) {
-            gameEndHandler()
-            addGame()
-        }
+                if (game.isGameOver()) {
+                    gameEndHandler()
+                    addGame()
+                }
+            }
+        )
     }
 
     function onSquareClick(square) {}
