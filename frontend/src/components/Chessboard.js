@@ -136,16 +136,7 @@ function Board() {
     }
 
     function gameEndHandler(iResigned) {
-        if (iResigned) {
-            resigned = true
-        }
-        myTimer?.current.stopTimer()
-        opponentTimer?.current.stopTimer()
-        setEndDialogMessages()
-        handleClickOpen()
-
-        setIsGameOver(true)
-        var gameResult = ""
+        let gameResult = ""
 
         //TODO: Make sure this shows correct result, for all 4 cases:
         // - Checkmate
@@ -155,7 +146,6 @@ function Board() {
 
         if (iResigned) {
             gameResult += username + " Lost"
-            addGame()
         } else if (game.isCheckmate()) {
             if (game.inCheck() && game.turn() === boardOrientation) {
                 // player lost, opponent won
@@ -173,12 +163,31 @@ function Board() {
         }
 
         initSocket({ username })
-        socket.emit("game_over", {
-            to: opponentUserName,
-            gameResult,
-            opponentTimeInfo,
-            myTimeInfo,
-        })
+        socket.emit(
+            "game_over",
+            {
+                to: opponentUserName,
+                gameResult,
+                opponentTimeInfo,
+                myTimeInfo,
+            },
+            (res) => {
+                if (res !== "success") return
+
+                if (iResigned) {
+                    resigned = true
+                }
+                myTimer?.current.stopTimer()
+                opponentTimer?.current.stopTimer()
+                setEndDialogMessages()
+                handleClickOpen()
+                setIsGameOver(true)
+
+                if (iResigned) {
+                    addGame()
+                }
+            }
+        )
 
         // send gameResult through "game_over"
 
@@ -324,6 +333,7 @@ function Board() {
     }, [isGameOver])
 
     function onDrop(sourceSquare, targetSquare) {
+        if (socket.disconnected) return
         if (isGameOver) {
             return
         } else if (game.turn() !== boardOrientation[0]) {
@@ -339,6 +349,8 @@ function Board() {
         } catch (err) {
             return
         }
+
+        setPosition(game.fen())
 
         const myMinutes = myTimer.current.getMinutes(),
             mySeconds = myTimer.current.getSeconds()
@@ -358,6 +370,7 @@ function Board() {
             (res) => {
                 if (res !== "success") {
                     game.undo()
+                    setPosition(game.fen())
                     return
                 }
                 // if valid move
