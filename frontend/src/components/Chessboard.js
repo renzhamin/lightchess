@@ -40,6 +40,7 @@ function Board() {
     const [gameEndMessage, setGameEndMessage] = useState("")
     const [gameEndTitle, setGameEndTitle] = useState("")
     const [isGameOver, setIsGameOver] = useState(false)
+    const [isGameAdded, setIsGameAdded] = useState(false)
 
     const { opponentUserName, mycolor, time_format } = useParams()
 
@@ -189,6 +190,7 @@ function Board() {
     }
 
     const addGame = async () => {
+        if (isGameAdded) return
         try {
             // TODO: set game values properly
             await axios.post(`${config.backend}/api/games`, {
@@ -202,6 +204,7 @@ function Board() {
                 whiteUserElo: whiteElo,
                 blackUserElo: blackElo,
             })
+            setIsGameAdded(true)
         } catch (error) {
             console.error(error)
         }
