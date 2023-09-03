@@ -1,46 +1,33 @@
+import { Grid } from "@mui/material"
 import axios from "axios"
 import * as ChessJS from "chess.js"
-import { useContext, useEffect, useState, useRef } from "react"
-import { useParams } from "react-router"
-import { Chessboard } from "react-chessboard"
-import { AppContext } from "../App"
-import { Grid } from "@mui/material"
-import GameInfo from "./GameInfo"
-import Timer from "./Timer"
-import useSound from "use-sound"
-import moveSfx from "./../components/static/sounds/Move.mp3"
-import captureSfx from "./../components/static/sounds/Capture.mp3"
-import CheckmateSfx from "./../components/static/sounds/Checkmate.mp3"
-import parsePgn from "./PgnParser"
-import GameEndDialog from "./GameEndDialog.js"
-import { Typography, Button } from "@mui/material"
 import * as React from "react"
-import PropTypes from "prop-types"
-import Avatar from "@mui/material/Avatar"
-import List from "@mui/material/List"
-import ListItem from "@mui/material/ListItem"
-import ListItemAvatar from "@mui/material/ListItemAvatar"
-import ListItemText from "@mui/material/ListItemText"
-import DialogTitle from "@mui/material/DialogTitle"
-import Dialog from "@mui/material/Dialog"
-import PersonIcon from "@mui/icons-material/Person"
-import AddIcon from "@mui/icons-material/Add"
-import { blue } from "@mui/material/colors"
+import { useContext, useEffect, useRef, useState } from "react"
+import { Chessboard } from "react-chessboard"
+import { useParams } from "react-router"
+import useSound from "use-sound"
+import { AppContext } from "../App"
 import { config } from "../config/config_env"
+import CheckmateSfx from "./../components/static/sounds/Checkmate.mp3"
+import moveSfx from "./../components/static/sounds/Move.mp3"
+import GameEndDialog from "./GameEndDialog.js"
+import GameInfo from "./GameInfo"
+import parsePgn from "./PgnParser"
+import Timer from "./Timer"
 
-var myInfo = {}
-var opponentInfo = {}
+let myInfo = {}
+let opponentInfo = {}
 
-var myELO, opponentELO
-var whiteElo, blackElo
-var opponentHistory = ""
-var initialMinute,
+let myELO, opponentELO
+let whiteElo, blackElo
+let opponentHistory = ""
+let initialMinute,
     initialSeconds,
     increment = 0
-var timeUpdated = false
+let timeUpdated = false
 
 function Board() {
-    const { socket, userMap, username, initSocket } = useContext(AppContext)
+    const { socket, username, initSocket } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
     const [game, setGame] = useState(new Chess())
     const [position, setPosition] = useState(game.fen())
@@ -136,6 +123,7 @@ function Board() {
     }
 
     function gameEndHandler(iResigned) {
+        if (socket.disconnected) return
         let gameResult = ""
 
         //TODO: Make sure this shows correct result, for all 4 cases:
@@ -188,10 +176,6 @@ function Board() {
                 }
             }
         )
-
-        // send gameResult through "game_over"
-
-        // update game table
     }
 
     const areYouWinningSon = () => {
