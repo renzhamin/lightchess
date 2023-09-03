@@ -53,19 +53,17 @@ const UserCard = () => {
         }
     }
 
-    function isEmpty(obj) {
-        return Object.keys(obj).length === 0
-    }
-
     async function getLeaderboard() {
         const response = await axios.get(
             `${config.backend}/api/user/${username}`
         )
-        const elo = response.data.elo
-        const gamesWon = response.data.wins
-        const gamesLost = response.data.losses
-        const gamesDrawn = response.data.draws
-        const totalGames = gamesWon + gamesLost + gamesDrawn
+
+        const elo = response.data.elo ?? 1200
+        const gamesWon = response.data.wins ?? 0
+        const gamesLost = response.data.losses ?? 0
+        const gamesDrawn = response.data.draws ?? 0
+        const totalGames =
+            Number(gamesWon) + Number(gamesLost) + Number(gamesDrawn)
 
         setCardInfo({
             elo: elo,
