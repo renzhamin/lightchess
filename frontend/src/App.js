@@ -37,17 +37,18 @@ if (process.env.NODE_ENV === "development") {
 
 const initSocket = (args) => {
     const { username } = args
-    if (socket.connected || username === "") return
+    if (!username || username.length == 0 || socket.connected) return
     socket.connect()
-    socket.emit("initSocket", { username }, (response) => {})
+    socket.emit("initSocket", { username }, () => {})
 }
+
 const initReady = (args) => {
     const { username } = args
     if (username === "") return
     if (socket.disconnected) {
         initSocket({ username })
     }
-    socket.emit("initReady", args, (response) => {})
+    socket.emit("initReady", args, () => {})
 }
 
 class ProtectedRoute extends Component {

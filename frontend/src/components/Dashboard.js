@@ -87,8 +87,6 @@ const Dashboard = (props) => {
     }, [username])
 
     useEffect(() => {
-        updateUserList()
-
         socket.on("Challenge_accepted", (data) => {
             history.push(
                 "/play/" + data.from + "/" + data.yourcolor + "/" + timeFormat

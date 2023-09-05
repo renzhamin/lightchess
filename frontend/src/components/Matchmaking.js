@@ -30,8 +30,6 @@ const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-var myUsername
-var username
 var minEloDiff = 200
 var myELO = 9999
 var myInfo
@@ -128,9 +126,6 @@ export const Matchmaking = () => {
                     })
             }
 
-            updateUserList()
-            updateReadyUserList()
-
             if (inQueue) {
                 findOpponent()
             }
@@ -153,7 +148,7 @@ export const Matchmaking = () => {
             socket.off("Challenge")
             clearInterval(interval)
         }
-    }, [myInfo, myELO, readyUserList])
+    }, [readyUserList])
 
     const Challenge = () => {
         // e.preventDefault()

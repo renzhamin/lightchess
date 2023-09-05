@@ -327,57 +327,67 @@ function Board() {
             return
         }
 
+        let move_success = false
+
         let move = { from: sourceSquare, to: targetSquare, promotion: "q" }
         try {
             let result = game.move(move)
             if (result == null) {
                 return
+            } else {
+                setPosition(game.fen())
+                move_success = true
             }
         } catch (err) {
             return
         }
-
-        setPosition(game.fen())
 
         const myMinutes = myTimer.current.getMinutes(),
             mySeconds = myTimer.current.getSeconds()
         const opponentMinutes = opponentTimer.current.getMinutes(),
             opponentSeconds = opponentTimer.current.getSeconds()
         initSocket({ username })
-        socket.emit(
-            "send_move",
-            {
-                to: opponentUserName,
-                move,
-                myMinutes,
-                mySeconds,
-                opponentMinutes,
-                opponentSeconds,
-            },
-            (res) => {
-                if (res !== "success") {
-                    game.undo()
-                    setPosition(game.fen())
-                    return
-                }
-                // if valid move
-
-                playMoveSfx()
-
-                myTimer.current.incrementTimer(increment)
-                opponentTimer.current.startTimer()
-                myTimer.current.stopTimer()
-
-                setPgnMoves(parsePgn(game.pgn()))
-
+        if (socket.disconnected) {
+            if (move_success) {
+                game.undo()
                 setPosition(game.fen())
-
-                if (game.isGameOver()) {
-                    gameEndHandler()
-                    addGame()
-                }
             }
-        )
+        } else {
+            socket.emit(
+                "send_move",
+                {
+                    to: opponentUserName,
+                    move,
+                    myMinutes,
+                    mySeconds,
+                    opponentMinutes,
+                    opponentSeconds,
+                },
+                (res) => {
+                    if (res !== "success") {
+                        if (move_success) {
+                            game.undo()
+                            setPosition(game.fen())
+                        }
+                        return
+                    }
+                    // if valid move
+
+                    playMoveSfx()
+
+                    myTimer.current.incrementTimer(increment)
+                    opponentTimer.current.startTimer()
+                    myTimer.current.stopTimer()
+
+                    setPgnMoves(parsePgn(game.pgn()))
+
+                    if (game.isGameOver()) {
+                        gameEndHandler()
+                        addGame()
+                    }
+                }
+            )
+        }
     }
 
     function onSquareClick(square) {}

@@ -30,16 +30,16 @@ const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-var myUsername
-var username
-var minEloDiff = 200
-var myELO = 9999
-var myInfo
-var myTimeControl = "-1"
-var inQueue = false
-var receiver
-var myColor
-var queueStatus = -1
+let myUsername
+let username
+let minEloDiff = 200
+let myELO = 9999
+let myInfo
+let myTimeControl = "-1"
+let inQueue = false
+let receiver
+let myColor
+let queueStatus = -1
 
 export const Quick_Game = () => {
     const location = useLocation()
@@ -83,8 +83,6 @@ export const Quick_Game = () => {
     )
 
     useEffect(() => {
-        // fetchData()
-
         const interval = setInterval(() => {
             if (!myInfo && username) {
                 axios
@@ -94,9 +92,6 @@ export const Quick_Game = () => {
                         myELO = myInfo?.data.elo
                     })
             }
-
-            updateUserList()
-            updateReadyUserList()
 
             if (inQueue) {
                 findOpponent()
@@ -124,14 +119,20 @@ export const Quick_Game = () => {
 
     const Challenge = () => {
         // e.preventDefault()
-        Dequeue()
         initSocket({ username })
-        socket.emit("Challenge", {
-            to: receiver.username,
-            msg: "challenge",
-            yourcolor: myColor == 1 ? 0 : 1,
-        })
-        inQueue = false
+        socket.emit(
+            "Challenge",
+            {
+                to: receiver.username,
+                msg: "challenge",
+                yourcolor: myColor == 1 ? 0 : 1,
+            },
+            (res) => {
+                if (res === "success") {
+                    Dequeue()
+                }
+            }
+        )
         history.push(
             "/play/" + receiver.username + "/" + myColor + "/" + myTimeControl
         )
