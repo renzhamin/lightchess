@@ -24,3 +24,23 @@ other and track their progress through our leaderboards, creating an engaging an
 -   Automatic paring of two players waiting in a QuickGame/Matchmaking queue.
 -   Rating system and user statistics including rating graph.
 -   Authenticate with google or with email and password.
+
+# Demo
+
+## Quick Game with Auto Pairing
+
+https://github.com/renzhamin/lightchess/assets/57265942/43bced9e-f68f-4d05-b69a-5fe7eda1e88d
+
+## Direct challange to any active player
+
+https://github.com/renzhamin/lightchess/assets/57265942/83692386-d73c-4297-92f8-f9c220e69e21
+
+## Show user stats and replay past games
+
+https://github.com/renzhamin/lightchess/assets/57265942/93570108-56a1-4294-9a69-14831de722c7
+
+## Replay any game with pgn viewer
+
+https://github.com/renzhamin/lightchess/assets/57265942/c1327cd3-81ba-48d5-a916-ba27702de80d
+
+
