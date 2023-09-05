@@ -8,6 +8,9 @@ export const validateRegistrationData = async (req, res, next) => {
 
     if (!password) return res.status(400).json({ msg: "Provide password" })
 
+    if (!confPassword || password !== confPassword)
+        return res.status(400).json({ msg: "Passwords don't match" })
+
     if (!username) return res.status(400).json({ msg: "Provide username" })
 
     if (!email) return res.status(400).json({ msg: "Provide email" })
