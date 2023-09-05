@@ -71,7 +71,6 @@ io.on("connection", (socket) => {
             if (userMap.get(String(socket.id))) {
                 return
             }
-            const fn = args[args.length - 1]
             const data = args[0]
 
             Users.findOne({
@@ -87,15 +86,11 @@ io.on("connection", (socket) => {
                 data.elo = user.elo
                 userMap.set(String(socket.id), data)
                 socketMap.set(data.username, String(socket.id))
-                fn(
-                    `welcome ${data.username} from SERVER [initSocket successfull]`
-                )
             })
         } else if (eventName == "rmReady") {
             readyMap.delete(String(socket.id))
         } else if (eventName == "initReady") {
             if (readyMap.get(String(socket.id))) return
-            const fn = args[args.length - 1]
             const data = args[0]
 
             if (!data || !data.username) {
@@ -114,9 +109,6 @@ io.on("connection", (socket) => {
                     }
                     data.elo = user.elo
                     readyMap.set(String(socket.id), data)
-                    fn(
-                        `welcome ${data.username} with elo ${data.elo} from SERVER [initReady successfull]`
-                    )
                 })
             }
         } else {

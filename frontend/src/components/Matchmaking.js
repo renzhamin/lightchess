@@ -136,7 +136,7 @@ export const Matchmaking = () => {
     }
 
     function Enqueue(timeControl) {
-        initSocket({ username })
+        Dequeue()
         socket.emit("rmReady")
         inQueue = true
         if (queueStatus == timeControl) queueStatus = -1
@@ -198,6 +198,7 @@ export const Matchmaking = () => {
                     onClick={() => Enqueue("1+1")}
                     variant="contained"
                     color="secondary"
+                    disabled
                 >
                     {" "}
                     1+1 {<br />}Bullet{" "}
@@ -230,6 +231,7 @@ export const Matchmaking = () => {
                     onClick={() => Enqueue("3+3")}
                     variant="contained"
                     color="secondary"
+                    disabled
                 >
                     {" "}
                     3+3{<br />} Blitz{" "}
@@ -269,6 +271,7 @@ export const Matchmaking = () => {
                     onClick={() => Enqueue("5+5")}
                     variant="contained"
                     color="secondary"
+                    disabled
                 >
                     {" "}
                     5+5 {<br />}Blitz{" "}
@@ -301,6 +304,7 @@ export const Matchmaking = () => {
                     onClick={() => Enqueue("10+10")}
                     variant="contained"
                     color="secondary"
+                    disabled
                 >
                     {" "}
                     10+10 {<br />}Rapid{" "}
@@ -340,6 +344,7 @@ export const Matchmaking = () => {
                     onClick={() => Enqueue("30+30")}
                     variant="contained"
                     color="secondary"
+                    disabled
                 >
                     {" "}
                     30+30{<br />} Classical{" "}
@@ -372,6 +377,7 @@ export const Matchmaking = () => {
                     onClick={() => Enqueue("60+60")}
                     variant="contained"
                     color="secondary"
+                    disabled
                 >
                     {" "}
                     60+60 {<br />}Classical{" "}

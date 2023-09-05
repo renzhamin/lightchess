@@ -39,7 +39,7 @@ const initSocket = (args) => {
     const { username } = args
     if (!username || username.length == 0 || socket.connected) return
     socket.connect()
-    socket.emit("initSocket", { username }, () => {})
+    socket.emit("initSocket", { username })
 }
 
 const initReady = (args) => {
@@ -48,7 +48,7 @@ const initReady = (args) => {
     if (socket.disconnected) {
         initSocket({ username })
     }
-    socket.emit("initReady", args, () => {})
+    socket.emit("initReady", args)
 }
 
 class ProtectedRoute extends Component {

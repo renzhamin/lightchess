@@ -19,6 +19,7 @@ const Navbar = () => {
                 pathname: "/login",
                 openLogoutSnackBar: true,
             })
+            history.go(0)
         } catch (error) {
             console.error(error)
         }
