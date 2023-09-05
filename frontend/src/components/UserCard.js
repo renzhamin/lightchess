@@ -13,8 +13,7 @@ import Typography from "@mui/material/Typography"
 import jwt_decode from "jwt-decode"
 
 const UserCard = () => {
-    const [token, setToken] = useState("")
-    const [expire, setExpire] = useState("")
+    const [expire, setExpire] = useState(0)
     const { username, setUserName } = useContext(AppContext)
     const [cardInfo, setCardInfo] = useState({})
     const history = useHistory()
@@ -27,10 +26,9 @@ const UserCard = () => {
             if (expire * 1000 < currentDate.getTime()) {
                 const response = await axios.get(`${config.backend}/api/token`)
                 axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
-                setToken(response.data.accessToken)
                 const decoded = jwt_decode(response.data.accessToken)
                 setUserName(decoded.username)
-                setExpire(decoded.exp)
+                setExpire(Number(decoded.exp))
             }
             return axiosConfig
         },
@@ -39,22 +37,12 @@ const UserCard = () => {
         }
     )
 
-    const refreshToken = async () => {
-        try {
-            const response = await axios.get(`${config.backend}/api/token`)
-            setToken(response.data.accessToken)
-            const decoded = jwt_decode(response.data.accessToken)
-            setUserName(decoded.username)
-            setExpire(decoded.exp)
-        } catch (error) {
-            if (error.response) {
-                history.push("/")
-            }
-        }
-    }
-
     async function getLeaderboard() {
-        const response = await axios.get(
+        if (!username) {
+            await axiosJWT.get(`${config.backend}/api/health`)
+            return
+        }
+        const response = await axiosJWT.get(
             `${config.backend}/api/user/${username}`
         )
 
@@ -113,7 +101,6 @@ const UserCard = () => {
     )
 
     useEffect(() => {
-        refreshToken()
         getLeaderboard()
     }, [username])
 

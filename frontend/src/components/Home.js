@@ -1,36 +1,18 @@
-import { useState, useEffect, useContext, forwardRef } from "react"
-import axios from "axios"
-import jwt_decode from "jwt-decode"
-import { useHistory } from "react-router-dom"
-import { AppContext } from "../App.js"
-import { Chat } from "./Chat.js"
-import LoadingButton from "@mui/lab/LoadingButton"
 import {
-    Table,
-    Button,
-    Typography,
     Container,
     CssBaseline,
-    TableContainer,
-    Paper,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    Snackbar,
-    IconButton,
     Grid,
     Link,
+    Snackbar,
+    Typography,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
+import { forwardRef, useState } from "react"
 import { useLocation } from "react-router-dom"
-import { config } from "../config/config_env"
-import CloseIcon from "@mui/icons-material/Close"
-import Quick_Game from "./Quick_Game"
-import Matchmaking from "./Matchmaking"
 import Leaderboard from "./Leaderboard"
-import UserCard from "./UserCard"
+import Quick_Game from "./Quick_Game"
 import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
+import UserCard from "./UserCard"
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
@@ -55,11 +37,8 @@ function Copyright(props) {
 
 export const Home = () => {
     const location = useLocation()
-    /* if (location.refresh == true) { */
-    /*     window.location.reload() */
-    /* } */
     const [open, setOpen] = useState(location.openSnackbar)
-    const handleClose = (event, reason) => {
+    const handleClose = (_, reason) => {
         if (reason === "clickaway") {
             return
         }

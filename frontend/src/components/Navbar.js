@@ -1,8 +1,8 @@
-import React, { useContext } from "react"
+import { AppBar, Button, Toolbar, Typography } from "@mui/material"
 import axios from "axios"
+import React, { useContext } from "react"
 import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
-import { AppBar, Toolbar, IconButton, Typography, Button } from "@mui/material"
 import { config } from "../config/config_env"
 import lightchess_logo_grey from "./static/images/lightchess_logo_grey.png"
 
@@ -12,12 +12,13 @@ const Navbar = () => {
 
     const Logout = async () => {
         try {
+            socket.emit("rmReady")
+            socket.disconnect()
             await axios.delete(`${config.backend}/api/logout`)
             history.push({
                 pathname: "/login",
                 openLogoutSnackBar: true,
             })
-            socket.disconnect()
         } catch (error) {
             console.error(error)
         }

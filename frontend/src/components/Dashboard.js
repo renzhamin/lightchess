@@ -1,90 +1,59 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useState, useEffect, useContext, forwardRef } from "react"
-import axios from "axios"
-import jwt_decode from "jwt-decode"
-import { useHistory } from "react-router-dom"
-import { AppContext } from "../App.js"
-import { Chat } from "./Chat.js"
+import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
 import {
-    Table,
+    AlertTitle,
     Button,
-    Typography,
     Container,
     CssBaseline,
-    TableContainer,
-    Paper,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    Snackbar,
     Grid,
     IconButton,
-    AlertTitle,
     Link,
+    Paper,
+    Snackbar,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
-import { useLocation } from "react-router-dom"
-import { config } from "../config/config_env"
-import CompareArrowsIcon from "@mui/icons-material/CompareArrows"
+import { forwardRef, useContext, useEffect, useState } from "react"
+import { useHistory, useLocation } from "react-router-dom"
+import { AppContext } from "../App.js"
 
-var timeControl = "5+0"
-var playingAgainst
-var opponentUsername
-var timeFormat = "5+0"
-var myColor
+let playingAgainst
+let opponentUsername
+let timeFormat = "5+0"
+let myColor
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-const Dashboard = (props) => {
+const Dashboard = () => {
     const location = useLocation()
     const history = useHistory()
 
-    const { username, setUserName } = useContext(AppContext)
-
-    const [token, setToken] = useState("")
-    const [expire, setExpire] = useState("")
-    const [users, setUsers] = useState([])
+    const { username } = useContext(AppContext)
 
     const [open, setOpen] = useState(location.openSnackbar)
 
-    /* if (location.refresh == true) { */
-    /*     window.location.reload() */
-    /* } */
-
-    const {
-        socket,
-        initSocket,
-        initReady,
-        userList,
-        updateUserList,
-        updateReadyUserList,
-        readyUserList,
-    } = useContext(AppContext)
+    const { socket, initSocket, updateUserList, userList } =
+        useContext(AppContext)
 
     const handleClick = () => {
         setOpen(true)
     }
 
-    const handleClose = (event, reason) => {
+    const handleClose = (_, reason) => {
         if (reason === "clickaway") {
             return
         }
 
         setOpen(false)
     }
-
-    useEffect(() => {
-        refreshToken()
-        getUsers()
-        updateUserList()
-    }, [])
-
-    useEffect(() => {
-        updateUserList()
-    }, [username])
 
     useEffect(() => {
         socket.on("Challenge_accepted", (data) => {
@@ -106,72 +75,32 @@ const Dashboard = (props) => {
         }
     }, [])
 
-    const axiosJWT = axios.create()
-
-    axiosJWT.interceptors.request.use(
-        async (axiosConfig) => {
-            const currentDate = new Date()
-            if (expire * 1000 < currentDate.getTime()) {
-                const response = await axios.get(`${config.backend}/api/token`)
-                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
-                setToken(response.data.accessToken)
-                const decoded = jwt_decode(response.data.accessToken)
-                setUserName(decoded.username)
-                setExpire(decoded.exp)
-            }
-            return axiosConfig
-        },
-        (error) => {
-            return Promise.reject(error)
-        }
-    )
-
-    const refreshToken = async () => {
-        try {
-            const response = await axiosJWT.get(`${config.backend}/api/token`)
-            setToken(response.data.accessToken)
-            const decoded = jwt_decode(response.data.accessToken)
-            setUserName(decoded.username)
-            setExpire(decoded.exp)
-        } catch (error) {
-            if (error.response) {
-                history.push("/")
-            }
-        }
-    }
-
-    const getUsers = async () => {
-        const response = await axiosJWT.get(`${config.backend}/api/users`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        })
-        setUsers(response.data)
-    }
-
     const Challenge_dashboard = (receiver) => {
-        // e.preventDefault()
         initSocket({ username })
         socket.emit("Challenge_dashboard", {
             to: receiver.username,
             timeFormat: timeFormat,
             msg: "challenge",
             challenger: username,
-            // yourcolor: myColor == 1 ? 0 : 1,
         })
-        /* history.push("/play/" + receiver.id + "/" + myColor) */
     }
 
     const AcceptChallenge = (e) => {
         e.preventDefault()
         initSocket({ username })
-        socket.emit("Challenge_accepted", {
-            to: playingAgainst,
-            msg: "challenge_accepted",
-            yourcolor: myColor === 1 ? 0 : 1,
-        })
-        history.push(
-            "/play/" + playingAgainst + "/" + myColor + "/" + timeFormat
+        socket.emit(
+            "Challenge_accepted",
+            {
+                to: playingAgainst,
+                msg: "challenge_accepted",
+                yourcolor: myColor === 1 ? 0 : 1,
+            },
+            (res) => {
+                if (res !== "success") return
+                history.push(
+                    "/play/" + playingAgainst + "/" + myColor + "/" + timeFormat
+                )
+            }
         )
     }
 
@@ -217,7 +146,7 @@ const Dashboard = (props) => {
             <Button
                 size="large"
                 sx={{ mt: 3, mb: 2 }}
-                onClick={getUsers}
+                onClick={() => updateUserList()}
                 variant="contained"
                 alignItems="center"
             >

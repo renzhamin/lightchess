@@ -1,39 +1,24 @@
-import { useState, useEffect, useContext, forwardRef } from "react"
-import axios from "axios"
-import jwt_decode from "jwt-decode"
-import { useHistory } from "react-router-dom"
-import { AppContext } from "../App.js"
-import { Chat } from "./Chat.js"
+import CloseIcon from "@mui/icons-material/Close"
 import LoadingButton from "@mui/lab/LoadingButton"
 import {
-    Table,
-    Button,
-    Typography,
     Container,
     CssBaseline,
-    TableContainer,
-    Paper,
-    TableHead,
-    TableRow,
-    TableCell,
-    TableBody,
-    Snackbar,
-    IconButton,
     Grid,
+    IconButton,
+    Typography,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
-import { useLocation } from "react-router-dom"
+import axios from "axios"
+import { forwardRef, useContext, useEffect } from "react"
+import { useHistory } from "react-router-dom"
+import { AppContext } from "../App.js"
 import { config } from "../config/config_env"
-import CloseIcon from "@mui/icons-material/Close"
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-let myUsername
-let username
-let minEloDiff = 200
-let myELO = 9999
+let myELO = 1200
 let myInfo
 let myTimeControl = "-1"
 let inQueue = false
@@ -42,61 +27,22 @@ let myColor
 let queueStatus = -1
 
 export const Quick_Game = () => {
-    const location = useLocation()
     const history = useHistory()
 
-    const [token, setToken] = useState("")
-    const [expire, setExpire] = useState("")
-    const [users, setUsers] = useState([])
-
-    const [open, setOpen] = useState(location.openSnackbar)
-
-    const {
-        username,
-        setUserName,
-        socket,
-        initSocket,
-        initReady,
-        updateUserList,
-        updateReadyUserList,
-        readyUserList,
-    } = useContext(AppContext)
-
-    const axiosJWT = axios.create()
-
-    axiosJWT.interceptors.request.use(
-        async (axiosConfig) => {
-            const currentDate = new Date()
-            if (expire * 1000 < currentDate.getTime()) {
-                const response = await axios.get(`${config.backend}/api/token`)
-                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
-                setToken(response.data.accessToken)
-                const decoded = jwt_decode(response.data.accessToken)
-                setUserName(decoded.username)
-                setExpire(decoded.exp)
-            }
-            return axiosConfig
-        },
-        (error) => {
-            return Promise.reject(error)
-        }
-    )
+    const { username, socket, initSocket, initReady, readyUserList } =
+        useContext(AppContext)
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (!myInfo && username) {
-                axios
-                    .get(`${config.backend}/api/user/` + username)
-                    .then((data) => {
-                        myInfo = data
-                        myELO = myInfo?.data.elo
-                    })
-            }
+        if (!myInfo && username) {
+            axios.get(`${config.backend}/api/user/` + username).then((data) => {
+                myInfo = data
+                myELO = myInfo?.data.elo
+            })
+        }
 
-            if (inQueue) {
-                findOpponent()
-            }
-        }, 2000)
+        if (inQueue) {
+            findOpponent()
+        }
 
         socket.on("Challenge", (data) => {
             Dequeue()
@@ -113,9 +59,8 @@ export const Quick_Game = () => {
 
         return () => {
             socket.off("Challenge")
-            clearInterval(interval)
         }
-    }, [myInfo, myELO, readyUserList])
+    }, [readyUserList])
 
     const Challenge = () => {
         // e.preventDefault()
@@ -128,20 +73,23 @@ export const Quick_Game = () => {
                 yourcolor: myColor == 1 ? 0 : 1,
             },
             (res) => {
-                if (res === "success") {
-                    Dequeue()
-                }
+                if (res !== "success") return
+                Dequeue()
+                history.push(
+                    "/play/" +
+                        receiver.username +
+                        "/" +
+                        myColor +
+                        "/" +
+                        myTimeControl
+                )
             }
-        )
-        history.push(
-            "/play/" + receiver.username + "/" + myColor + "/" + myTimeControl
         )
     }
 
     function findOpponent() {
         for (let i = 0; i < readyUserList.length; i++) {
             if (
-                Math.abs(myELO - readyUserList[i].elo) <= minEloDiff &&
                 myTimeControl === readyUserList[i].timeControl &&
                 username != readyUserList[i].username
             ) {
@@ -170,11 +118,6 @@ export const Quick_Game = () => {
         socket.emit("rmReady")
         inQueue = false
         queueStatus = -1
-    }
-
-    function customHandler() {
-        if ((queueStatus = "custom")) queueStatus = -1
-        else queueStatus = "custom"
     }
 
     return (

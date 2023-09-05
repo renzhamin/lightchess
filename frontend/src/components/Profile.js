@@ -1,70 +1,67 @@
-import { useLocation, useHistory } from "react-router-dom"
-import { useCallback } from "react"
-import axios from "axios"
-import { config } from "../config/config_env"
-import { Container, Grid } from "@mui/material"
-import { useEffect, useState } from "react"
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js"
-import { Pie, Line } from "react-chartjs-2"
-import Chart from "react-apexcharts"
+import { CardActionArea, Container, Grid } from "@mui/material"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
-import { CardActionArea } from "@mui/material"
-import Typography from "@mui/material/Typography"
-import Table from "@mui/material/Table"
-import TableHead from "@mui/material/Table"
+import Link from "@mui/material/Link"
+import Paper from "@mui/material/Paper"
+import { default as Table, default as TableHead } from "@mui/material/Table"
 import TableBody from "@mui/material/TableBody"
 import TableCell from "@mui/material/TableCell"
 import TableContainer from "@mui/material/TableContainer"
 import TableRow from "@mui/material/TableRow"
-import Paper from "@mui/material/Paper"
-import Link from "@mui/material/Link"
+import Typography from "@mui/material/Typography"
+import axios from "axios"
+import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js"
+import { useEffect, useState } from "react"
+import Chart from "react-apexcharts"
+import { Pie } from "react-chartjs-2"
+import { useHistory, useLocation } from "react-router-dom"
+import { config } from "../config/config_env"
+import jwt_decode from "jwt-decode"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
-function Profile(props) {
-    const [, updateState] = useState()
-    const forceUpdate = useCallback(() => updateState({}), [])
+function Profile() {
     const location = useLocation()
     const history = useHistory()
     const username = location.pathname.split("/").at(-1)
     const [currentElo, setCurrentElo] = useState()
+    const [expire, setExpire] = useState(0)
 
     // Needed for date calculation
-    var DateDiff = {
+    let DateDiff = {
         inMinutes: function (d1, d2) {
-            var t2 = d2.getTime()
-            var t1 = d1.getTime()
+            let t2 = d2.getTime()
+            let t1 = d1.getTime()
 
             return Math.floor((t2 - t1) / (60 * 1000))
         },
 
         inHours: function (d1, d2) {
-            var t2 = d2.getTime()
-            var t1 = d1.getTime()
+            let t2 = d2.getTime()
+            let t1 = d1.getTime()
 
             return Math.floor((t2 - t1) / (60 * 60 * 1000))
         },
 
         inDays: function (d1, d2) {
-            var t2 = d2.getTime()
-            var t1 = d1.getTime()
+            let t2 = d2.getTime()
+            let t1 = d1.getTime()
 
             return Math.floor((t2 - t1) / (24 * 3600 * 1000))
         },
 
         inWeeks: function (d1, d2) {
-            var t2 = d2.getTime()
-            var t1 = d1.getTime()
+            let t2 = d2.getTime()
+            let t1 = d1.getTime()
 
             return parseInt((t2 - t1) / (24 * 3600 * 1000 * 7))
         },
 
         inMonths: function (d1, d2) {
-            var d1Y = d1.getFullYear()
-            var d2Y = d2.getFullYear()
-            var d1M = d1.getMonth()
-            var d2M = d2.getMonth()
+            let d1Y = d1.getFullYear()
+            let d2Y = d2.getFullYear()
+            let d1M = d1.getMonth()
+            let d2M = d2.getMonth()
 
             return d2M + 12 * d2Y - (d1M + 12 * d1Y)
         },
@@ -112,9 +109,32 @@ function Profile(props) {
     const [leftTableData, setLeftTableData] = useState([])
     const [rightTableData, setRightTableData] = useState([])
 
+    const axiosJWT = axios.create()
+
+    axiosJWT.interceptors.request.use(
+        async (axiosConfig) => {
+            const currentDate = new Date()
+            if (expire * 1000 < currentDate.getTime()) {
+                const response = await axios.get(`${config.backend}/api/token`)
+                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
+                const decoded = jwt_decode(response.data.accessToken)
+                setExpire(Number(decoded.exp))
+            }
+            return axiosConfig
+        },
+        (error) => {
+            return Promise.reject(error)
+        }
+    )
+
     useEffect(() => {
         async function getUserInfo() {
-            const response = await axios.get(
+            if (!username) {
+                await axiosJWT.get(`${config.backend}/api/health`)
+                return
+            }
+
+            const response = await axiosJWT.get(
                 `${config.backend}/api/user/${username}`
             )
 
@@ -144,7 +164,7 @@ function Profile(props) {
                 ],
             })
 
-            var eloHistory = response.data.elo_history.split(",")
+            let eloHistory = response.data.elo_history.split(",")
             for (let i = 0; i < eloHistory.length; i++) {
                 eloHistory[i] = parseInt(eloHistory[i])
             }
@@ -184,11 +204,11 @@ function Profile(props) {
 
             // set right table data
 
-            const games = await axios.get(
+            const games = await axiosJWT.get(
                 `${config.backend}/api/user/${username}/games`
             )
 
-            var gameInfo = games.data
+            let gameInfo = games.data
             gameInfo = gameInfo.reverse()
 
             function genData(
@@ -219,19 +239,19 @@ function Profile(props) {
             const rtData = []
 
             for (let i = 0; i < gameInfo.length; i++) {
-                var result = ""
+                let result = ""
                 if (gameInfo[i].winnerUserName === "--") result = "--"
                 else if (gameInfo[i].winnerUserName === username) result = "1-0"
                 else if (gameInfo[i].winnerUserName !== username) result = "0-1"
 
-                var opponent =
+                let opponent =
                     gameInfo[i].whiteUserName === username
                         ? gameInfo[i].blackUserName
                         : gameInfo[i].whiteUserName
 
                 // process date
-                var date = gameInfo[i].createdAt
-                var dateString = "--"
+                let date = gameInfo[i].createdAt
+                let dateString = "--"
                 if (date !== undefined) {
                     const now = new Date()
                     const gameDate = new Date(date)
@@ -278,7 +298,7 @@ function Profile(props) {
                 setCurrentElo(eloHistory.at(-1))
 
                 // process rating change
-                var ratingChange =
+                let ratingChange =
                     eloHistory[eloHistory.length - 1 - i] -
                     eloHistory[eloHistory.length - 1 - i - 1]
                 if (ratingChange > 0) {

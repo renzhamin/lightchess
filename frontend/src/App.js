@@ -73,7 +73,6 @@ class ProtectedRoute extends Component {
 }
 
 function App() {
-    const [userMap, setUserMap] = useState(new Map())
     const [userList, setUserList] = useState([])
     const [readyUserMap, setReadyUserMap] = useState(new Map())
     const [readyUserList, setReadyUserList] = useState([])
@@ -90,7 +89,6 @@ function App() {
                     ...value,
                 })
             })
-            setUserMap(newUserMap)
             setUserList([...users])
         })
     }
@@ -123,7 +121,6 @@ function App() {
     return (
         <AppContext.Provider
             value={{
-                userMap,
                 userList,
                 updateUserList,
                 readyUserMap,
