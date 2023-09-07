@@ -45,6 +45,7 @@ function Board() {
     const [isGameAdded, setIsGameAdded] = useState(false)
     const [open, setOpen] = useState(false)
     const [error, setError] = useState("")
+    const [boardWidth, setBWidth] = useState(720)
 
     const { opponentUserName, mycolor, time_format } = useParams()
 
@@ -56,6 +57,22 @@ function Board() {
 
     const handleClickOpen = () => {
         setOpen(true)
+    }
+
+    const resizeHandler = () => {
+        const ww = window.innerWidth
+        const wh = window.innerHeight
+        let w = ww
+
+        if (ww <= 500) w = ww - 10
+        else if (ww <= 800) w = ww - 20
+        else {
+            w = 720
+        }
+
+        if (w > wh) w = wh - 10
+
+        setBWidth(w)
     }
 
     function ratingDelta(myRating, opponentRating, myGameResult) {
@@ -72,6 +89,7 @@ function Board() {
     }
 
     function setTimeControl() {
+        if (!time_format) return
         let parsed = time_format.split("+")
         initialMinute = parseInt(parsed[0])
         initialSeconds = 0
@@ -290,6 +308,7 @@ function Board() {
     }, [])
 
     useEffect(() => {
+        resizeHandler()
         const interval = setInterval(() => {
             // assuming I am white
             if (!timeUpdated) {
@@ -395,12 +414,12 @@ function Board() {
 
     return (
         <Grid
+            height={"100vh"}
             container
-            sx={{ mt: 5 }}
             direction="row"
             alignItems="center"
             justifyContent="center"
-            spacing={3}
+            position={"relative"}
         >
             <Snackbar
                 open={error.length > 0}
@@ -426,7 +445,7 @@ function Board() {
                     gameEndTitle={gameEndTitle}
                 />
             </Grid>
-            <Grid item>
+            <Grid item height="100%" className="flex-center">
                 <Chessboard
                     id="BasicBoard"
                     showBoardNotation="true"
@@ -436,10 +455,10 @@ function Board() {
                     arePremovesAllowed="true"
                     clearPremovesOnRightClick="true"
                     onSquareClick={onSquareClick}
-                    boardWidth="720"
+                    boardWidth={boardWidth}
                 />
             </Grid>
-            <Grid item>
+            <Grid item height="100%" className="flex-center">
                 <GameInfo
                     gameEndHandler={gameEndHandler}
                     opponentUserName={opponentUserName}

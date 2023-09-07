@@ -55,14 +55,14 @@ const initReady = (args) => {
 
 class ProtectedRoute extends Component {
     render() {
-        const { component: Component, ...props } = this.props
+        const { component: Component, path, ...props } = this.props
         return (
             <Route
                 {...props}
                 render={(props) =>
                     hasValidRefreshToken() ? (
                         <>
-                            <Navbar />
+                            {!path?.startsWith("/play") && <Navbar />}
                             <Component {...props} />
                         </>
                     ) : (
@@ -205,7 +205,11 @@ function App() {
                                 path="/play/:opponentUserName/:mycolor/:time_format"
                                 component={Board}
                             />
-                            <ProtectedRoute path="/play" component={Board} />
+                            <ProtectedRoute
+                                path="/play"
+                                component={Board}
+                                hasNav={false}
+                            />
                             <ProtectedRoute
                                 path="/user/:username"
                                 component={Profile}
