@@ -9,14 +9,13 @@ import TableCell from "@mui/material/TableCell"
 import TableContainer from "@mui/material/TableContainer"
 import TableRow from "@mui/material/TableRow"
 import Typography from "@mui/material/Typography"
-import axios from "axios"
 import { ArcElement, Chart as ChartJS, Legend, Tooltip } from "chart.js"
-import { useEffect, useState } from "react"
+import { useContext, useEffect, useState } from "react"
 import Chart from "react-apexcharts"
 import { Pie } from "react-chartjs-2"
 import { useHistory, useLocation } from "react-router-dom"
+import { AppContext } from "../App"
 import { config } from "../config/config_env"
-import jwt_decode from "jwt-decode"
 
 ChartJS.register(ArcElement, Tooltip, Legend)
 
@@ -25,7 +24,7 @@ function Profile() {
     const history = useHistory()
     const username = location.pathname.split("/").at(-1)
     const [currentElo, setCurrentElo] = useState()
-    const [expire, setExpire] = useState(0)
+    const { axiosJWT } = useContext(AppContext)
 
     // Needed for date calculation
     let DateDiff = {
@@ -108,24 +107,6 @@ function Profile() {
 
     const [leftTableData, setLeftTableData] = useState([])
     const [rightTableData, setRightTableData] = useState([])
-
-    const axiosJWT = axios.create()
-
-    axiosJWT.interceptors.request.use(
-        async (axiosConfig) => {
-            const currentDate = new Date()
-            if (expire * 1000 < currentDate.getTime()) {
-                const response = await axios.get(`${config.backend}/api/token`)
-                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
-                const decoded = jwt_decode(response.data.accessToken)
-                setExpire(Number(decoded.exp))
-            }
-            return axiosConfig
-        },
-        (error) => {
-            return Promise.reject(error)
-        }
-    )
 
     useEffect(() => {
         async function getUserInfo() {

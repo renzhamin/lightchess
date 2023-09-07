@@ -1,14 +1,12 @@
-import { Grid } from "@mui/material"
-import axios from "axios"
+import { Grid, Snackbar } from "@mui/material"
+import MuiAlert from "@mui/material/Alert"
 import * as ChessJS from "chess.js"
-import * as React from "react"
-import { useContext, useEffect, useRef, useState } from "react"
+import { forwardRef, useContext, useEffect, useRef, useState } from "react"
 import { Chessboard } from "react-chessboard"
 import { useParams } from "react-router"
 import useSound from "use-sound"
 import { AppContext } from "../App"
 import { config } from "../config/config_env"
-import CheckmateSfx from "./../components/static/sounds/Checkmate.mp3"
 import moveSfx from "./../components/static/sounds/Move.mp3"
 import GameEndDialog from "./GameEndDialog.js"
 import GameInfo from "./GameInfo"
@@ -26,8 +24,12 @@ let initialMinute,
     increment = 0
 let timeUpdated = false
 
+const Alert = forwardRef(function Alert(props, ref) {
+    return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
+})
+
 function Board() {
-    const { socket, username } = useContext(AppContext)
+    const { socket, username, axiosJWT } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
     const [game, _] = useState(new Chess())
     const [position, setPosition] = useState(game.fen())
@@ -41,6 +43,8 @@ function Board() {
     const [gameEndTitle, setGameEndTitle] = useState("")
     const [isGameOver, setIsGameOver] = useState(false)
     const [isGameAdded, setIsGameAdded] = useState(false)
+    const [open, setOpen] = useState(false)
+    const [error, setError] = useState("")
 
     const { opponentUserName, mycolor, time_format } = useParams()
 
@@ -49,8 +53,6 @@ function Board() {
 
     const [playMoveSfx] = useSound(moveSfx)
     /* const [playCheckmateSfx] = useSound(CheckmateSfx) */
-
-    const [open, setOpen] = React.useState(false)
 
     const handleClickOpen = () => {
         setOpen(true)
@@ -192,7 +194,7 @@ function Board() {
         if (isGameAdded) return
         try {
             // TODO: set game values properly
-            await axios.post(`${config.backend}/api/games`, {
+            await axiosJWT.post(`${config.backend}/api/games`, {
                 whiteUserName: mycolor == 1 ? opponentUserName : username,
                 blackUserName: mycolor == 1 ? username : opponentUserName,
                 winnerUserName: areYouWinningSon()
@@ -210,18 +212,18 @@ function Board() {
     }
 
     useEffect(() => {
-        axios.get(`${config.backend}/api/user/` + username).then((data) => {
+        axiosJWT.get(`${config.backend}/api/user/` + username).then((data) => {
             myInfo = data
             myELO = myInfo?.data.elo
         })
-        axios
+        axiosJWT
             .get(`${config.backend}/api/user/` + opponentUserName)
             .then((data) => {
                 opponentInfo = data
                 opponentELO = opponentInfo?.data.elo
             })
 
-        axios
+        axiosJWT
             .get(
                 `${config.backend}/api/user/` + opponentUserName + "/recents/5"
             )
@@ -323,7 +325,9 @@ function Board() {
     }, [isGameOver])
 
     function onDrop(sourceSquare, targetSquare) {
-        if (isGameOver || socket.disconnected) {
+        if (isGameOver) return
+        if (socket.disconnected) {
+            setError("Disconnected right now")
             return
         } else if (game.turn() !== boardOrientation[0]) {
             return
@@ -364,6 +368,7 @@ function Board() {
                     if (move_success) {
                         game.undo()
                         setPosition(game.fen())
+                        setError("Move failed due to connection error")
                     }
                     return
                 }
@@ -397,6 +402,22 @@ function Board() {
             justifyContent="center"
             spacing={3}
         >
+            <Snackbar
+                open={error.length > 0}
+                autoHideDuration={2000}
+                onClose={() => setError("")}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                key={"bottomright"}
+            >
+                <Alert
+                    onClose={handleClose}
+                    severity="error"
+                    sx={{ width: "100%" }}
+                >
+                    {error}
+                </Alert>
+            </Snackbar>
+
             <Grid item>
                 <GameEndDialog
                     open={open}

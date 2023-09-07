@@ -7,8 +7,6 @@ import {
     IconButton,
     Typography,
 } from "@mui/material"
-import axios from "axios"
-import jwt_decode from "jwt-decode"
 import { useContext, useEffect, useState } from "react"
 import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
@@ -17,36 +15,23 @@ import { config } from "../config/config_env"
 let myELO = 1200
 let myInfo
 let myTimeControl = "-1"
-let inQueue = false
 let receiver
 let myColor
 let queueStatus = -1
 
 export const Quick_Game = () => {
     const history = useHistory()
-    const [expire, setExpire] = useState(1)
 
-    const { username, socket, initReady, readyUserList, setUserName } =
+    const { username, socket, initReady, readyUserList, axiosJWT } =
         useContext(AppContext)
 
-    const axiosJWT = axios.create()
+    const [inQueue, setInQueue] = useState(false)
 
-    axiosJWT.interceptors.request.use(
-        async (axiosConfig) => {
-            const currentDate = new Date()
-            if (expire * 1000 < currentDate.getTime()) {
-                const response = await axios.get(`${config.backend}/api/token`)
-                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
-                const decoded = jwt_decode(response.data.accessToken)
-                setUserName(decoded.username)
-                setExpire(decoded.exp)
-            }
-            return axiosConfig
-        },
-        (error) => {
-            return Promise.reject(error)
+    useEffect(() => {
+        if (inQueue) {
+            findOpponent()
         }
-    )
+    }, [readyUserList])
 
     useEffect(() => {
         if (!myInfo && username) {
@@ -57,15 +42,7 @@ export const Quick_Game = () => {
                     myELO = myInfo?.data.elo
                 })
         }
-    }, [])
 
-    useEffect(() => {
-        if (inQueue) {
-            findOpponent()
-        }
-    }, [readyUserList])
-
-    useEffect(() => {
         socket.on("Challenge", (data, ack) => {
             Dequeue()
             history.push(
@@ -76,7 +53,6 @@ export const Quick_Game = () => {
                     "/" +
                     myTimeControl
             )
-            inQueue = false
             ack("success")
         })
 
@@ -124,8 +100,9 @@ export const Quick_Game = () => {
     }
 
     function Enqueue(timeControl) {
+        queueStatus = -1
         socket.emit("rmReady")
-        inQueue = true
+        setInQueue(true)
         if (queueStatus == timeControl) queueStatus = -1
         else queueStatus = timeControl
         myTimeControl = timeControl
@@ -135,7 +112,7 @@ export const Quick_Game = () => {
 
     function Dequeue() {
         socket.emit("rmReady")
-        inQueue = false
+        setInQueue(false)
         queueStatus = -1
     }
 

@@ -7,11 +7,12 @@ import { config } from "../config/config_env"
 import lightchess_logo_grey from "./static/images/lightchess_logo_grey.png"
 
 const Navbar = () => {
-    const { socket } = useContext(AppContext)
+    const { socket, setUserName } = useContext(AppContext)
     const history = useHistory()
 
     const Logout = async () => {
         try {
+            setUserName("")
             socket.emit("rmReady")
             socket.disconnect()
             await axios.delete(`${config.backend}/api/logout`)

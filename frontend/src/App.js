@@ -18,6 +18,8 @@ import NotFound from "./components/NotFound"
 import Matchmaking from "./components/Matchmaking"
 import ForgotPassword from "./components/ForgotPassword"
 import lightchess_logo_grey from "./components/static/images/lightchess_logo_grey.png"
+import axios from "axios"
+import jwt_decode from "jwt-decode"
 
 export const AppContext = React.createContext()
 
@@ -72,11 +74,40 @@ class ProtectedRoute extends Component {
     }
 }
 
+const axiosJWT = axios.create()
+let access_token = ""
+let expire = 0
+let username = ""
+
 function App() {
     const [userList, setUserList] = useState([])
-    const [readyUserMap, setReadyUserMap] = useState(new Map())
     const [readyUserList, setReadyUserList] = useState([])
-    const [username, setUserName] = useState("")
+    function setUserName(user) {
+        if (user) username = user
+    }
+
+    axiosJWT.interceptors.request.use(
+        async (axiosConfig) => {
+            const currentDate = new Date()
+            if (
+                !access_token ||
+                Number(expire) * 1000 < currentDate.getTime()
+            ) {
+                const response = await axios.get(`${config.backend}/api/token`)
+                access_token = response.data.accessToken
+                const decoded = await jwt_decode(access_token)
+                if (!username) {
+                    setUserName(decoded.username)
+                }
+                expire = decoded.exp
+            }
+            axiosConfig.headers.Authorization = `Bearers ${access_token}`
+            return axiosConfig
+        },
+        (error) => {
+            return Promise.reject(error)
+        }
+    )
 
     const updateUserList = () => {
         socket.emit("getusers", "args", (usermap) => {
@@ -101,30 +132,28 @@ function App() {
                     ...value,
                 })
             })
-            setReadyUserMap(newReadyMap)
             setReadyUserList([...users])
         })
     }
 
     useEffect(() => {
         const interval = setInterval(() => {
-            initSocket({ username })
-            if (socket.connected) {
-                updateUserList()
+            if (username) {
+                initSocket({ username })
                 updateReadyUserList()
             }
         }, 2000)
+
         return () => {
             clearInterval(interval)
         }
-    })
+    }, [])
 
     return (
         <AppContext.Provider
             value={{
                 userList,
                 updateUserList,
-                readyUserMap,
                 readyUserList,
                 updateReadyUserList,
                 socket,
@@ -132,6 +161,7 @@ function App() {
                 initReady,
                 username,
                 setUserName,
+                axiosJWT,
             }}
         >
             <ThemeProvider theme={themeLight}>

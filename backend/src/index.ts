@@ -11,6 +11,7 @@ import Users from "./models/UserModel"
 
 dotenv.config()
 const app = express()
+
 const server = createServer(app)
 
 export const io = new Server(server)

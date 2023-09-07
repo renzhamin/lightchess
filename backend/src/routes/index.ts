@@ -27,8 +27,8 @@ import router_google from "./router-google"
 const router = express.Router()
 
 router.get("/users", verifyToken, getUsers)
-router.get("/user/:username", getPublicUserInfo)
-router.get("/user/:username/recents/:n", getLastNMatchResults)
+router.get("/user/:username", verifyToken, getPublicUserInfo)
+router.get("/user/:username/recents/:n", verifyToken, getLastNMatchResults)
 router.post(
     "/register",
     validateRegistrationData,
@@ -45,9 +45,9 @@ router.post(
     verifySpecialAccessToken,
     resetPassword
 )
-router.get("/user/:username/games", getGames)
-router.get("/leaderboard", getLeaderBoard)
-router.post("/games", addGames)
+router.get("/user/:username/games", verifyToken, getGames)
+router.get("/leaderboard", verifyToken, getLeaderBoard)
+router.post("/games", verifyToken, addGames)
 
 router.post("/login", Login)
 router.delete("/logout", Logout)

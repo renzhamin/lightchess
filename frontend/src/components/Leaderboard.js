@@ -10,18 +10,19 @@ import {
     TableRow,
     Typography,
 } from "@mui/material"
-import axios from "axios"
-import { useEffect, useState } from "react"
-import { config } from "../config/config_env"
+import { useContext, useEffect, useState } from "react"
 import { useHistory } from "react-router-dom"
+import { AppContext } from "../App"
+import { config } from "../config/config_env"
 
 const Leaderboard = () => {
     const [leaderBoardTable, setLeaderBoardTable] = useState([])
     const history = useHistory()
+    const { axiosJWT } = useContext(AppContext)
 
     useEffect(() => {
         async function getLeaderboard() {
-            const response = await axios.get(
+            const response = await axiosJWT.get(
                 `${config.backend}/api/leaderboard`
             )
 

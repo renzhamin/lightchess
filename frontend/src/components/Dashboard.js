@@ -36,11 +36,22 @@ const Dashboard = () => {
     const location = useLocation()
     const history = useHistory()
 
-    const { username } = useContext(AppContext)
-
     const [open, setOpen] = useState(location.openSnackbar)
 
-    const { socket, updateUserList, userList } = useContext(AppContext)
+    const { socket, username, updateUserList, userList } =
+        useContext(AppContext)
+
+    useEffect(() => {
+        updateUserList()
+
+        const interval = setInterval(() => {
+            updateUserList()
+        }, 5000)
+
+        return () => {
+            clearInterval(interval)
+        }
+    }, [])
 
     const handleClick = () => {
         setOpen(true)
@@ -55,17 +66,19 @@ const Dashboard = () => {
     }
 
     useEffect(() => {
-        socket.on("Challenge_accepted", (data) => {
+        socket.on("Challenge_accepted", (data, ack) => {
             history.push(
                 "/play/" + data.from + "/" + data.yourcolor + "/" + timeFormat
             )
+            ack("success")
         })
 
-        socket.on("Challenge_dashboard", (data) => {
+        socket.on("Challenge_dashboard", (data, ack) => {
             opponentUsername = data.challenger
             playingAgainst = data.from
             timeFormat = data.timeFormat
             handleClick()
+            ack("success")
         })
 
         return () => {

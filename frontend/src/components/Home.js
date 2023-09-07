@@ -10,6 +10,7 @@ import MuiAlert from "@mui/material/Alert"
 import { forwardRef, useContext, useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
 import { AppContext } from "../App"
+import { config } from "../config/config_env"
 import Leaderboard from "./Leaderboard"
 import Quick_Game from "./Quick_Game"
 import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
@@ -39,16 +40,16 @@ function Copyright(props) {
 export const Home = () => {
     const location = useLocation()
     const [open, setOpen] = useState(location.openSnackbar)
-    const { socket, initSocket, username } = useContext(AppContext)
+    const { username, axiosJWT } = useContext(AppContext)
 
     useEffect(() => {
-        socket.on("disconnect", () => {
-            initSocket({ username })
-        })
-
-        return () => {
-            socket.off("disconnect")
+        const init = async () => {
+            if (!username) {
+                await axiosJWT.get(`${config.backend}/api/health`)
+            }
         }
+
+        init()
     }, [])
 
     const handleClose = (_, reason) => {

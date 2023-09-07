@@ -7,47 +7,30 @@ import {
     IconButton,
     Typography,
 } from "@mui/material"
-import axios from "axios"
-import jwt_decode from "jwt-decode"
 import { useContext, useEffect, useState } from "react"
-import { useHistory, useLocation } from "react-router-dom"
+import { useHistory } from "react-router-dom"
 import { AppContext } from "../App.js"
 import { config } from "../config/config_env"
 
 let myELO = 1200
 let myInfo
 let myTimeControl = "-1"
-let inQueue = false
 let receiver
 let myColor
 let queueStatus = -1
 
 export const Matchmaking = () => {
     const history = useHistory()
+    const [inQueue, setInQueue] = useState(false)
 
-    const [expire, setExpire] = useState("")
-
-    const { username, setUserName, socket, initReady, readyUserList } =
-        useContext(AppContext)
-
-    const axiosJWT = axios.create()
-
-    axiosJWT.interceptors.request.use(
-        async (axiosConfig) => {
-            const currentDate = new Date()
-            if (expire * 1000 < currentDate.getTime()) {
-                const response = await axios.get(`${config.backend}/api/token`)
-                axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
-                const decoded = jwt_decode(response.data.accessToken)
-                setUserName(decoded.username)
-                setExpire(decoded.exp)
-            }
-            return axiosConfig
-        },
-        (error) => {
-            return Promise.reject(error)
-        }
-    )
+    const {
+        username,
+        axiosJWT,
+        socket,
+        initReady,
+        readyUserList,
+        updateReadyUserList,
+    } = useContext(AppContext)
 
     useEffect(() => {
         if (inQueue) {
@@ -56,6 +39,9 @@ export const Matchmaking = () => {
     }, [readyUserList])
 
     useEffect(() => {
+        if (!username) {
+            axiosJWT.get(`${config.backend}/api/health`)
+        }
         if (!myInfo && username) {
             axiosJWT
                 .get(`${config.backend}/api/user/` + username)
@@ -75,12 +61,16 @@ export const Matchmaking = () => {
                     "/" +
                     myTimeControl
             )
-            inQueue = false
             ack("success")
         })
 
+        const interval = setInterval(() => {
+            updateReadyUserList()
+        }, 2000)
+
         return () => {
             socket.off("Challenge")
+            clearInterval(interval)
         }
     }, [])
 
@@ -125,7 +115,7 @@ export const Matchmaking = () => {
     function Enqueue(timeControl) {
         Dequeue()
         socket.emit("rmReady")
-        inQueue = true
+        setInQueue(true)
         if (queueStatus == timeControl) queueStatus = -1
         else queueStatus = timeControl
         myTimeControl = timeControl
@@ -135,7 +125,7 @@ export const Matchmaking = () => {
 
     function Dequeue() {
         socket.emit("rmReady")
-        inQueue = false
+        setInQueue(false)
         queueStatus = -1
     }
 
