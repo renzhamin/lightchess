@@ -40,8 +40,7 @@ const Dashboard = () => {
 
     const [open, setOpen] = useState(location.openSnackbar)
 
-    const { socket, initSocket, updateUserList, userList } =
-        useContext(AppContext)
+    const { socket, updateUserList, userList } = useContext(AppContext)
 
     const handleClick = () => {
         setOpen(true)
@@ -76,7 +75,6 @@ const Dashboard = () => {
     }, [])
 
     const Challenge_dashboard = (receiver) => {
-        initSocket({ username })
         socket.emit("Challenge_dashboard", {
             to: receiver.username,
             timeFormat: timeFormat,
@@ -87,7 +85,6 @@ const Dashboard = () => {
 
     const AcceptChallenge = (e) => {
         e.preventDefault()
-        initSocket({ username })
         socket.emit(
             "Challenge_accepted",
             {

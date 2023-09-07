@@ -7,8 +7,9 @@ import {
     Typography,
 } from "@mui/material"
 import MuiAlert from "@mui/material/Alert"
-import { forwardRef, useState } from "react"
+import { forwardRef, useContext, useEffect, useState } from "react"
 import { useLocation } from "react-router-dom"
+import { AppContext } from "../App"
 import Leaderboard from "./Leaderboard"
 import Quick_Game from "./Quick_Game"
 import lightchess_logo_blue from "./static/images/lightchess_logo_blue.png"
@@ -38,6 +39,18 @@ function Copyright(props) {
 export const Home = () => {
     const location = useLocation()
     const [open, setOpen] = useState(location.openSnackbar)
+    const { socket, initSocket, username } = useContext(AppContext)
+
+    useEffect(() => {
+        socket.on("disconnect", () => {
+            initSocket({ username })
+        })
+
+        return () => {
+            socket.off("disconnect")
+        }
+    }, [])
+
     const handleClose = (_, reason) => {
         if (reason === "clickaway") {
             return

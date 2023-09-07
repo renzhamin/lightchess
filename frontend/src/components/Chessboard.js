@@ -27,9 +27,9 @@ let initialMinute,
 let timeUpdated = false
 
 function Board() {
-    const { socket, username, initSocket } = useContext(AppContext)
+    const { socket, username } = useContext(AppContext)
     const Chess = typeof ChessJS === "function" ? ChessJS : ChessJS.Chess // For VS code intellisence to work
-    const [game, setGame] = useState(new Chess())
+    const [game, _] = useState(new Chess())
     const [position, setPosition] = useState(game.fen())
     const [boardOrientation, setBoardOrientation] = useState("white")
 
@@ -48,7 +48,7 @@ function Board() {
     const opponentTimer = useRef()
 
     const [playMoveSfx] = useSound(moveSfx)
-    const [playCheckmateSfx] = useSound(CheckmateSfx)
+    /* const [playCheckmateSfx] = useSound(CheckmateSfx) */
 
     const [open, setOpen] = React.useState(false)
 
@@ -151,8 +151,7 @@ function Board() {
             }
         }
 
-        initSocket({ username })
-        socket.emit(
+        socket.timeout(5000).emit(
             "game_over",
             {
                 to: opponentUserName,
@@ -160,7 +159,7 @@ function Board() {
                 opponentTimeInfo,
                 myTimeInfo,
             },
-            (res) => {
+            (_, res) => {
                 if (res !== "success") return
 
                 if (iResigned) {
@@ -211,21 +210,6 @@ function Board() {
     }
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            // assuming I am white
-            if (!timeUpdated) {
-                setTimeControl()
-                timeUpdated = true
-            }
-        }, 1000)
-
-        return () => {
-            clearInterval(interval)
-        }
-    }, [])
-
-    useEffect(() => {
-        // fetchData()
         axios.get(`${config.backend}/api/user/` + username).then((data) => {
             myInfo = data
             myELO = myInfo?.data.elo
@@ -246,49 +230,69 @@ function Board() {
             })
 
         if (mycolor == 1) setBoardOrientation("black")
+    }, [])
 
-        socket.on("send_move", (data) => {
-            game.move(data.move)
-            setPosition(game.fen())
+    useEffect(() => {
+        socket.on("send_move", (data, ack) => {
+            try {
+                game.move(data.move)
+                setPosition(game.fen())
 
-            // timer
-            opponentTimer.current.stopTimer()
-            myTimer.current.startTimer()
-            myTimer.current.setAll(data.opponentMinutes, data.opponentSeconds)
-            opponentTimer.current.setAll(data.myMinutes, data.mySeconds)
-            setOpponentTimeInfo(data.myTimeInfo)
-            setPgnMoves(parsePgn(game.pgn()))
+                ack("success")
 
-            // TODO: checkmate sound does not seem to play
-            // if (game.isGameOver()) {
-            //     playCheckmateSfx()
-            //     console.log("checkmate sound played")
-            // } else {
-            playMoveSfx()
-            // }
+                // timer
+                opponentTimer.current.stopTimer()
+                myTimer.current.startTimer()
+                myTimer.current.setAll(
+                    data.opponentMinutes,
+                    data.opponentSeconds
+                )
+                opponentTimer.current.setAll(data.myMinutes, data.mySeconds)
+                setOpponentTimeInfo(data.myTimeInfo)
+                setPgnMoves(parsePgn(game.pgn()))
 
-            if (game.isGameOver()) {
-                gameEndHandler()
-                // TODO: create a gameResult to send to opponent
+                // TODO: checkmate sound does not seem to play
+                // if (game.isGameOver()) {
+                //     playCheckmateSfx()
+                //     console.log("checkmate sound played")
+                // } else {
+                playMoveSfx()
+                // }
+
+                if (game.isGameOver()) {
+                    gameEndHandler()
+                    // TODO: create a gameResult to send to opponent
+                }
+
+                // TODO: sync time
+            } catch (err) {
+                console.error(err)
             }
-            // TODO: sync time
         })
 
-        socket.on("game_over", (data) => {
+        socket.on("game_over", (data, ack) => {
             setIsGameOver(true)
-            // NOT CONFIDENT THIS WORKS
             myTimer?.current?.stopTimer()
             opponentTimer?.current?.stopTimer()
             setMyTimeInfo(data.opponentTimeInfo)
             setOpponentTimeInfo(data.myTimeInfo)
             setEndDialogMessages()
             handleClickOpen()
+            ack("success")
         })
 
+        return () => {
+            socket.off("send_move")
+            socket.off("game_over")
+        }
+    }, [])
+
+    useEffect(() => {
         const interval = setInterval(() => {
             // assuming I am white
             if (!timeUpdated) {
                 setTimeControl()
+                timeUpdated = true
             }
             if (myTimer && opponentTimer && initialMinute) {
                 const blackTime =
@@ -314,14 +318,12 @@ function Board() {
         }, 500)
 
         return () => {
-            socket.off("send_move")
             clearInterval(interval)
         }
     }, [isGameOver])
 
     function onDrop(sourceSquare, targetSquare) {
-        if (socket.disconnected) return
-        if (isGameOver) {
+        if (isGameOver || socket.disconnected) {
             return
         } else if (game.turn() !== boardOrientation[0]) {
             return
@@ -346,48 +348,42 @@ function Board() {
             mySeconds = myTimer.current.getSeconds()
         const opponentMinutes = opponentTimer.current.getMinutes(),
             opponentSeconds = opponentTimer.current.getSeconds()
-        initSocket({ username })
-        if (socket.disconnected) {
-            if (move_success) {
-                game.undo()
-                setPosition(game.fen())
-            }
-        } else {
-            socket.emit(
-                "send_move",
-                {
-                    to: opponentUserName,
-                    move,
-                    myMinutes,
-                    mySeconds,
-                    opponentMinutes,
-                    opponentSeconds,
-                },
-                (res) => {
-                    if (res !== "success") {
-                        if (move_success) {
-                            game.undo()
-                            setPosition(game.fen())
-                        }
-                        return
+
+        socket.timeout(2000).emit(
+            "send_move",
+            {
+                to: opponentUserName,
+                move,
+                myMinutes,
+                mySeconds,
+                opponentMinutes,
+                opponentSeconds,
+            },
+            (_, res) => {
+                if (res !== "success") {
+                    if (move_success) {
+                        game.undo()
+                        setPosition(game.fen())
                     }
-                    // if valid move
-
-                    playMoveSfx()
-
-                    myTimer.current.incrementTimer(increment)
-                    opponentTimer.current.startTimer()
-                    myTimer.current.stopTimer()
-
-                    setPgnMoves(parsePgn(game.pgn()))
-
-                    if (game.isGameOver()) {
-                        gameEndHandler()
-                        addGame()
-                    }
+                    return
                 }
-            )
-        }
+
+                // if valid move
+
+                playMoveSfx()
+
+                myTimer.current.incrementTimer(increment)
+                opponentTimer.current.startTimer()
+                myTimer.current.stopTimer()
+
+                setPgnMoves(parsePgn(game.pgn()))
+
+                if (game.isGameOver()) {
+                    gameEndHandler()
+                    addGame()
+                }
+            }
+        )
     }
 
     function onSquareClick(square) {}

@@ -120,10 +120,18 @@ io.on("connection", (socket) => {
             if (to) {
                 socket
                     .to(to)
-                    .emit(eventName, { ...args[0], from: senderUsername })
-                if (typeof fn === "function") {
-                    fn("success")
-                }
+                    .timeout(1000)
+                    .emit(
+                        eventName,
+                        { ...args[0], from: senderUsername },
+                        (_: any, res: any) => {
+                            if (res[0] && res[0] === "success") {
+                                if (typeof fn === "function") {
+                                    fn("success")
+                                }
+                            }
+                        }
+                    )
             }
         }
     })

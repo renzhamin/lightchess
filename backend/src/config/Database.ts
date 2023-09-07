@@ -9,6 +9,8 @@ if (!DATABASE_URL) {
     throw Error("database env vars are not set")
 }
 
-const db = new Sequelize(DATABASE_URL)
+const db = new Sequelize(DATABASE_URL, {
+    logging: false,
+})
 
 export default db

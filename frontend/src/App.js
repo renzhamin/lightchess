@@ -79,7 +79,6 @@ function App() {
     const [username, setUserName] = useState("")
 
     const updateUserList = () => {
-        initSocket({ username })
         socket.emit("getusers", "args", (usermap) => {
             let newUserMap = new Map(Object.entries(usermap))
             let users = []
@@ -93,7 +92,6 @@ function App() {
         })
     }
     const updateReadyUserList = () => {
-        initSocket({ username })
         socket.emit("get_readyusers", "args", (usermap) => {
             let newReadyMap = new Map(Object.entries(usermap))
             let users = []
@@ -110,8 +108,11 @@ function App() {
 
     useEffect(() => {
         const interval = setInterval(() => {
-            updateUserList()
-            updateReadyUserList()
+            initSocket({ username })
+            if (socket.connected) {
+                updateUserList()
+                updateReadyUserList()
+            }
         }, 2000)
         return () => {
             clearInterval(interval)

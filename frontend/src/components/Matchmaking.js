@@ -14,30 +14,21 @@ import { useHistory, useLocation } from "react-router-dom"
 import { AppContext } from "../App.js"
 import { config } from "../config/config_env"
 
-var minEloDiff = 200
-var myELO = 9999
-var myInfo
-var myTimeControl = "-1"
-var inQueue = false
-var receiver
-var myColor
-var queueStatus = -1
+let myELO = 1200
+let myInfo
+let myTimeControl = "-1"
+let inQueue = false
+let receiver
+let myColor
+let queueStatus = -1
 
 export const Matchmaking = () => {
-    const location = useLocation()
     const history = useHistory()
 
-    const [token, setToken] = useState("")
     const [expire, setExpire] = useState("")
 
-    const {
-        username,
-        setUserName,
-        socket,
-        initSocket,
-        initReady,
-        readyUserList,
-    } = useContext(AppContext)
+    const { username, setUserName, socket, initReady, readyUserList } =
+        useContext(AppContext)
 
     const axiosJWT = axios.create()
 
@@ -47,7 +38,6 @@ export const Matchmaking = () => {
             if (expire * 1000 < currentDate.getTime()) {
                 const response = await axios.get(`${config.backend}/api/token`)
                 axiosConfig.headers.Authorization = `Bearer ${response.data.accessToken}`
-                setToken(response.data.accessToken)
                 const decoded = jwt_decode(response.data.accessToken)
                 setUserName(decoded.username)
                 setExpire(decoded.exp)
@@ -60,22 +50,22 @@ export const Matchmaking = () => {
     )
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            if (!myInfo && username) {
-                axiosJWT
-                    .get(`${config.backend}/api/user/` + username)
-                    .then((data) => {
-                        myInfo = data
-                        myELO = myInfo.data.elo
-                    })
-            }
+        if (inQueue) {
+            findOpponent()
+        }
+    }, [readyUserList])
 
-            if (inQueue) {
-                findOpponent()
-            }
-        }, 1000)
+    useEffect(() => {
+        if (!myInfo && username) {
+            axiosJWT
+                .get(`${config.backend}/api/user/` + username)
+                .then((data) => {
+                    myInfo = data
+                    myELO = myInfo.data.elo
+                })
+        }
 
-        socket.on("Challenge", (data) => {
+        socket.on("Challenge", (data, ack) => {
             Dequeue()
             history.push(
                 "/play/" +
@@ -86,17 +76,16 @@ export const Matchmaking = () => {
                     myTimeControl
             )
             inQueue = false
+            ack("success")
         })
 
         return () => {
             socket.off("Challenge")
-            clearInterval(interval)
         }
-    }, [readyUserList])
+    }, [])
 
     const Challenge = () => {
         // e.preventDefault()
-        initSocket({ username })
         socket.emit(
             "Challenge",
             {
@@ -122,14 +111,12 @@ export const Matchmaking = () => {
     function findOpponent() {
         for (let i = 0; i < readyUserList.length; i++) {
             if (
-                Math.abs(myELO - readyUserList[i].elo) <= minEloDiff &&
                 myTimeControl === readyUserList[i].timeControl &&
                 username != readyUserList[i].username
             ) {
                 myColor = Math.floor(Math.random() * 2)
                 receiver = readyUserList[i]
                 Challenge()
-                initSocket({ username })
                 socket.emit("rmReady")
             }
         }
@@ -147,7 +134,6 @@ export const Matchmaking = () => {
     }
 
     function Dequeue() {
-        initSocket({ username })
         socket.emit("rmReady")
         inQueue = false
         queueStatus = -1
