@@ -83,7 +83,7 @@ function App() {
     const [userList, setUserList] = useState([])
     const [readyUserList, setReadyUserList] = useState([])
     function setUserName(user) {
-        if (user) username = user
+        username = user
     }
 
     axiosJWT.interceptors.request.use(
@@ -91,6 +91,7 @@ function App() {
             const currentDate = new Date()
             if (
                 !access_token ||
+                !username ||
                 Number(expire) * 1000 < currentDate.getTime()
             ) {
                 const response = await axios.get(`${config.backend}/api/token`)
@@ -205,11 +206,7 @@ function App() {
                                 path="/play/:opponentUserName/:mycolor/:time_format"
                                 component={Board}
                             />
-                            <ProtectedRoute
-                                path="/play"
-                                component={Board}
-                                hasNav={false}
-                            />
+                            <ProtectedRoute path="/play" component={Board} />
                             <ProtectedRoute
                                 path="/user/:username"
                                 component={Profile}
