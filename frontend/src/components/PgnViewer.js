@@ -9,6 +9,7 @@ import TextField from "@mui/material/TextField"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { Link } from "@mui/material"
+import { getBoardWidth } from "../utils/getBoardWidth"
 function PgnViewer(props) {
     // const gameDecription = Children.onlyText(props.children);
     const location = useLocation()
@@ -32,7 +33,7 @@ function PgnViewer(props) {
             locale: "en",
             startPlay: 1,
             showResult: true,
-            boardSize: "650",
+            boardSize: getBoardWidth(),
             showFen: true,
             pieceStyle: "wikipedia",
             theme: "brown",

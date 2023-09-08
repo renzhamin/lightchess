@@ -7,6 +7,7 @@ import { useParams } from "react-router"
 import useSound from "use-sound"
 import { AppContext } from "../App"
 import { config } from "../config/config_env"
+import { getBoardWidth } from "../utils/getBoardWidth"
 import moveSfx from "./../components/static/sounds/Move.mp3"
 import GameEndDialog from "./GameEndDialog.js"
 import GameInfo from "./GameInfo"
@@ -57,22 +58,6 @@ function Board() {
 
     const handleClickOpen = () => {
         setOpen(true)
-    }
-
-    const resizeHandler = () => {
-        const ww = window.innerWidth
-        const wh = window.innerHeight
-        let w = ww
-
-        if (ww <= 500) w = ww - 10
-        else if (ww <= 800) w = ww - 20
-        else {
-            w = 720
-        }
-
-        if (w > wh) w = wh - 10
-
-        setBWidth(w)
     }
 
     function ratingDelta(myRating, opponentRating, myGameResult) {
@@ -308,7 +293,7 @@ function Board() {
     }, [])
 
     useEffect(() => {
-        resizeHandler()
+        setBWidth(getBoardWidth())
         const interval = setInterval(() => {
             // assuming I am white
             if (!timeUpdated) {
