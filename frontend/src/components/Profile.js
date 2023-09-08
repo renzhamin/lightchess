@@ -1,4 +1,5 @@
 import { CardActionArea, Container, Grid } from "@mui/material"
+import Box from "@mui/material/Box"
 import Card from "@mui/material/Card"
 import CardContent from "@mui/material/CardContent"
 import Link from "@mui/material/Link"
@@ -352,7 +353,7 @@ function Profile() {
             </Grid>
 
             <TableContainer>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
+                <Table aria-label="simple table">
                     <TableBody>
                         <TableRow>
                             <TableCell></TableCell>
@@ -361,67 +362,81 @@ function Profile() {
                 </Table>
             </TableContainer>
 
-            <TableContainer>
-                <Table sx={{ minWidth: 650 }} aria-label="simple table">
-                    <TableBody>
-                        <TableRow>
-                            <TableCell>
-                                <Paper
-                                    container
-                                    spacing={0}
-                                    direction="column"
-                                    alignItems="center"
-                                    justifyContent="center"
-                                    elevation={3}
-                                    align="center"
-                                    sx={{ width: 300 }}
-                                >
-                                    <TableContainer>
-                                        <Table
-                                            sx={{ width: 300 }}
-                                            size="small"
-                                            aria-label="a dense table"
-                                            align="center"
+            <Box
+                className="flex-center"
+                sx={{
+                    flexDirection: {
+                        xs: "column-reverse",
+                        md: "row",
+                    },
+                    columnGap: {
+                        sm: 4,
+                        md: 10,
+                        lg: 30,
+                    },
+                }}
+            >
+                <Box
+                    sx={{
+                        marginTop: {
+                            xs: 10,
+                            md: 0,
+                        },
+                    }}
+                >
+                    <Paper
+                        container
+                        spacing={0}
+                        direction="column"
+                        alignItems="center"
+                        justifyContent="center"
+                        elevation={3}
+                        align="center"
+                        sx={{ width: 300 }}
+                    >
+                        <TableContainer>
+                            <Table
+                                size="small"
+                                aria-label="a dense table"
+                                align="center"
+                            >
+                                <TableBody>
+                                    {leftTableData.map((row) => (
+                                        <TableRow
+                                            key={row.name}
+                                            sx={{
+                                                "&:last-child td, &:last-child th":
+                                                    {
+                                                        border: 0,
+                                                    },
+                                            }}
                                         >
-                                            <TableBody>
-                                                {leftTableData.map((row) => (
-                                                    <TableRow
-                                                        key={row.name}
-                                                        sx={{
-                                                            "&:last-child td, &:last-child th":
-                                                                {
-                                                                    border: 0,
-                                                                },
-                                                        }}
-                                                    >
-                                                        <TableCell
-                                                            component="th"
-                                                            scope="row"
-                                                        >
-                                                            {row.title}
-                                                        </TableCell>
-                                                        <TableCell align="right">
-                                                            {row.num}
-                                                        </TableCell>
-                                                    </TableRow>
-                                                ))}
-                                            </TableBody>
-                                        </Table>
-                                    </TableContainer>
-                                </Paper>
-                            </TableCell>
-                            <TableCell>
-                                <Pie
-                                    data={pieChartData}
-                                    width={350}
-                                    height={350}
-                                    options={{ maintainAspectRatio: false }}
-                                />
-                            </TableCell>
-                        </TableRow>
-                    </TableBody>
-                </Table>
-            </TableContainer>
+                                            <TableCell
+                                                component="th"
+                                                scope="row"
+                                            >
+                                                {row.title}
+                                            </TableCell>
+                                            <TableCell align="right">
+                                                {row.num}
+                                            </TableCell>
+                                        </TableRow>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+                    </Paper>
+                </Box>
+                <Box>
+                    <Pie
+                        data={pieChartData}
+                        width={350}
+                        height={350}
+                        spacing={0}
+                        options={{ maintainAspectRatio: false }}
+                    />
+                </Box>
+            </Box>
             <Typography
                 variant="h5"
                 gutterBottom
