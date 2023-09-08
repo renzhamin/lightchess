@@ -9,6 +9,7 @@ import { AppContext } from "../App"
 import { config } from "../config/config_env"
 import { getBoardWidth } from "../utils/getBoardWidth"
 import moveSfx from "./../components/static/sounds/Move.mp3"
+import checkSfx from "./../components/static/sounds/Checkmate.mp3"
 import GameEndDialog from "./GameEndDialog.js"
 import GameInfo from "./GameInfo"
 import parsePgn from "./PgnParser"
@@ -23,7 +24,6 @@ let opponentHistory = ""
 let initialMinute,
     initialSeconds,
     increment = 0
-let timeUpdated = false
 
 const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
@@ -54,7 +54,7 @@ function Board() {
     const opponentTimer = useRef()
 
     const [playMoveSfx] = useSound(moveSfx)
-    /* const [playCheckmateSfx] = useSound(CheckmateSfx) */
+    const [playCheckmateSfx] = useSound(checkSfx)
 
     const handleClickOpen = () => {
         setOpen(true)
@@ -93,21 +93,21 @@ function Board() {
         myTimer.current.startMinutes(initialMinute)
     }
 
-    function setEndDialogMessages() {
+    function setEndDialogMessages(iWon) {
         const delta = ratingDelta(
-            myInfo?.data.elo,
-            opponentInfo?.data?.elo,
-            areYouWinningSon()
+            Number(myInfo?.data.elo),
+            Number(opponentInfo?.data?.elo),
+            iWon
         )
-        if (areYouWinningSon()) {
+        if (iWon) {
             setGameEndTitle("Victory!")
             setGameEndMessage("ELO +" + delta)
         } else {
             setGameEndTitle("Defeat!")
             setGameEndMessage("ELO " + delta)
         }
-        let myNewElo = myInfo?.data.elo + delta
-        let opponentNewElo = opponentInfo?.data.elo - delta
+        let myNewElo = Number(myInfo?.data.elo) + delta
+        let opponentNewElo = Number(opponentInfo?.data.elo) - delta
 
         // I am white
         whiteElo = myNewElo
@@ -128,82 +128,54 @@ function Board() {
         return time_
     }
 
-    function gameEndHandler(iResigned) {
+    function gameEndHandler(iLost) {
         if (socket.disconnected) return
-        let gameResult = ""
-
-        //TODO: Make sure this shows correct result, for all 4 cases:
-        // - Checkmate
-        // - Resign
-        // - Timeover
-        // - Draw
-
-        if (iResigned) {
-            gameResult += username + " Lost"
-        } else if (game.isCheckmate()) {
-            if (game.inCheck() && game.turn() === boardOrientation) {
-                // player lost, opponent won
-                gameResult += game.turn() + " Lost"
-            } else {
-                const opponent = game.turn() === "w" ? "b" : "w"
-                gameResult += opponent + " Lost"
-            }
-        } else if (game.isDraw()) {
-            gameResult += "Game Drawn"
-            if (game.isInsufficientMaterial()) {
-            } else if (game.isStalemate()) {
-            } else if (game.isThreefoldRepetition()) {
-            }
-        }
+        let winner = iLost ? opponentUserName : username
 
         socket.timeout(5000).emit(
             "game_over",
             {
                 to: opponentUserName,
-                gameResult,
+                winner,
                 opponentTimeInfo,
                 myTimeInfo,
             },
             (_, res) => {
                 if (res !== "success") return
 
-                if (iResigned) {
+                if (iLost) {
                     resigned = true
                 }
                 myTimer?.current.stopTimer()
                 opponentTimer?.current.stopTimer()
-                setEndDialogMessages()
+                setEndDialogMessages(!iLost)
                 handleClickOpen()
                 setIsGameOver(true)
 
-                if (iResigned) {
-                    addGame()
-                }
+                addGame(!iLost)
             }
         )
     }
 
-    const areYouWinningSon = () => {
-        if (
-            resigned ||
-            (game.isGameOver() && boardOrientation[0] == game.turn())
-        ) {
-            return false
-        }
-        return true
-    }
+    /* const areYouWinningSon = () => { */
+    /*     if ( */
+    /*         resigned || */
+    /*         (game.isGameOver() && boardOrientation[0] == game.turn()) */
+    /*     ) { */
+    /*         return false */
+    /*     } */
+    /*     return true */
+    /* } */
 
-    const addGame = async () => {
+    const addGame = async (iWon = false) => {
         if (isGameAdded) return
         try {
             // TODO: set game values properly
             await axiosJWT.post(`${config.backend}/api/games`, {
                 whiteUserName: mycolor == 1 ? opponentUserName : username,
                 blackUserName: mycolor == 1 ? username : opponentUserName,
-                winnerUserName: areYouWinningSon()
-                    ? username
-                    : opponentUserName,
-                loserUserName: areYouWinningSon() ? opponentUserName : username,
+                winnerUserName: iWon ? username : opponentUserName,
+                loserUserName: iWon ? opponentUserName : username,
                 pgn: game.pgn(),
                 whiteUserElo: whiteElo,
                 blackUserElo: blackElo,
@@ -254,16 +226,10 @@ function Board() {
             setPgnMoves(parsePgn(game.pgn()))
 
             // TODO: checkmate sound does not seem to play
-            // if (game.isGameOver()) {
-            //     playCheckmateSfx()
-            //     console.log("checkmate sound played")
-            // } else {
-            playMoveSfx()
-            // }
-
             if (game.isGameOver()) {
-                gameEndHandler()
-                // TODO: create a gameResult to send to opponent
+                playCheckmateSfx()
+            } else {
+                playMoveSfx()
             }
 
             // TODO: sync time
@@ -276,7 +242,7 @@ function Board() {
             opponentTimer?.current?.stopTimer()
             setMyTimeInfo(data.opponentTimeInfo)
             setOpponentTimeInfo(data.myTimeInfo)
-            setEndDialogMessages()
+            setEndDialogMessages(data.winner === username)
             handleClickOpen()
         })
 
@@ -320,7 +286,7 @@ function Board() {
     function onDrop(sourceSquare, targetSquare) {
         if (isGameOver) return
         if (socket.disconnected) {
-            setError("Disconnected right now")
+            setError("You are disconnected right now")
             return
         } else if (game.turn() !== boardOrientation[0]) {
             return
@@ -361,7 +327,7 @@ function Board() {
                     if (move_success) {
                         game.undo()
                         setPosition(game.fen())
-                        setError("Move failed due to connection error")
+                        setError("Opponent is disconnected")
                     }
                     return
                 }
@@ -377,14 +343,11 @@ function Board() {
                 setPgnMoves(parsePgn(game.pgn()))
 
                 if (game.isGameOver()) {
-                    gameEndHandler()
-                    addGame()
+                    gameEndHandler(false)
                 }
             }
         )
     }
-
-    function onSquareClick(square) {}
 
     return (
         <Grid
@@ -397,7 +360,7 @@ function Board() {
         >
             <Snackbar
                 open={error.length > 0}
-                autoHideDuration={2000}
+                autoHideDuration={1500}
                 onClose={() => setError("")}
                 anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
                 key={"bottomright"}
@@ -428,7 +391,6 @@ function Board() {
                     boardOrientation={boardOrientation}
                     arePremovesAllowed="true"
                     clearPremovesOnRightClick="true"
-                    onSquareClick={onSquareClick}
                     boardWidth={boardWidth}
                 />
             </Grid>
