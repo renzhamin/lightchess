@@ -239,43 +239,36 @@ function Board() {
 
     useEffect(() => {
         socket.on("send_move", (data, ack) => {
-            try {
-                game.move(data.move)
-                setPosition(game.fen())
+            ack("success")
+            game.move(data.move)
+            setPosition(game.fen())
 
-                ack("success")
+            // timer
+            opponentTimer.current.stopTimer()
+            myTimer.current.startTimer()
+            myTimer.current.setAll(data.opponentMinutes, data.opponentSeconds)
+            opponentTimer.current.setAll(data.myMinutes, data.mySeconds)
+            setOpponentTimeInfo(data.myTimeInfo)
+            setPgnMoves(parsePgn(game.pgn()))
 
-                // timer
-                opponentTimer.current.stopTimer()
-                myTimer.current.startTimer()
-                myTimer.current.setAll(
-                    data.opponentMinutes,
-                    data.opponentSeconds
-                )
-                opponentTimer.current.setAll(data.myMinutes, data.mySeconds)
-                setOpponentTimeInfo(data.myTimeInfo)
-                setPgnMoves(parsePgn(game.pgn()))
+            // TODO: checkmate sound does not seem to play
+            // if (game.isGameOver()) {
+            //     playCheckmateSfx()
+            //     console.log("checkmate sound played")
+            // } else {
+            playMoveSfx()
+            // }
 
-                // TODO: checkmate sound does not seem to play
-                // if (game.isGameOver()) {
-                //     playCheckmateSfx()
-                //     console.log("checkmate sound played")
-                // } else {
-                playMoveSfx()
-                // }
-
-                if (game.isGameOver()) {
-                    gameEndHandler()
-                    // TODO: create a gameResult to send to opponent
-                }
-
-                // TODO: sync time
-            } catch (err) {
-                console.error(err)
+            if (game.isGameOver()) {
+                gameEndHandler()
+                // TODO: create a gameResult to send to opponent
             }
+
+            // TODO: sync time
         })
 
         socket.on("game_over", (data, ack) => {
+            ack("success")
             setIsGameOver(true)
             myTimer?.current?.stopTimer()
             opponentTimer?.current?.stopTimer()
@@ -283,7 +276,6 @@ function Board() {
             setOpponentTimeInfo(data.myTimeInfo)
             setEndDialogMessages()
             handleClickOpen()
-            ack("success")
         })
 
         return () => {
