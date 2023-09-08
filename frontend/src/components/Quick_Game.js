@@ -14,13 +14,13 @@ import { config } from "../config/config_env"
 
 let myELO = 1200
 let myInfo
-let myTimeControl = "-1"
 let receiver
-let myColor
 let queueStatus = -1
 
 export const Quick_Game = () => {
     const history = useHistory()
+    const [myTimeControl, setMyTimeControl] = useState("-1")
+    const [myColor, setMyColor] = useState(1)
 
     const { username, socket, initReady, readyUserList, axiosJWT } =
         useContext(AppContext)
@@ -51,7 +51,7 @@ export const Quick_Game = () => {
                     "/" +
                     data.yourcolor +
                     "/" +
-                    myTimeControl
+                    data.timeControl
             )
             ack("success")
         })
@@ -61,14 +61,15 @@ export const Quick_Game = () => {
         }
     }, [])
 
-    const Challenge = () => {
+    const Challenge = (amIBlack, timeControl) => {
         // e.preventDefault()
         socket.emit(
             "Challenge",
             {
                 to: receiver.username,
                 msg: "challenge",
-                yourcolor: myColor == 1 ? 0 : 1,
+                yourcolor: amIBlack == 1 ? 0 : 1,
+                timeControl,
             },
             (res) => {
                 if (res !== "success") return
@@ -77,9 +78,9 @@ export const Quick_Game = () => {
                     "/play/" +
                         receiver.username +
                         "/" +
-                        myColor +
+                        amIBlack +
                         "/" +
-                        myTimeControl
+                        timeControl
                 )
             }
         )
@@ -91,10 +92,11 @@ export const Quick_Game = () => {
                 myTimeControl === readyUserList[i].timeControl &&
                 username != readyUserList[i].username
             ) {
-                myColor = Math.floor(Math.random() * 2)
+                const myRandColor = Math.floor(Math.random() * 2)
+                setMyColor(myRandColor)
                 receiver = readyUserList[i]
-                Challenge()
-                socket.emit("rmReady")
+                Dequeue()
+                Challenge(myRandColor, myTimeControl)
             }
         }
     }
@@ -105,7 +107,7 @@ export const Quick_Game = () => {
         setInQueue(true)
         if (queueStatus == timeControl) queueStatus = -1
         else queueStatus = timeControl
-        myTimeControl = timeControl
+        setMyTimeControl(timeControl)
         myELO = myInfo?.data?.elo
         initReady({ username, timeControl })
     }

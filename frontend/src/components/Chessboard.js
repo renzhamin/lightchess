@@ -61,13 +61,13 @@ function Board() {
     }
 
     function ratingDelta(myRating, opponentRating, myGameResult) {
-        var myChanceToWin =
+        const myChanceToWin =
             1 / (1 + Math.pow(10, (opponentRating - myRating) / 400))
 
         return Math.round(32 * (myGameResult - myChanceToWin))
     }
 
-    var resigned = false
+    let resigned = false
 
     const handleClose = (value) => {
         setOpen(false)
@@ -94,7 +94,7 @@ function Board() {
     }
 
     function setEndDialogMessages() {
-        var delta = ratingDelta(
+        const delta = ratingDelta(
             myInfo?.data.elo,
             opponentInfo?.data?.elo,
             areYouWinningSon()
@@ -215,6 +215,10 @@ function Board() {
     }
 
     useEffect(() => {
+        setTimeControl()
+        setBWidth(getBoardWidth())
+        if (mycolor == 1) setBoardOrientation("black")
+
         axiosJWT.get(`${config.backend}/api/user/` + username).then((data) => {
             myInfo = data
             myELO = myInfo?.data.elo
@@ -233,8 +237,6 @@ function Board() {
             .then((data) => {
                 opponentHistory = data.data.str
             })
-
-        if (mycolor == 1) setBoardOrientation("black")
     }, [])
 
     useEffect(() => {
@@ -285,13 +287,8 @@ function Board() {
     }, [])
 
     useEffect(() => {
-        setBWidth(getBoardWidth())
         const interval = setInterval(() => {
             // assuming I am white
-            if (!timeUpdated) {
-                setTimeControl()
-                timeUpdated = true
-            }
             if (myTimer && opponentTimer && initialMinute) {
                 const blackTime =
                     convertTimeToString(myTimer.current.getMinutes()) +
