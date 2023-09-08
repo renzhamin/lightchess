@@ -351,12 +351,13 @@ function Board() {
 
     return (
         <Grid
-            height={"100vh"}
+            height={"100%"}
             container
             direction="row"
             alignItems="center"
             justifyContent="center"
             position={"relative"}
+            marginTop={5}
         >
             <Snackbar
                 open={error.length > 0}
@@ -394,7 +395,7 @@ function Board() {
                     boardWidth={boardWidth}
                 />
             </Grid>
-            <Grid item height="100%" className="flex-center">
+            <Grid item marginTop={4} height="100%" className="flex-center">
                 <GameInfo
                     gameEndHandler={gameEndHandler}
                     opponentUserName={opponentUserName}
