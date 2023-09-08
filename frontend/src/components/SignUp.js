@@ -19,27 +19,6 @@ const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-function Copyright(props) {
-    return (
-        <Typography
-            variant="body2"
-            color="text.secondary"
-            align="center"
-            {...props}
-        >
-            {"Copyright © "}
-            <Link
-                color="inherit"
-                href="https://github.com/renzhamin/lightchess"
-            >
-                renzhamin
-            </Link>{" "}
-            {new Date().getFullYear()}
-            {"."}
-        </Typography>
-    )
-}
-
 const SignUp = () => {
     const { username, setUserName } = useContext(AppContext)
     const [email, setEmail] = useState("")
@@ -187,7 +166,6 @@ const SignUp = () => {
                     </Grid>
                 </Box>
             </Box>
-            <Copyright sx={{ mt: 5 }} />
         </Container>
     )
 }

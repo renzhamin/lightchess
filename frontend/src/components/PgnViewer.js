@@ -46,27 +46,6 @@ function PgnViewer(props) {
         setPgn(e.target.value)
     }
 
-    function Copyright(props) {
-        return (
-            <Typography
-                variant="body2"
-                color="text.secondary"
-                align="center"
-                {...props}
-            >
-                {"Copyright © "}
-                <Link
-                    color="inherit"
-                    href="https://github.com/renzhamin/lightchess"
-                >
-                    renzhamin
-                </Link>{" "}
-                {new Date().getFullYear()}
-                {"."}
-            </Typography>
-        )
-    }
-
     return (
         <Box sx={{ height: "100vh", overflow: "hidden" }}>
             <Grid>
@@ -95,7 +74,6 @@ function PgnViewer(props) {
                     />
                 </Grid>
             </Grid>
-            <Copyright sx={{ mt: 8, mb: 1 }} />
         </Box>
     )
 }

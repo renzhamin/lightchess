@@ -20,27 +20,6 @@ const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-function Copyright(props) {
-    return (
-        <Typography
-            variant="body2"
-            color="text.secondary"
-            align="center"
-            {...props}
-        >
-            {"Copyright © "}
-            <Link
-                color="inherit"
-                href="https://github.com/renzhamin/lightchess"
-            >
-                renzhamin
-            </Link>{" "}
-            {new Date().getFullYear()}
-            {"."}
-        </Typography>
-    )
-}
-
 const ForgotPassword = () => {
     const history = useHistory()
     const location = useLocation()
@@ -170,7 +149,6 @@ const ForgotPassword = () => {
                     </Button>
                 </Box>
             </Box>
-            <Copyright sx={{ mt: 8, mb: 4 }} />
         </Container>
     )
 }

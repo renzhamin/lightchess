@@ -115,7 +115,11 @@ const Dashboard = () => {
     }
 
     return (
-        <Container component="main" alignItems="center">
+        <Container
+            component="main"
+            alignItems="center"
+            sx={{ minHeight: "80vh" }}
+        >
             <CssBaseline />
             <Snackbar
                 open={open}

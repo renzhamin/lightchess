@@ -19,27 +19,6 @@ const Alert = forwardRef(function Alert(props, ref) {
     return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />
 })
 
-function Copyright(props) {
-    return (
-        <Typography
-            variant="body2"
-            color="text.secondary"
-            align="center"
-            {...props}
-        >
-            {"Copyright © "}
-            <Link
-                color="inherit"
-                href="https://github.com/renzhamin/lightchess"
-            >
-                renzhamin
-            </Link>{" "}
-            {new Date().getFullYear()}
-            {"."}
-        </Typography>
-    )
-}
-
 export const Home = () => {
     const location = useLocation()
     const [open, setOpen] = useState(location.openSnackbar)
@@ -63,94 +42,91 @@ export const Home = () => {
         setOpen(false)
     }
     return (
-        <>
-            <Container component="main">
-                <CssBaseline />
+        <Container component="main">
+            <CssBaseline />
 
-                <Snackbar
-                    open={open}
-                    autoHideDuration={3000}
+            <Snackbar
+                open={open}
+                autoHideDuration={3000}
+                onClose={handleClose}
+                anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+                key={"bottomright"}
+            >
+                <Alert
                     onClose={handleClose}
-                    anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-                    key={"bottomright"}
+                    severity="success"
+                    sx={{ width: "100%" }}
                 >
-                    <Alert
-                        onClose={handleClose}
-                        severity="success"
-                        sx={{ width: "100%" }}
-                    >
-                        Logged in!
-                    </Alert>
-                </Snackbar>
-                <Grid container mt={3}>
-                    <Grid
-                        item
-                        xs={12}
-                        sm={8}
-                        spacing={0}
-                        direction="row"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <Quick_Game />
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        sm={4}
-                        container
-                        spacing={0}
-                        direction="column"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <UserCard />
-                    </Grid>
-                </Grid>
+                    Logged in!
+                </Alert>
+            </Snackbar>
+            <Grid container mt={3}>
                 <Grid
-                    container
+                    item
+                    xs={12}
+                    sm={8}
                     spacing={0}
+                    direction="row"
                     alignItems="center"
                     justifyContent="center"
-                    mt={5}
                 >
-                    <Grid
-                        item
-                        xs={12}
-                        sm={6}
-                        mt={5}
-                        container
-                        spacing={0}
-                        direction="column"
-                        justifyContent="center"
-                        alignItems="center"
-                    >
-                        <img
-                            style={{ width: 250 }}
-                            src={lightchess_logo_blue}
-                            alt="lightchess-logo"
-                        />
-                        {/* <Typography>
+                    <Quick_Game />
+                </Grid>
+                <Grid
+                    item
+                    xs={12}
+                    sm={4}
+                    container
+                    spacing={0}
+                    direction="column"
+                    alignItems="center"
+                    justifyContent="center"
+                >
+                    <UserCard />
+                </Grid>
+            </Grid>
+            <Grid
+                container
+                spacing={0}
+                alignItems="center"
+                justifyContent="center"
+                mt={5}
+            >
+                <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    mt={5}
+                    container
+                    spacing={0}
+                    direction="column"
+                    justifyContent="center"
+                    alignItems="center"
+                >
+                    <img
+                        style={{ width: 250 }}
+                        src={lightchess_logo_blue}
+                        alt="lightchess-logo"
+                    />
+                    {/* <Typography>
                             Number of online users {userList.length}
                         </Typography> */}
-                    </Grid>
-                    <Grid
-                        item
-                        xs={12}
-                        sm={6}
-                        mt={5}
-                        container
-                        spacing={0}
-                        direction="column"
-                        alignItems="center"
-                        justifyContent="center"
-                    >
-                        <Leaderboard />
-                    </Grid>
                 </Grid>
-            </Container>
-            <Copyright sx={{ mt: 8 }} />
-        </>
+                <Grid
+                    item
+                    xs={12}
+                    sm={6}
+                    mt={5}
+                    container
+                    spacing={0}
+                    direction="column"
+                    alignItems="center"
+                    justifyContent="center"
+                >
+                    <Leaderboard />
+                </Grid>
+            </Grid>
+        </Container>
     )
 }
 
