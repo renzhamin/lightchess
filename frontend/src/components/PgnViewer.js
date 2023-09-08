@@ -68,7 +68,7 @@ function PgnViewer(props) {
     }
 
     return (
-        <>
+        <Box sx={{ height: "100vh", overflow: "hidden" }}>
             <Grid>
                 <Grid item align="center">
                     <div
@@ -95,8 +95,8 @@ function PgnViewer(props) {
                     />
                 </Grid>
             </Grid>
-            <Copyright sx={{ mt: 8, mb: 4 }} />
-        </>
+            <Copyright sx={{ mt: 8, mb: 1 }} />
+        </Box>
     )
 }
 

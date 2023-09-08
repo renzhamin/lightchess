@@ -448,29 +448,24 @@ function Profile() {
                 Recent Game History
             </Typography>
 
-            <Grid
-                container
-                spacing={0}
-                mt={5}
-                direction="column"
-                alignItems="center"
-                justifyContent="center"
+            <Box
+                className="flex-center"
+                sx={{
+                    flexDirection: "column",
+                }}
             >
-                <Grid item>
+                <Box sx={{ maxWidth: 900 }}>
                     <Paper
-                        container
                         spacing={0}
                         direction="column"
                         alignItems="center"
                         justifyContent="center"
-                        elevation={3}
                         align="center"
-                        sx={{ width: 1200, maxHeight: 600, overflow: "auto" }}
+                        sx={{ maxHeight: 500, overflow: "auto" }}
                     >
                         <TableContainer>
                             <Table
                                 sx={{
-                                    width: 1200,
                                     maxHeight: 600,
                                     tableLayout: "fixed",
                                 }}
@@ -561,10 +556,10 @@ function Profile() {
                             </Table>
                         </TableContainer>
                     </Paper>
-                </Grid>
+                </Box>
 
-                <Grid item mt={10}>
-                    <Card sx={{ maxWidth: 720 }}>
+                <Box sx={{ marginTop: 10, maxWidth: "100%" }}>
+                    <Card sx={{ overflow: "scroll" }}>
                         <Chart
                             options={lineChartOptions}
                             series={lineChartSeries}
@@ -584,8 +579,8 @@ function Profile() {
                             </CardContent>
                         </CardActionArea>
                     </Card>
-                </Grid>
-            </Grid>
+                </Box>
+            </Box>
         </Container>
     )
 }
