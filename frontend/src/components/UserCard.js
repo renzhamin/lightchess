@@ -51,13 +51,6 @@ const UserCard = () => {
     const card = (
         <React.Fragment>
             <CardContent>
-                <Typography
-                    sx={{ fontSize: 16, fontFamily: "monospace" }}
-                    color="text.secondary"
-                    gutterBottom
-                >
-                    USER CARD
-                </Typography>
                 <Typography variant="h5" component="div">
                     {username}
                 </Typography>

@@ -55,7 +55,7 @@ const Leaderboard = () => {
             <Typography variant="h6" gutterBottom>
                 Leaderboard
             </Typography>
-            <Grid>
+            <Grid width={"100%"}>
                 <Grid item>
                     <Paper
                         container
@@ -65,15 +65,10 @@ const Leaderboard = () => {
                         justifyContent="center"
                         elevation={3}
                         align="center"
-                        sx={{ width: 400, maxHeight: 400, overflow: "auto" }}
+                        /* sx={{ width: 400, maxHeight: 400, overflow: "auto" }} */
                     >
                         <TableContainer>
                             <Table
-                                sx={{
-                                    width: 400,
-                                    maxHeight: 600,
-                                    tableLayout: "fixed",
-                                }}
                                 size="small"
                                 aria-label="a dense table"
                                 align="center"

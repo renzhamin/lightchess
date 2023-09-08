@@ -28,8 +28,11 @@ function Copyright(props) {
             {...props}
         >
             {"Copyright © "}
-            <Link color="inherit" href="https://github.com/l1ghtweight/">
-                Lightweight
+            <Link
+                color="inherit"
+                href="https://github.com/renzhamin/lightchess"
+            >
+                renzhamin
             </Link>{" "}
             {new Date().getFullYear()}
             {"."}
@@ -79,12 +82,11 @@ export const Home = () => {
                         Logged in!
                     </Alert>
                 </Snackbar>
-                <Grid container spacing={2} mt={3}>
+                <Grid container mt={3}>
                     <Grid
                         item
-                        xs={8}
-                        // mt={5}
-                        container
+                        xs={12}
+                        sm={8}
                         spacing={0}
                         direction="row"
                         alignItems="center"
@@ -94,8 +96,8 @@ export const Home = () => {
                     </Grid>
                     <Grid
                         item
-                        xs={4}
-                        // mt={5}
+                        xs={12}
+                        sm={4}
                         container
                         spacing={0}
                         direction="column"
@@ -114,7 +116,8 @@ export const Home = () => {
                 >
                     <Grid
                         item
-                        xs={8}
+                        xs={12}
+                        sm={6}
                         mt={5}
                         container
                         spacing={0}
@@ -123,7 +126,7 @@ export const Home = () => {
                         alignItems="center"
                     >
                         <img
-                            style={{ width: 250, height: 250 }}
+                            style={{ width: 250 }}
                             src={lightchess_logo_blue}
                             alt="lightchess-logo"
                         />
@@ -133,7 +136,8 @@ export const Home = () => {
                     </Grid>
                     <Grid
                         item
-                        xs={4}
+                        xs={12}
+                        sm={6}
                         mt={5}
                         container
                         spacing={0}
@@ -145,7 +149,7 @@ export const Home = () => {
                     </Grid>
                 </Grid>
             </Container>
-            <Copyright sx={{ mt: 8, mb: 4 }} />
+            <Copyright sx={{ mt: 8 }} />
         </>
     )
 }

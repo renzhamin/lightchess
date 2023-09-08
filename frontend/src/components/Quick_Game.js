@@ -128,55 +128,61 @@ export const Quick_Game = () => {
                 alignItems="center"
                 justifyContent="center"
             >
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "175px",
-                        maxHeight: "200px",
-                        minWidth: "175px",
-                        minHeight: "200px",
-                    }}
-                    loading={queueStatus === "1+0"}
-                    onClick={() => Enqueue("1+0")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    Bullet{" "}
-                </LoadingButton>
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "175px",
-                        maxHeight: "200px",
-                        minWidth: "175px",
-                        minHeight: "200px",
-                    }}
-                    loading={queueStatus === "5+0"}
-                    onClick={() => Enqueue("5+0")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    Blitz{" "}
-                </LoadingButton>
-                <LoadingButton
-                    sx={{ m: 2 }}
-                    style={{
-                        maxWidth: "175px",
-                        maxHeight: "200px",
-                        minWidth: "175px",
-                        minHeight: "200px",
-                    }}
-                    loading={queueStatus === "10+0"}
-                    onClick={() => Enqueue("10+0")}
-                    variant="contained"
-                    color="secondary"
-                >
-                    {" "}
-                    Rapid{" "}
-                </LoadingButton>
                 <Grid item>
+                    <LoadingButton
+                        sx={{ m: 2 }}
+                        style={{
+                            maxWidth: "175px",
+                            maxHeight: "200px",
+                            minWidth: "175px",
+                            minHeight: "200px",
+                        }}
+                        loading={queueStatus === "1+0"}
+                        onClick={() => Enqueue("1+0")}
+                        variant="contained"
+                        color="secondary"
+                    >
+                        {" "}
+                        Bullet{" "}
+                    </LoadingButton>
+                </Grid>
+                <Grid item>
+                    <LoadingButton
+                        sx={{ m: 2 }}
+                        style={{
+                            maxWidth: "175px",
+                            maxHeight: "200px",
+                            minWidth: "175px",
+                            minHeight: "200px",
+                        }}
+                        loading={queueStatus === "5+0"}
+                        onClick={() => Enqueue("5+0")}
+                        variant="contained"
+                        color="secondary"
+                    >
+                        {" "}
+                        Blitz{" "}
+                    </LoadingButton>
+                </Grid>
+                <Grid item>
+                    <LoadingButton
+                        sx={{ m: 2 }}
+                        style={{
+                            maxWidth: "175px",
+                            maxHeight: "200px",
+                            minWidth: "175px",
+                            minHeight: "200px",
+                        }}
+                        loading={queueStatus === "10+0"}
+                        onClick={() => Enqueue("10+0")}
+                        variant="contained"
+                        color="secondary"
+                    >
+                        {" "}
+                        Rapid{" "}
+                    </LoadingButton>
+                </Grid>
+                <Grid item xs={12} align="center">
                     <IconButton
                         color="primary"
                         aria-label="Cancel Queue"
