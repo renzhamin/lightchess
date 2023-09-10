@@ -14,7 +14,10 @@ const app = express()
 
 const server = createServer(app)
 
-export const io = new Server(server)
+export const io = new Server(server, {
+    pingInterval: 2500,
+    pingTimeout: 2500,
+})
 ;(async () => {
     try {
         await db.sync()
@@ -46,6 +49,17 @@ function serialiseMap<K, V>(x: Map<K, V>) {
     return dMap
 }
 
+async function getElo(username: string) {
+    const user = await Users.findOne({
+        attributes: ["elo"],
+        where: {
+            username: username,
+        },
+    })
+
+    return user?.elo ?? 1200
+}
+
 io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         const username = userMap.get(String(socket.id))?.username
@@ -74,41 +88,22 @@ io.on("connection", (socket) => {
             }
             const data = args[0]
 
-            Users.findOne({
-                attributes: ["elo"],
-                where: {
-                    username: data.username,
-                },
-            }).then((user) => {
-                if (!user) {
-                    // Got invalid username in initSocket
-                    return
-                }
-                data.elo = user.elo
-                userMap.set(String(socket.id), data)
-                socketMap.set(data.username, String(socket.id))
-            })
+            if (data?.username) {
+                getElo(data.username).then((elo) => {
+                    data.elo = elo
+                    userMap.set(String(socket.id), data)
+                    socketMap.set(data.username, String(socket.id))
+                })
+            }
         } else if (eventName == "rmReady") {
             readyMap.delete(String(socket.id))
         } else if (eventName == "initReady") {
             if (readyMap.get(String(socket.id))) return
             const data = args[0]
 
-            if (!data || !data.username) {
-                // Improper Data Found
-                return
-            } else {
-                Users.findOne({
-                    attributes: ["elo"],
-                    where: {
-                        username: data.username,
-                    },
-                }).then((user) => {
-                    if (!user) {
-                        // Got invalid username in initReady
-                        return
-                    }
-                    data.elo = user.elo
+            if (data?.username) {
+                getElo(data.username).then((elo) => {
+                    data.elo = elo
                     readyMap.set(String(socket.id), data)
                 })
             }
