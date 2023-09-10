@@ -222,6 +222,7 @@ function Board() {
             myTimer.current.startTimer()
             myTimer.current.setAll(data.opponentMinutes, data.opponentSeconds)
             opponentTimer.current.setAll(data.myMinutes, data.mySeconds)
+            opponentTimer.current.incrementTimer(increment)
             setOpponentTimeInfo(data.myTimeInfo)
             setPgnMoves(parsePgn(game.pgn()))
 
