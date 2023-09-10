@@ -69,8 +69,9 @@ function Board() {
 
     let resigned = false
 
-    const handleClose = (value) => {
+    const handleClose = () => {
         setOpen(false)
+        window.location.href = "/"
     }
 
     function setTimeControl() {
