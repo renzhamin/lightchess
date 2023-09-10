@@ -1,13 +1,13 @@
-import express from "express"
-import dotenv from "dotenv"
 import cookieParser from "cookie-parser"
+import dotenv from "dotenv"
+import express from "express"
+import path from "path"
 import db from "./config/Database"
 import router from "./routes/index"
-import path from "path"
 
 import { createServer } from "http"
 import { Server } from "socket.io"
-import Users from "./models/UserModel"
+import { getEloFromCache } from "./modules/Utils"
 
 dotenv.config()
 const app = express()
@@ -15,8 +15,8 @@ const app = express()
 const server = createServer(app)
 
 export const io = new Server(server, {
-    pingInterval: 2500,
-    pingTimeout: 2500,
+    pingInterval: 5000,
+    pingTimeout: 5000,
 })
 ;(async () => {
     try {
@@ -49,17 +49,6 @@ function serialiseMap<K, V>(x: Map<K, V>) {
     return dMap
 }
 
-async function getElo(username: string) {
-    const user = await Users.findOne({
-        attributes: ["elo"],
-        where: {
-            username: username,
-        },
-    })
-
-    return user?.elo ?? 1200
-}
-
 io.on("connection", (socket) => {
     socket.on("disconnect", () => {
         const username = userMap.get(String(socket.id))?.username
@@ -89,7 +78,7 @@ io.on("connection", (socket) => {
             const data = args[0]
 
             if (data?.username) {
-                getElo(data.username).then((elo) => {
+                getEloFromCache(data.username).then((elo) => {
                     data.elo = elo
                     userMap.set(String(socket.id), data)
                     socketMap.set(data.username, String(socket.id))
@@ -102,7 +91,7 @@ io.on("connection", (socket) => {
             const data = args[0]
 
             if (data?.username) {
-                getElo(data.username).then((elo) => {
+                getEloFromCache(data.username).then((elo) => {
                     data.elo = elo
                     readyMap.set(String(socket.id), data)
                 })

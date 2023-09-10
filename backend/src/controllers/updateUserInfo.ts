@@ -1,4 +1,5 @@
 import Users from "../models/UserModel"
+import { eloCache } from "../modules/Utils"
 
 export const updateElo = async (username: string, elo: number) => {
     const user = await Users.findOne({
@@ -10,6 +11,7 @@ export const updateElo = async (username: string, elo: number) => {
     }
 
     user.elo = elo
+    eloCache.set(username, elo)
     user.elo_history += "," + String(elo)
     await user.save()
 }
