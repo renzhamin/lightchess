@@ -14,10 +14,7 @@ const app = express()
 
 const server = createServer(app)
 
-export const io = new Server(server, {
-    pingInterval: 5000,
-    pingTimeout: 5000,
-})
+export const io = new Server(server)
 ;(async () => {
     try {
         await db.sync()

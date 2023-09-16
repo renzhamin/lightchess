@@ -11,9 +11,11 @@ import { getBoardWidth } from "../utils/getBoardWidth"
 import moveSfx from "./../components/static/sounds/Move.mp3"
 import checkSfx from "./../components/static/sounds/Checkmate.mp3"
 import GameEndDialog from "./GameEndDialog.js"
+import ResignDialog from "./ResignDialog"
 import GameInfo from "./GameInfo"
 import parsePgn from "./PgnParser"
 import Timer from "./Timer"
+import { neutralizeBack } from "../utils/modifyBackBtn"
 
 let myInfo = {}
 let opponentInfo = {}
@@ -45,6 +47,7 @@ function Board() {
     const [isGameOver, setIsGameOver] = useState(false)
     const [isGameAdded, setIsGameAdded] = useState(false)
     const [open, setOpen] = useState(false)
+    const [resignOpen, setResignOpen] = useState(false)
     const [error, setError] = useState("")
     const [boardWidth, setBWidth] = useState(720)
 
@@ -188,6 +191,7 @@ function Board() {
     }
 
     useEffect(() => {
+        neutralizeBack(() => setResignOpen(true))
         setTimeControl()
         setBWidth(getBoardWidth())
         if (mycolor == 1) setBoardOrientation("black")
@@ -383,6 +387,14 @@ function Board() {
                     onClose={handleClose}
                     gameEndMessage={gameEndMessage}
                     gameEndTitle={gameEndTitle}
+                />
+                <ResignDialog
+                    open={resignOpen}
+                    onCancel={() => setResignOpen(false)}
+                    onOk={() => {
+                        setResignOpen(false)
+                        gameEndHandler(true)
+                    }}
                 />
             </Grid>
             <Grid item height="100%" className="flex-center">
